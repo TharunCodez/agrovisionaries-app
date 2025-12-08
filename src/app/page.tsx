@@ -1,11 +1,15 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Leaf } from 'lucide-react';
+import { useRole } from '@/contexts/role-context';
 
 export default function Home() {
   const heroImage = PlaceHolderImages.find((img) => img.id === 'landing-hero');
+  const { setRole } = useRole();
 
   return (
     <div className="relative min-h-screen w-full">
@@ -32,11 +36,11 @@ export default function Home() {
             Empowering farmers with smart technology for a sustainable future. Real-time data, intelligent alerts, and precise control, all in one place.
           </p>
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-            <Button asChild size="lg" className="font-bold">
-              <Link href="/dashboard">Farmer Portal</Link>
+            <Button asChild size="lg" className="font-bold" onClick={() => setRole('farmer')}>
+              <Link href="/farmer/dashboard">Farmer Portal</Link>
             </Button>
-            <Button asChild size="lg" variant="secondary" className="font-bold">
-              <Link href="/government">Government Portal</Link>
+            <Button asChild size="lg" variant="secondary" className="font-bold" onClick={() => setRole('government')}>
+              <Link href="/government/dashboard">Government Portal</Link>
             </Button>
           </div>
         </div>

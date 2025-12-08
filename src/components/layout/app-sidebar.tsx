@@ -1,35 +1,34 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
-  Sidebar,
-  SidebarHeader,
-  SidebarContent,
-  SidebarMenu,
-  SidebarMenuItem,
-  SidebarMenuButton,
-  SidebarFooter,
-} from '@/components/ui/sidebar';
-import {
-  LayoutDashboard,
-  HardDrive,
-  Map,
   Bell,
+  HardDrive,
   Landmark,
-  Settings,
+  LayoutDashboard,
   Leaf,
   LogOut,
+  Map,
+  Settings,
 } from 'lucide-react';
-import { Button } from '../ui/button';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from '@/components/ui/sidebar';
 
-const menuItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/devices', label: 'Devices', icon: HardDrive },
-  { href: '/map', label: 'Map View', icon: Map },
-  { href: '/notifications', label: 'Notifications', icon: Bell },
-  { href: '/government', label: 'Government', icon: Landmark },
-  { href: '/settings', label: 'Settings', icon: Settings },
+const governmentMenuItems = [
+  { href: '/government/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/government/devices', label: 'Devices', icon: HardDrive },
+  { href: '/government/map', label: 'Map View', icon: Map },
+  { href: '/government/notifications', label: 'Notifications', icon: Bell },
+  { href: '/government/farmers', label: 'Farmer Database', icon: Landmark },
+  { href: '/government/settings', label: 'Settings', icon: Settings },
 ];
 
 export default function AppSidebar() {
@@ -47,7 +46,7 @@ export default function AppSidebar() {
       </SidebarHeader>
       <SidebarContent className="p-2">
         <SidebarMenu>
-          {menuItems.map((item) => (
+          {governmentMenuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
