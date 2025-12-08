@@ -10,16 +10,16 @@ export default function PumpControlCard() {
   const [isPumpOn, setIsPumpOn] = useState(false);
 
   return (
-    <Card>
+    <Card className='overflow-hidden'>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="text-lg font-medium">Irrigation Pump</CardTitle>
-        <Power className={`h-6 w-6 ${isPumpOn ? 'text-green-500' : 'text-muted-foreground'}`} />
+        <Power className={cn('h-6 w-6 text-muted-foreground transition-colors', isPumpOn && 'text-green-500')}/>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center gap-4 pt-4">
         <div 
             className={cn(
-                "relative flex h-24 w-24 items-center justify-center rounded-full border-4 transition-all",
-                isPumpOn ? 'border-green-500 bg-green-500/20 shadow-[0_0_20px_5px] shadow-green-500/50' : 'border-muted bg-muted/20'
+                "relative flex h-24 w-24 items-center justify-center rounded-full border-4 transition-all duration-500",
+                isPumpOn ? 'border-green-500 bg-green-500/20 shadow-[0_0_20px_5px] shadow-green-500/30' : 'border-muted bg-muted/20'
             )}
         >
           <Switch
@@ -27,11 +27,14 @@ export default function PumpControlCard() {
               checked={isPumpOn}
               onCheckedChange={setIsPumpOn}
               className="h-14 w-28 data-[state=checked]:bg-green-600"
-              thumbClassName="h-12 w-12 data-[state=checked]:translate-x-[3.25rem]"
+              thumbClassName="h-12 w-12 data-[state=checked]:translate-x-[3.25rem] transition-all duration-300"
               aria-label="Toggle irrigation pump"
           />
         </div>
-        <p className={`text-lg font-bold ${isPumpOn ? 'text-green-500' : 'text-muted-foreground'}`}>
+        <p className={cn(
+            'text-lg font-bold transition-colors',
+            isPumpOn ? 'text-green-500' : 'text-muted-foreground'
+        )}>
           {isPumpOn ? 'ON' : 'OFF'}
         </p>
       </CardContent>

@@ -1,10 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, HardDrive, Siren } from "lucide-react";
+import { farmerData } from "@/lib/data";
+
+const totalFarmers = farmerData.length;
+const devicesOnline = farmerData.reduce((acc, farmer) => acc + farmer.devices, 0);
 
 const stats = [
-    { title: "Total Farmers", value: "358", icon: Users, description: "+22 this month" },
-    { title: "Devices Online", value: "1,204", icon: HardDrive, description: "95% uptime" },
-    { title: "Critical Alerts", value: "12", icon: Siren, description: "Last 24 hours" },
+    { title: "Total Farmers", value: totalFarmers, icon: Users, description: "+2 this month" },
+    { title: "Devices Online", value: devicesOnline, icon: HardDrive, description: "95% uptime" },
+    { title: "Critical Alerts", value: "2", icon: Siren, description: "Last 24 hours" },
 ];
 
 export default function StatsCards() {
