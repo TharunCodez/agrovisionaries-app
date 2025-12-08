@@ -22,7 +22,7 @@ export default function GovernmentMapPage() {
 
     useEffect(() => {
         if (!clientId || !clientSecret) {
-            console.error("Sentinel Hub credentials are not set in .env.local");
+            console.error("Sentinel Hub credentials are not set in .env");
             return;
         }
 
@@ -33,7 +33,11 @@ export default function GovernmentMapPage() {
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: `grant_type=client_credentials&client_id=${clientId}&client_secret=${clientSecret}`,
+                    body: new URLSearchParams({
+                        'grant_type': 'client_credentials',
+                        'client_id': clientId,
+                        'client_secret': clientSecret
+                    })
                 });
 
                 if (!tokenResponse.ok) {
@@ -66,7 +70,7 @@ export default function GovernmentMapPage() {
                 <h1 className="font-headline text-3xl font-bold">Device Map View</h1>
                 <Card>
                     <CardContent className="p-6">
-                        <p className="text-destructive">Sentinel Hub Client ID or Secret is not configured. Please add them to your .env.local file to display the map.</p>
+                        <p className="text-destructive">Sentinel Hub Client ID or Secret is not configured. Please add them to your .env file to display the map.</p>
                     </CardContent>
                 </Card>
             </div>
