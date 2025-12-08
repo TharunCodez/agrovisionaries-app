@@ -1,3 +1,22 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "landing-hero",
+      "description": "A lush green field under a clear blue sky, representing modern agriculture.",
+      "imageUrl": "https://images.unsplash.com/photo-1451440063999-77a8b2960d2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxmYXJtJTIwbGFuZHNjYXBlfGVufDB8fHx8MTc2NTEzMDc2MHww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farm landscape"
+    },
+    {
+      "id": "farmer-avatar",
+      "description": "A portrait of a farmer in a field.",
+      "imageUrl": "https://images.unsplash.com/photo-1618496899001-b58ebcbeef26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmYXJtZXIlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjUxNzg4OTB8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farmer portrait"
+    },
+    {
+      "id": "gov-avatar",
+      "description": "A professional headshot of a person in business attire.",
+      "imageUrl": "https://images.unsplash.com/photo-1560250097-0b93528c311a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBoZWFkc2hvdHxlbnwwfHx8fDE3NjUxMzQzOTd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "professional headshot"
+    }
+  ]
 }
