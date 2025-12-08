@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { deviceData, farmerData } from "@/lib/data"
 import { cn } from "@/lib/utils"
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ChevronRight, HardDrive, Waves, Thermometer, CloudRain } from "lucide-react";
 import { Button } from "../ui/button";
@@ -83,8 +83,8 @@ export function GovDeviceTable() {
                     const isExpanded = expandedRow === device.id;
 
                     return (
-                        <>
-                            <TableRow key={device.id} onClick={() => toggleRow(device.id)} className="cursor-pointer">
+                        <Fragment key={device.id}>
+                            <TableRow onClick={() => toggleRow(device.id)} className="cursor-pointer">
                                 <TableCell>
                                     <Button variant="ghost" size="icon" className="h-8 w-8">
                                         {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
@@ -149,7 +149,7 @@ export function GovDeviceTable() {
                                 </TableRow>
                             )}
                             </AnimatePresence>
-                        </>
+                        </Fragment>
                     )
                 })}
             </TableBody>
