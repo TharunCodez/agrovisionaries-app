@@ -1,12 +1,11 @@
 'use client';
 import { Card, CardContent } from "@/components/ui/card";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { getSentinelHubToken } from "@/lib/actions";
 
 export default function GovernmentMapPage() {
     const mapRef = useRef<HTMLIFrameElement>(null);
-
-    const clientId = process.env.NEXT_PUBLIC_SENTINELHUB_CLIENT_ID;
-    const clientSecret = process.env.NEXT_PUBLIC_SENTINELHUB_CLIENT_SECRET;
+    const [mapError, setMapError] = useState<string | null>(null);
 
     // A simple hash function to create a slightly different map for each session
     const getSessionHash = () => {
@@ -21,32 +20,15 @@ export default function GovernmentMapPage() {
     };
 
     useEffect(() => {
-        if (!clientId || !clientSecret) {
-            console.error("Sentinel Hub credentials are not set in .env");
-            return;
-        }
-
         const fetchTokenAndLoadMap = async () => {
             try {
-                const tokenResponse = await fetch('https://services.sentinel-hub.com/oauth/token', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        'grant_type': 'client_credentials',
-                        'client_id': clientId,
-                        'client_secret': clientSecret
-                    })
-                });
+                const tokenResult = await getSentinelHubToken();
 
-                if (!tokenResponse.ok) {
-                    throw new Error(`Failed to fetch Sentinel Hub token: ${tokenResponse.statusText}`);
+                if (tokenResult.error || !tokenResult.access_token) {
+                    throw new Error(tokenResult.error || "Failed to retrieve Sentinel Hub access token.");
                 }
-
-                const tokenData = await tokenResponse.json();
-                const accessToken = tokenData.access_token;
                 
+                const accessToken = tokenResult.access_token;
                 const sessionHash = getSessionHash();
                 const randomLat = 28.6139 + (sessionHash % 1000) / 5000 - 0.1; // Centered around Delhi
                 const randomLng = 77.2090 + (sessionHash % 1000) / 5000 - 0.1;
@@ -56,21 +38,22 @@ export default function GovernmentMapPage() {
                     mapRef.current.src = mapUrl;
                 }
 
-            } catch (error) {
+            } catch (error: any) {
                 console.error("Error setting up Sentinel Hub map:", error);
+                setMapError(error.message);
             }
         };
 
         fetchTokenAndLoadMap();
-    }, [clientId, clientSecret]);
+    }, []);
 
-    if (!clientId || !clientSecret) {
+    if (mapError) {
         return (
              <div className="flex flex-col gap-6">
                 <h1 className="font-headline text-3xl font-bold">Device Map View</h1>
                 <Card>
                     <CardContent className="p-6">
-                        <p className="text-destructive">Sentinel Hub Client ID or Secret is not configured. Please add them to your .env file to display the map.</p>
+                        <p className="text-destructive">{mapError}</p>
                     </CardContent>
                 </Card>
             </div>

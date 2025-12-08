@@ -23,3 +23,40 @@ export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
     };
   }
 }
+
+export async function getSentinelHubToken(): Promise<{ access_token?: string; error?: string }> {
+    const clientId = process.env.SENTINELHUB_CLIENT_ID;
+    const clientSecret = process.env.SENTINELHUB_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+        console.error("Sentinel Hub credentials are not set on the server.");
+        return { error: "Sentinel Hub credentials are not configured on the server." };
+    }
+
+    try {
+        const tokenResponse = await fetch('https://services.sentinel-hub.com/oauth/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                'grant_type': 'client_credentials',
+                'client_id': clientId,
+                'client_secret': clientSecret
+            })
+        });
+
+        if (!tokenResponse.ok) {
+           const errorBody = await tokenResponse.text();
+           console.error("Failed to fetch Sentinel Hub token:", errorBody);
+           return { error: `Failed to fetch Sentinel Hub token: ${tokenResponse.statusText}` };
+        }
+
+        const tokenData = await tokenResponse.json();
+        return { access_token: tokenData.access_token };
+
+    } catch (error: any) {
+        console.error("Error getting Sentinel Hub token:", error);
+        return { error: error.message || "An unknown error occurred while fetching the token." };
+    }
+}
