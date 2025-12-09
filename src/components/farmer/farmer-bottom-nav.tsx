@@ -18,7 +18,7 @@ export default function FarmerBottomNav() {
   const pathname = usePathname();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:hidden">
       <nav className="flex h-16 items-center justify-around">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/farmer/dashboard' && pathname.startsWith(item.href));
@@ -32,12 +32,13 @@ export default function FarmerBottomNav() {
               )}
             >
               <item.icon className="h-6 w-6" />
-              <span className="text-xs font-medium sr-only">{item.label}</span>
+              <span className="text-xs font-medium">{item.label}</span>
             </Link>
           );
         })}
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center gap-1 p-2 text-muted-foreground">
             <LanguageSwitcher />
+            <span className="text-xs font-medium">Language</span>
         </div>
       </nav>
     </div>

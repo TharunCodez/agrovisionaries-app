@@ -6,8 +6,8 @@ import WeatherCard from "@/components/farmer/weather-card";
 
 export default function FarmerDashboardPage() {
   return (
-    <div className="flex flex-col gap-6 pb-20">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="flex flex-col gap-6 pb-20 md:pb-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
            <WeatherCard />
         </div>

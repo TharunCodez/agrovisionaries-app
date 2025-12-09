@@ -32,17 +32,17 @@ export default function Home() {
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center p-4 text-center">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8 flex items-center justify-center gap-3">
-            <Leaf className="h-12 w-12 text-primary" />
-            <h1 className="font-headline text-5xl font-bold tracking-tight text-foreground md:text-7xl">
+            <Leaf className="h-10 w-10 md:h-12 md:w-12 text-primary" />
+            <h1 className="font-headline text-4xl md:text-7xl font-bold tracking-tight text-foreground">
               Agro Visionaries
             </h1>
           </div>
-          <p className="mb-10 text-lg text-muted-foreground md:text-xl">
+          <p className="mb-10 text-base md:text-xl text-muted-foreground">
             Empowering farmers with smart technology for a sustainable future. Real-time data, intelligent alerts, and precise control, all in one place.
           </p>
         </div>
       </div>
-       <footer className="absolute bottom-0 left-0 right-0 z-10 p-4 text-center text-sm text-muted-foreground">
+       <footer className="absolute bottom-0 left-0 right-0 z-10 p-4 text-center text-xs md:text-sm text-muted-foreground">
         © {new Date().getFullYear()} Agro Visionaries. All Rights Reserved.
       </footer>
     </div>

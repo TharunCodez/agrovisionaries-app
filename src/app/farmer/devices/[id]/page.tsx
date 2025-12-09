@@ -57,7 +57,7 @@ function DeviceDetailClientView({ device }: { device: (typeof deviceData)[0] }) 
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
   return (
-    <div className="flex flex-col gap-6 pb-20">
+    <div className="flex flex-col gap-6 pb-20 md:pb-6">
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="icon" asChild>
           <Link href="/farmer/devices">
@@ -113,7 +113,7 @@ function DeviceDetailClientView({ device }: { device: (typeof deviceData)[0] }) 
           <CardTitle className="text-lg">Live Sensor Readings</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <SensorCard type="temperature" value={`${device.temperature}°C`} />
             <SensorCard type="soil" value={`${device.soilMoisture}%`} />
             <SensorCard

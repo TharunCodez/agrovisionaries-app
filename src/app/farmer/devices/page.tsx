@@ -10,15 +10,15 @@ export default function DevicesPage() {
     const userDevices = deviceData.filter(d => d.farmerId === 'F001');
 
     return (
-        <div className="flex flex-col gap-6 pb-20">
+        <div className="flex flex-col gap-6 pb-20 md:pb-6">
             <div className="flex items-center justify-between">
-                 <h1 className="font-headline text-3xl font-bold">My Devices</h1>
+                 <h1 className="font-headline text-2xl md:text-3xl font-bold">My Devices</h1>
                  <Button>
-                    <PlusCircle className="mr-2"/>
+                    <PlusCircle className="mr-2 h-4 w-4"/>
                     Add Device
                  </Button>
             </div>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {userDevices.map(device => (
                     <DeviceCard key={device.id} device={device as Device} />
                 ))}

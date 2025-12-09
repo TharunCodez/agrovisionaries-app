@@ -32,7 +32,7 @@ const notifications = [
 export default function GovernmentNotificationsPage() {
     return (
         <div className="flex flex-col gap-6">
-            <h1 className="font-headline text-3xl font-bold">Notifications</h1>
+            <h1 className="font-headline text-2xl md:text-3xl font-bold">Notifications</h1>
             <Card>
                 <CardHeader>
                     <CardTitle>System-wide Alerts</CardTitle>
@@ -40,14 +40,16 @@ export default function GovernmentNotificationsPage() {
                 <CardContent className="flex flex-col gap-4">
                      {notifications.map(notification => (
                          <Alert key={notification.id} variant={notification.type as "default" | "destructive"}>
-                            {notification.icon}
-                            <AlertTitle className="flex justify-between">
-                                <span>{notification.title}</span>
-                                <span className="text-xs text-muted-foreground font-normal">{notification.time}</span>
-                            </AlertTitle>
-                            <AlertDescription>
-                                {notification.description}
-                            </AlertDescription>
+                            <div className="flex-shrink-0">{notification.icon}</div>
+                            <div className="flex-grow">
+                                <AlertTitle className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
+                                    <span>{notification.title}</span>
+                                    <span className="mt-1 text-xs text-muted-foreground sm:mt-0">{notification.time}</span>
+                                </AlertTitle>
+                                <AlertDescription>
+                                    {notification.description}
+                                </AlertDescription>
+                            </div>
                         </Alert>
                      ))}
                 </CardContent>

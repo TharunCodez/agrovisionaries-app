@@ -2,11 +2,10 @@
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, HardDrive, Thermometer, Droplets, Waves, Rss, CloudRain, Battery, MapPin } from "lucide-react";
+import { ChevronRight, HardDrive, Thermometer, Droplets, Waves, Rss } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from "../ui/button";
-import { useRouter } from "next/navigation";
 
 export type Device = {
     id: string;
@@ -28,7 +27,6 @@ export type Device = {
 
 export default function DeviceCard({ device }: { device: Device }) {
     const isOnline = device.status === 'Online';
-    const router = useRouter();
 
     const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
     const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
@@ -55,9 +53,10 @@ export default function DeviceCard({ device }: { device: Device }) {
 
     return (
         <Card className="p-4 transition-all hover:bg-card/90 hover:shadow-lg bg-card text-card-foreground">
-            <div className="flex items-start justify-between gap-4">
+           <Link href={`/farmer/devices/${device.id}`} className="block">
+            <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                 <div className="flex-1">
-                    <Link href={`/farmer/devices/${device.id}`} className="block">
+                    
                         <div className="flex items-center gap-3 mb-2">
                              <HardDrive className={cn("h-6 w-6", isOnline ? 'text-primary' : 'text-muted-foreground')} />
                              <div>
@@ -65,7 +64,7 @@ export default function DeviceCard({ device }: { device: Device }) {
                                 <p className="text-xs text-muted-foreground">{device.id}</p>
                              </div>
                         </div>
-                    </Link>
+                    
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm mt-4">
                         <div className="flex items-center gap-2" title="Temperature">
                             <Thermometer className="h-5 w-5 text-red-400" />
@@ -85,21 +84,22 @@ export default function DeviceCard({ device }: { device: Device }) {
                         </div>
                     </div>
                 </div>
-                <div className="flex flex-col items-end gap-2 shrink-0">
-                     <Badge variant={'default'} className={cn('text-white', getStatusBadgeClass())}>
-                        {device.status}
-                    </Badge>
-                     <Badge className={cn(getHealthBadgeClass(), 'text-white')}>{device.health}</Badge>
+                <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
+                     <div className="flex gap-2">
+                        <Badge variant={'default'} className={cn('text-white', getStatusBadgeClass())}>
+                            {device.status}
+                        </Badge>
+                         <Badge className={cn(getHealthBadgeClass(), 'text-white')}>{device.health}</Badge>
+                     </div>
                      <p className="text-xs text-muted-foreground mt-2">{timeAgo}</p>
                 </div>
             </div>
              <div className="flex justify-end items-center mt-4 border-t border-border pt-3">
-                <Link href={`/farmer/devices/${device.id}`} passHref>
-                     <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
-                    </Button>
-                </Link>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                </Button>
             </div>
+            </Link>
         </Card>
     );
 }

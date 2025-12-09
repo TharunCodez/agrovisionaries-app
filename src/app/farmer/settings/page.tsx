@@ -9,8 +9,8 @@ export default function SettingsPage() {
     const avatarImage = PlaceHolderImages.find(img => img.id === 'farmer-avatar');
 
     return (
-        <div className="flex flex-col gap-6 pb-20">
-            <h1 className="font-headline text-3xl font-bold">Settings</h1>
+        <div className="flex flex-col gap-6 pb-20 md:pb-6">
+            <h1 className="font-headline text-2xl md:text-3xl font-bold">Settings</h1>
             <Card>
                 <CardHeader className="text-center">
                     <Avatar className="mx-auto h-24 w-24 border-4 border-primary">
@@ -28,14 +28,14 @@ export default function SettingsPage() {
             <Card>
                 <CardContent className="divide-y p-0">
                     <div className="flex items-center p-4">
-                        <List className="mr-4" />
+                        <List className="mr-4 h-5 w-5" />
                         <span className="flex-1">Account</span>
-                        <ChevronRight />
+                        <ChevronRight className="h-5 w-5" />
                     </div>
                      <div className="flex items-center p-4">
-                        <List className="mr-4" />
+                        <List className="mr-4 h-5 w-5" />
                         <span className="flex-1">Notifications</span>
-                        <ChevronRight />
+                        <ChevronRight className="h-5 w-5" />
                     </div>
                     <div className="flex items-center p-4">
                          <span className="flex-1">Language</span>

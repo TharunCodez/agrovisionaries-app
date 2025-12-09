@@ -39,7 +39,7 @@ function GovernmentMap() {
   );
 
   return (
-    <div className="md:pb-0 flex flex-col gap-6 h-[calc(100vh-8rem)] pb-4 md:h-[calc(100vh-4rem)]">
+    <div className="flex h-[calc(100vh-8rem)] flex-col gap-6 pb-4 md:h-[calc(100vh-4rem)] md:pb-0">
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ChevronLeft />
@@ -47,7 +47,7 @@ function GovernmentMap() {
         <h1 className="font-headline text-xl font-bold">Device Map View</h1>
         <div className="w-10"></div>
       </div>
-      <div className="flex-1 rounded-lg overflow-hidden border">
+      <div className="flex-1 overflow-hidden rounded-lg border">
         <StableMap
           center={defaultCenter}
           zoom={zoom ? parseInt(zoom) : 10}

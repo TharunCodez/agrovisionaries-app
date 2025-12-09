@@ -81,10 +81,10 @@ function SatelliteView() {
           <div className="space-y-2">
             <Label>Data Layer</Label>
             <Tabs value={dataLayer} onValueChange={(value) => setDataLayer(value as DataLayer)} className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="ndvi"><Leaf className="w-4 h-4 mr-2"/>NDVI</TabsTrigger>
-                    <TabsTrigger value="moisture"><Droplets className="w-4 h-4 mr-2"/>Moisture</TabsTrigger>
-                    <TabsTrigger value="trueColor"><Eye className="w-4 h-4 mr-2"/>True Color</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3 h-auto flex-wrap sm:flex-nowrap">
+                    <TabsTrigger value="ndvi" className="flex-col sm:flex-row gap-2"><Leaf className="w-4 h-4"/>NDVI</TabsTrigger>
+                    <TabsTrigger value="moisture" className="flex-col sm:flex-row gap-2"><Droplets className="w-4 h-4"/>Moisture</TabsTrigger>
+                    <TabsTrigger value="trueColor" className="flex-col sm:flex-row gap-2"><Eye className="w-4 h-4"/>True Color</TabsTrigger>
                 </TabsList>
             </Tabs>
           </div>
@@ -126,7 +126,7 @@ function SatelliteView() {
           <Card>
             <CardHeader className="pb-2">
               <CardDescription className="flex items-center gap-2 text-sm"><Leaf className="w-4 h-4"/> NDVI Index</CardDescription>
-              <CardTitle className="text-3xl text-green-600">0.571</CardTitle>
+              <CardTitle className="text-2xl md:text-3xl text-green-600">0.571</CardTitle>
             </CardHeader>
              <CardContent>
                 <p className="text-xs text-muted-foreground">Last updated: 12/9/2025</p>
@@ -135,7 +135,7 @@ function SatelliteView() {
           <Card>
             <CardHeader className="pb-2">
               <CardDescription className="flex items-center gap-2 text-sm"><Droplets className="w-4 h-4"/> Soil Moisture</CardDescription>
-              <CardTitle className="text-3xl text-blue-500">54%</CardTitle>
+              <CardTitle className="text-2xl md:text-3xl text-blue-500">54%</CardTitle>
             </CardHeader>
              <CardContent>
                 <p className="text-xs text-muted-foreground">Based on last sensor reading</p>
@@ -144,7 +144,7 @@ function SatelliteView() {
           <Card>
             <CardHeader className="pb-2">
               <CardDescription className="flex items-center gap-2 text-sm"><Info className="w-4 h-4"/> Status</CardDescription>
-              <CardTitle className="text-3xl text-yellow-600">Needs Review</CardTitle>
+              <CardTitle className="text-2xl md:text-3xl text-yellow-600">Needs Review</CardTitle>
             </CardHeader>
              <CardContent>
                 <p className="text-xs text-muted-foreground">Anomalies detected</p>
@@ -160,7 +160,7 @@ function SatelliteView() {
 export default function SatellitePage() {
     return (
         <div className="flex flex-col gap-6 h-full">
-             <h1 className="font-headline text-3xl font-bold">Satellite Analytics</h1>
+             <h1 className="font-headline text-2xl md:text-3xl font-bold">Satellite Analytics</h1>
             <Suspense fallback={<Skeleton className="h-[70vh] w-full" />}>
                 <SatelliteView />
             </Suspense>
