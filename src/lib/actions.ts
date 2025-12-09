@@ -2,9 +2,9 @@
 
 import { smartAlertingSystem } from '@/ai/flows/smart-alerting-system';
 import type { SmartAlertingSystemOutput } from '@/ai/flows/smart-alerting-system';
-import { adminDb } from './firebase-admin';
+import { adminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
-import type { Farmer, Device, Plot } from '@/contexts/data-context';
+import type { Farmer, Device } from '@/contexts/data-context';
 
 export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
   try {
