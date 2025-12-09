@@ -159,9 +159,9 @@ export default function AddDevicePage() {
                         <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                             <Command>
                                 <CommandInput placeholder="Search farmer..." />
+                                <CommandList>
                                 <CommandEmpty>No farmer found.</CommandEmpty>
                                 <CommandGroup>
-                                <CommandList>
                                     {(farmers || []).map((farmer) => (
                                     <CommandItem
                                         value={farmer.name}
@@ -173,8 +173,8 @@ export default function AddDevicePage() {
                                         {farmer.name} ({farmer.phone})
                                     </CommandItem>
                                     ))}
-                                </CommandList>
                                 </CommandGroup>
+                                </CommandList>
                             </Command>
                         </PopoverContent>
                     </Popover>
