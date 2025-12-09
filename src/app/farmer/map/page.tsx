@@ -26,7 +26,7 @@ function FarmerMap() {
   const zoom = searchParams.get('zoom');
 
   const userDevices = useMemo(
-    () => devices.filter((d) => d.farmerPhone === user?.phoneNumber),
+    () => (devices || []).filter((d) => d.farmerPhone === user?.phoneNumber),
     [devices, user]
   );
 

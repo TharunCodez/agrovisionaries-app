@@ -15,7 +15,7 @@ export default function FarmerDashboardPage() {
   const { devices } = useData();
 
   const userDevices = useMemo(() => {
-    if (!user?.phoneNumber) return [];
+    if (!user?.phoneNumber || !devices) return [];
     // Filter devices based on the logged-in farmer's phone number
     return devices.filter(d => d.farmerPhone === user.phoneNumber);
   }, [devices, user]);

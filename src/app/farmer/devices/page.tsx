@@ -14,7 +14,7 @@ export default function DevicesPage() {
     // This would be replaced with a firestore query based on the logged-in farmer
     // For now, we'll use the mock user's farmer ID
     const userDevices = useMemo(() => {
-        if (!user?.phoneNumber) return [];
+        if (!user?.phoneNumber || !devices) return [];
         // In a real app, user.uid would be the source of truth.
         // We simulate this by filtering by phone number, which is known after login.
         return devices.filter(d => d.farmerPhone === user.phoneNumber);
