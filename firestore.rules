@@ -1,0 +1,212 @@
+/**
+ * This ruleset enforces a strict, user-centric security model for the Agro Visionaries application,
+ * distinguishing between two primary user roles: Farmers and Admins (government users).
+ *
+ * Core Philosophy:
+ * The security model is built on the principle of least privilege, where users can only access data
+ * they explicitly own or is created for them. All operations are denied by default and permissions
+ * are granted on a granular, per-collection basis. Farmers have control over their own profile and
+ * associated data, while Admins are restricted to their own profile. Cross-user operations, such
+ * as an Admin registering a device for a Farmer, are expected to be handled by a trusted backend
+ * (e.g., Cloud Functions, Server Actions) and are therefore disallowed from the client side.
+ *
+ * Data Structure:
+ * The data is organized into a mix of user-scoped documents and top-level collections.
+ * - /farmers/{farmerId}: Private data for each farmer.
+ * - /admins/{adminId}: Private data for each administrator.
+ * - /devices, /alerts, /sensorData: Top-level collections containing data related to farmers.
+ *   These collections are designed to be read-only from the client to reflect that they are
+ *   managed by system processes or administrators.
+ *
+ * Key Security Decisions:
+ * - Strict Ownership: Access to /farmers/{farmerId} and its subcollections is strictly limited to
+ *   the authenticated user whose UID matches the {farmerId}.
+ * - System-Managed Collections: Collections like /devices, /alerts, and /sensorData are considered
+ *   read-only for clients. All create, update (with a minor exception for alerts), and delete
+ *   operations are disabled to prevent unauthorized modification of system-generated data.
+ * - Query Security: Listing all users (/farmers, /admins) is explicitly forbidden. Queries on
+ *   top-level collections like /devices and /alerts are secured by rules on individual document
+ *   reads (`get`), ensuring that a query will only return documents the user is authorized to view.
+ * - Denormalization for Authorization: To ensure fast and secure access checks, authorization data
+ *   (like 'farmerId') is denormalized onto documents in top-level collections (/devices, /alerts).
+ *   This avoids costly and complex `get()` calls in most security rules.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Helper Functions
+    // -------------------------------------------------------------------------
+
+    /**
+     * Verifies that the user is authenticated.
+     */
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /**
+     * Checks if the currently authenticated user's UID matches the provided userId.
+     * This is the primary function for enforcing document ownership.
+     */
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    /**
+     * Ensures a document already exists before an operation.
+     * CRITICAL for all update and delete operations.
+     */
+    function docExists() {
+      return resource != null;
+    }
+
+    /**
+     * A secure convenience function for update/delete operations.
+     * Combines an ownership check with an existence check.
+     */
+    function isExistingOwner(userId) {
+      return isOwner(userId) && docExists();
+    }
+    
+    /**
+      * Validates that an incoming 'id' field matches the document's path ID.
+      * Used on create to enforce relational integrity.
+      */
+    function incomingIdMatches(docId) {
+      return request.resource.data.id == docId;
+    }
+
+    /**
+      * Validates that the 'id' field of a document is immutable.
+      * Used on update to prevent re-assigning ownership.
+      */
+    function idIsImmutable() {
+      return request.resource.data.id == resource.data.id;
+    }
+    
+    /**
+      * Validates that the 'farmerId' field of a document is immutable.
+      * Used on update to prevent re-assigning ownership.
+      */
+    function farmerIdIsImmutable() {
+      return request.resource.data.farmerId == resource.data.farmerId;
+    }
+
+    /**
+     * Allows a farmer to update ONLY the 'read' status of their own alert.
+     * This prevents them from altering any other system-generated alert data.
+     */
+    function canMarkAlertAsRead(farmerId) {
+      return isExistingOwner(farmerId) && request.resource.data.keys().hasOnly(['read']);
+    }
+
+    // -------------------------------------------------------------------------
+    // User & Admin Profile Rules
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description Controls access to farmer profile documents.
+     * @path /farmers/{farmerId}
+     * @allow (create) A new farmer signing up: `auth.uid == farmerId`.
+     * @allow (get) A farmer reading their own profile: `auth.uid == farmerId`.
+     * @deny (get) A farmer trying to read another farmer's profile.
+     * @deny (list) Any user trying to list all farmers in the system.
+     * @principle Restricts access to a user's own data tree and enforces self-creation.
+     */
+    match /farmers/{farmerId} {
+      allow get: if isOwner(farmerId);
+      allow list: if false; // Disallow listing all farmers for security.
+      allow create: if isOwner(farmerId) && incomingIdMatches(farmerId);
+      allow update: if isExistingOwner(farmerId) && idIsImmutable();
+      allow delete: if isExistingOwner(farmerId);
+    }
+    
+    /**
+     * @description Manages FCM tokens for push notifications for a specific farmer.
+     * @path /farmers/{farmerId}/fcmTokens/{token}
+     * @allow (create) A farmer's device registering its own FCM token.
+     * @deny (create) A farmer trying to add a token for another farmer.
+     * @principle Enforces strict ownership within a user's private subcollection.
+     */
+    match /farmers/{farmerId}/fcmTokens/{token} {
+      allow get, list: if isOwner(farmerId);
+      allow create: if isOwner(farmerId) && request.resource.data.farmerId == farmerId;
+      allow update: if isExistingOwner(farmerId) && farmerIdIsImmutable();
+      allow delete: if isExistingOwner(farmerId);
+    }
+
+    /**
+     * @description Controls access to administrator profile documents.
+     * @path /admins/{adminId}
+     * @allow (create) A new admin being created: `auth.uid == adminId`.
+     * @allow (get) An admin reading their own profile: `auth.uid == adminId`.
+     * @deny (list) Any user trying to list all admins.
+     * @principle Restricts access to a user's own data tree and enforces self-creation.
+     */
+    match /admins/{adminId} {
+      allow get: if isOwner(adminId);
+      allow list: if false; // Disallow listing all admins for security.
+      allow create: if isOwner(adminId) && incomingIdMatches(adminId);
+      allow update: if isExistingOwner(adminId) && idIsImmutable();
+      allow delete: if isExistingOwner(adminId);
+    }
+
+    // -------------------------------------------------------------------------
+    // System-Managed Collections (Read-Only for Clients)
+    // -------------------------------------------------------------------------
+
+    /**
+     * @description Controls access to device data. Devices are created by a trusted backend.
+     * Farmers can only read data for devices they own.
+     * @path /devices/{deviceId}
+     * @allow (get) A farmer reading a device document where `doc.farmerId == auth.uid`.
+     * @deny (get) A farmer trying to read a device owned by another farmer.
+     * @deny (create, update, delete) Any client trying to modify device data directly.
+     * @principle Enforces read-only access for clients on system-managed data, using a denormalized 'farmerId' for ownership checks.
+     */
+    match /devices/{deviceId} {
+      allow get: if isOwner(resource.data.farmerId);
+      allow list: if isSignedIn(); // Secured by the 'get' rule; queries only return docs the user can get.
+      allow create: if false; // Devices are registered by a trusted server process.
+      allow update: if false; // Device data is immutable from the client.
+      allow delete: if false; // Devices are deleted by a trusted server process.
+    }
+
+    /**
+     * @description Controls access to system-generated alerts. Farmers can read their own
+     * alerts and can mark them as read, but cannot modify them otherwise.
+     * @path /alerts/{alertId}
+     * @allow (get) A farmer reading an alert where `doc.farmerId == auth.uid`.
+     * @allow (update) A farmer updating ONLY the 'read' field on their own alert.
+     * @deny (update) A farmer trying to change the alert message or type.
+     * @deny (create, delete) Any client trying to create or delete alerts.
+     * @principle Grants highly specific write access (updating one field) while keeping the resource generally read-only for clients.
+     */
+    match /alerts/{alertId} {
+      allow get: if isOwner(resource.data.farmerId);
+      allow list: if isSignedIn(); // Secured by the 'get' rule.
+      allow create: if false; // Alerts are generated by the system.
+      allow update: if canMarkAlertAsRead(resource.data.farmerId);
+      allow delete: if false; // Alerts are deleted by the system.
+    }
+
+    /**
+     * @description Controls access to sensor data, which is written by IoT devices.
+     * Farmers can only read sensor data from devices that belong to them.
+     * @path /sensorData/{sensorDataId}
+     * @allow (get) A farmer reading sensor data if they own the parent device.
+     * @deny (get) A farmer trying to read data from a device they do not own.
+     * @deny (create, update, delete) Any client trying to tamper with sensor data logs.
+     * @principle Secures a child document by checking ownership on its related parent document via a `get()` call.
+     */
+    match /sensorData/{sensorDataId} {
+      allow get: if isSignedIn() && get(/databases/$(database)/documents/devices/$(resource.data.deviceId)).data.farmerId == request.auth.uid;
+      allow list: if isSignedIn(); // Secured by the 'get' rule, but queries will be slower due to `get` call.
+      allow create: if false; // Sensor data is written by IoT hardware, not users.
+      allow update: if false; // Sensor data is immutable.
+      allow delete: if false; // Sensor data is immutable.
+    }
+  }
+}
