@@ -1,5 +1,7 @@
 'use client';
 
+import { use } from 'react';
+import { notFound } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -10,11 +12,9 @@ import { ChevronLeft, Share2, Settings, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { deviceData } from '@/lib/data';
-import { notFound } from 'next/navigation';
 import SensorCard from '@/components/farmer/sensor-card';
 import { formatDistanceToNow } from 'date-fns';
-import { useMemo, useState, use } from 'react';
+import { useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Dialog,
@@ -27,6 +27,7 @@ import PumpControlCard from '@/components/farmer/pump-control-card';
 import WaterTank from '@/components/farmer/water-tank';
 import WeatherCard from '@/components/farmer/weather-card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useData } from '@/contexts/data-context';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -34,8 +35,32 @@ const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
 });
 
 // This is now the Client Component part of the page
-function DeviceDetailClientView({ device }: { device: (typeof deviceData)[0] }) {
+function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
+  const { devices } = useData();
+  const device = useMemo(() => devices.find(d => d.id === deviceId), [devices, deviceId]);
+
   const [isMapOpen, setMapOpen] = useState(false);
+
+  if (!device) {
+      // Data might still be loading, or device not found.
+      // notFound() can't be used in a client component that renders after initial load.
+      // So we'll show a message.
+       return (
+         <div className="flex flex-col items-center justify-center h-full text-center">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Device Not Found</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p>The device with ID "{deviceId}" could not be found.</p>
+                    <Button asChild variant="link">
+                        <Link href="/farmer/devices">Go back to devices</Link>
+                    </Button>
+                </CardContent>
+            </Card>
+        </div>
+       )
+  }
 
   const markers = useMemo(
     () => [
@@ -172,11 +197,7 @@ export default function FarmerDeviceDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = use(params);
-  const device = deviceData.find((d) => d.id === id);
-
-  if (!device) {
-    notFound();
-  }
-
-  return <DeviceDetailClientView device={device} />;
+  
+  // We pass the ID to the client component, which will fetch data from context.
+  return <DeviceDetailClientView deviceId={id} />;
 }

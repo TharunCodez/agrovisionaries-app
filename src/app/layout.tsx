@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import { Toaster } from '@/components/ui/toaster';
 import { RoleProvider } from '@/contexts/role-context';
 import { ThemeProvider } from '@/contexts/theme-provider';
+import { DataProvider } from '@/contexts/data-context';
 
 export const metadata: Metadata = {
   title: 'Agro Visionaries',
@@ -31,7 +32,11 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <ThemeProvider>
-          <RoleProvider>{children}</RoleProvider>
+          <RoleProvider>
+            <DataProvider>
+              {children}
+            </DataProvider>
+          </RoleProvider>
         </ThemeProvider>
         <Toaster />
       </body>

@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { deviceData, farmerData } from "@/lib/data"
 import { cn } from "@/lib/utils"
 import { useState, Fragment } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -17,6 +16,7 @@ import { ChevronDown, ChevronRight, HardDrive, Waves, Thermometer, Rss, Battery,
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from 'date-fns';
+import { useData } from "@/contexts/data-context";
 
 
 const getStatusBadge = (status: string) => {
@@ -37,6 +37,7 @@ const getStatusBadge = (status: string) => {
 export function GovDeviceTable() {
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
     const router = useRouter();
+    const { devices, farmers } = useData();
 
     const toggleRow = (id: string) => {
         setExpandedRow(expandedRow === id ? null : id);
@@ -46,8 +47,8 @@ export function GovDeviceTable() {
         router.push(`/government/map?lat=${lat}&lng=${lng}&zoom=15`);
     };
 
-    const devicesWithFarmer = deviceData.map(device => {
-        const farmer = farmerData.find(f => f.id === device.farmerId);
+    const devicesWithFarmer = devices.map(device => {
+        const farmer = farmers.find(f => f.id === device.farmerId);
         const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
         const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
         return {
@@ -55,6 +56,10 @@ export function GovDeviceTable() {
             farmerName: farmer?.name || 'N/A',
             lastUpdated: timeAgo,
         };
+    }).sort((a, b) => {
+      const aNum = parseInt(a.id.split('-')[1]);
+      const bNum = parseInt(b.id.split('-')[1]);
+      return aNum - bNum;
     });
 
   return (
@@ -71,6 +76,7 @@ export function GovDeviceTable() {
                     <TableHead>Device ID</TableHead>
                     <TableHead>Farmer</TableHead>
                     <TableHead>Region</TableHead>
+                    <TableHead>Type</TableHead>
                     <TableHead className="text-right">Status</TableHead>
                     <TableHead className="w-[120px] text-center">Actions</TableHead>
                     </TableRow>
@@ -93,6 +99,7 @@ export function GovDeviceTable() {
                                     </TableCell>
                                     <TableCell>{device.farmerName}</TableCell>
                                     <TableCell>{device.region}</TableCell>
+                                    <TableCell>{device.type || 'N/A'}</TableCell>
                                     <TableCell className="text-right">
                                         <Badge className={cn("text-white", getStatusBadge(device.status))}>{device.status}</Badge>
                                     </TableCell>
@@ -106,7 +113,7 @@ export function GovDeviceTable() {
                                 <AnimatePresence>
                                 {isExpanded && (
                                     <TableRow className="bg-muted/50 hover:bg-muted/50">
-                                        <TableCell colSpan={6}>
+                                        <TableCell colSpan={7}>
                                             <motion.div
                                                 initial={{ height: 0, opacity: 0 }}
                                                 animate={{ height: 'auto', opacity: 1 }}

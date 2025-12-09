@@ -3,9 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
-import { deviceData } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import dynamic from 'next/dynamic';
+import { useData } from '@/contexts/data-context';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -16,26 +16,25 @@ const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
 function GovernmentMap() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { devices } = useData();
 
   const lat = searchParams.get('lat');
   const lng = searchParams.get('lng');
   const zoom = searchParams.get('zoom');
-
-  const allDevices = useMemo(() => deviceData, []);
 
   const defaultCenter: [number, number] =
     lat && lng ? [parseFloat(lat), parseFloat(lng)] : [28.6139, 77.209];
 
   const markers = useMemo(
     () =>
-      allDevices.map((d) => ({
+      devices.map((d) => ({
         lat: d.lat,
         lng: d.lng,
         name: d.name,
         id: d.id,
         isDevice: true,
       })),
-    [allDevices]
+    [devices]
   );
 
   return (
