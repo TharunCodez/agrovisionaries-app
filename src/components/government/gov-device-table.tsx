@@ -13,7 +13,7 @@ import { deviceData, farmerData } from "@/lib/data"
 import { cn } from "@/lib/utils"
 import { useState, Fragment } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronRight, HardDrive, Waves, Thermometer, CloudRain, Rss, Battery, MapPin } from "lucide-react";
+import { ChevronDown, ChevronRight, HardDrive, Waves, Thermometer, Rss, Battery, MapPin, Droplets } from "lucide-react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from 'date-fns';
