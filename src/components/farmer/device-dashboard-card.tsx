@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -18,6 +17,7 @@ import WeatherCard from '@/components/farmer/weather-card';
 import { type Device } from './device-card';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
+import { useState } from 'react';
 
 const getStatusBadgeClass = (status: string) => {
     switch (status.toLowerCase()) {
@@ -35,6 +35,7 @@ const getStatusBadgeClass = (status: string) => {
 }
 
 export default function DeviceDashboardCard({ device }: { device: Device }) {
+  const [liveTemperature, setLiveTemperature] = useState<number | null>(null);
 
   const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
@@ -57,7 +58,7 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
       <CardContent>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-1">
-            <WeatherCard lat={device.lat} lng={device.lng}/>
+            <WeatherCard lat={device.lat} lng={device.lng} onTemperatureUpdate={setLiveTemperature} />
           </div>
           <div className="grid grid-cols-1 gap-6 lg:col-span-2">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -67,8 +68,8 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
           </div>
         </div>
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-          <SensorCard type="temperature" value={`${device.temperature}°C`} />
-          <SensorCard type="soil" value={`${device.soilMoisture}%`} />
+          <SensorCard type="temperature" value={liveTemperature ?? device.temperature} />
+          <SensorCard type="soil" value={device.soilMoisture} />
            <SensorCard
               type="wind"
               value={`${device.rssi > -85 ? 15 : 5}`}

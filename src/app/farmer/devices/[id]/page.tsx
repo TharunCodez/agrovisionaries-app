@@ -114,15 +114,15 @@ function DeviceDetailClientView({ device }: { device: (typeof deviceData)[0] }) 
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <SensorCard type="temperature" value={`${device.temperature}°C`} />
-            <SensorCard type="soil" value={`${device.soilMoisture}%`} />
+            <SensorCard type="temperature" value={device.temperature} />
+            <SensorCard type="soil" value={device.soilMoisture} />
             <SensorCard
               type="wind"
-              value={`${device.rssi > -85 ? 15 : 5} km/h`}
+              value={device.rssi > -85 ? 15 : 5}
             />
             <SensorCard
               type="solar"
-              value={`${Math.round(device.rssi / -2 + 80)}%`}
+              value={Math.round(device.rssi / -2 + 80)}
             />
           </div>
         </CardContent>

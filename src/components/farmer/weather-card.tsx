@@ -33,9 +33,10 @@ interface WeatherData {
 interface WeatherCardProps {
     lat?: number;
     lng?: number;
+    onTemperatureUpdate?: (temp: number) => void;
 }
 
-export default function WeatherCard({ lat = 28.6139, lng = 77.2090 }: WeatherCardProps) {
+export default function WeatherCard({ lat = 28.6139, lng = 77.2090, onTemperatureUpdate }: WeatherCardProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,10 +62,11 @@ export default function WeatherCard({ lat = 28.6139, lng = 77.2090 }: WeatherCar
         }
         const data = await response.json();
         const values = data.data.values;
-        const times = data.data.time;
+
+        const temperature = Math.round(values.temperature);
 
         setWeather({
-          temperature: Math.round(values.temperature),
+          temperature: temperature,
           weatherCode: values.weatherCode,
           windSpeed: values.windSpeed,
           humidity: values.humidity,
@@ -72,6 +74,11 @@ export default function WeatherCard({ lat = 28.6139, lng = 77.2090 }: WeatherCar
           sunriseTime: values.sunriseTime ? new Date(values.sunriseTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A',
           sunsetTime: values.sunsetTime ? new Date(values.sunsetTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A',
         });
+        
+        if (onTemperatureUpdate) {
+            onTemperatureUpdate(temperature);
+        }
+
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -80,7 +87,7 @@ export default function WeatherCard({ lat = 28.6139, lng = 77.2090 }: WeatherCar
     };
 
     fetchWeather();
-  }, [lat, lng]);
+  }, [lat, lng, onTemperatureUpdate]);
 
   if (loading) {
     return (
