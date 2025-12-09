@@ -1,10 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import {
-  SidebarTrigger,
-  useSidebar,
-} from '@/components/ui/sidebar';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,26 +16,31 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import LanguageSwitcher from './language-switcher';
 import { useRole } from '@/contexts/role-context';
 import NotificationBell from '../notifications/NotificationBell';
+import ThemeToggle from './theme-toggle';
 
-function getPageTitle(pathname: string, role: 'farmer' | 'government' | null): string {
-    if (role === 'government') {
-        if (pathname.startsWith('/government/dashboard')) return 'Regional Agriculture Overview';
-        if (pathname.startsWith('/government/devices')) return 'Device Management';
-        if (pathname.startsWith('/government/map')) return 'Device Map';
-        if (pathname.startsWith('/government/notifications')) return 'Notifications';
-        if (pathname.startsWith('/government/farmers')) return 'Farmer Database';
-        if (pathname.startsWith('/government/analytics')) return 'Analytics';
-        if (pathname.startsWith('/government/settings')) return 'Settings';
-        return 'Government Portal';
-    }
-     if (role === 'farmer') {
-        if (pathname.startsWith('/farmer/dashboard')) return 'Dashboard';
-        if (pathname.startsWith('/farmer/devices')) return 'My Devices';
-        if (pathname.startsWith('/farmer/map')) return 'Farm Map';
-        if (pathname.startsWith('/farmer/notifications')) return 'Alerts';
-        if (pathname.startsWith('/farmer/settings')) return 'Settings';
-        return 'Farmer Portal';
-    }
+function getPageTitle(
+  pathname: string,
+  role: 'farmer' | 'government' | null
+): string {
+  if (role === 'government') {
+    if (pathname.startsWith('/government/dashboard'))
+      return 'Regional Agriculture Overview';
+    if (pathname.startsWith('/government/devices')) return 'Device Management';
+    if (pathname.startsWith('/government/map')) return 'Device Map';
+    if (pathname.startsWith('/government/notifications')) return 'Notifications';
+    if (pathname.startsWith('/government/farmers')) return 'Farmer Database';
+    if (pathname.startsWith('/government/analytics')) return 'Analytics';
+    if (pathname.startsWith('/government/settings')) return 'Settings';
+    return 'Government Portal';
+  }
+  if (role === 'farmer') {
+    if (pathname.startsWith('/farmer/dashboard')) return 'Dashboard';
+    if (pathname.startsWith('/farmer/devices')) return 'My Devices';
+    if (pathname.startsWith('/farmer/map')) return 'Farm Map';
+    if (pathname.startsWith('/farmer/notifications')) return 'Alerts';
+    if (pathname.startsWith('/farmer/settings')) return 'Settings';
+    return 'Farmer Portal';
+  }
   return 'Agro Visionaries';
 }
 
@@ -48,7 +50,9 @@ export default function Header() {
   const { role } = useRole();
   const pageTitle = getPageTitle(pathname, role);
 
-  const avatarImage = PlaceHolderImages.find(img => img.id === (role === 'farmer' ? 'farmer-avatar' : 'gov-avatar'));
+  const avatarImage = PlaceHolderImages.find(
+    (img) => img.id === (role === 'farmer' ? 'farmer-avatar' : 'gov-avatar')
+  );
   const avatarFallback = role === 'farmer' ? 'FP' : 'GV';
 
   return (
@@ -58,13 +62,20 @@ export default function Header() {
         <h1 className="font-headline text-lg font-semibold">{pageTitle}</h1>
       </div>
       <div className="flex items-center gap-2 md:gap-4">
-         {role === 'farmer' && <LanguageSwitcher />}
-         <NotificationBell />
+        {role === 'farmer' && <LanguageSwitcher />}
+        <ThemeToggle />
+        <NotificationBell />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">
               <Avatar className="h-10 w-10">
-                {avatarImage && <AvatarImage src={avatarImage.imageUrl} alt="User Avatar" data-ai-hint={avatarImage.imageHint}/>}
+                {avatarImage && (
+                  <AvatarImage
+                    src={avatarImage.imageUrl}
+                    alt="User Avatar"
+                    data-ai-hint={avatarImage.imageHint}
+                  />
+                )}
                 <AvatarFallback>{avatarFallback}</AvatarFallback>
               </Avatar>
             </Button>

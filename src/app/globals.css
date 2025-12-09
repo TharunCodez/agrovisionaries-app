@@ -8,19 +8,19 @@ body {
 
 @layer base {
   :root {
-    --background: 150 25% 95%;
+    --background: 150 25% 95%; /* Light Green */
     --foreground: 141 33% 21%;
     --card: 150 25% 98%;
     --card-foreground: 141 33% 21%;
     --popover: 150 25% 98%;
     --popover-foreground: 141 33% 21%;
-    --primary: 141 33% 31%;
+    --primary: 141 33% 31%; /* Dark Green */
     --primary-foreground: 150 25% 95%;
     --secondary: 150 14% 87%;
     --secondary-foreground: 141 33% 31%;
     --muted: 150 14% 91%;
-    --muted-foreground: 141 20% 41%;
-    --accent: 28 36% 48%;
+    --muted-foreground: 141_20%_41%;
+    --accent: 28 36% 48%; /* Earthy Brown */
     --accent-foreground: 150 25% 95%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
@@ -42,6 +42,7 @@ body {
     --sidebar-border: 150 14% 87%;
     --sidebar-ring: 141 33% 31%;
   }
+
   .dark {
     --background: 141 15% 10%;
     --foreground: 150 14% 87%;
@@ -86,11 +87,20 @@ body {
     @apply bg-background text-foreground;
   }
   @keyframes wave {
-    0%, 100% { transform: translateY(0) translateX(-50%) rotate(0); }
-    50% { transform: translateY(-10px) translateX(-50%) rotate(5deg); }
+    0%,
+    100% {
+      transform: translateY(0) translateX(-50%) rotate(0);
+    }
+    50% {
+      transform: translateY(-10px) translateX(-50%) rotate(5deg);
+    }
   }
   @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 }
