@@ -12,14 +12,8 @@ import { deviceData } from "@/lib/data";
 import { notFound, useRouter } from "next/navigation";
 import SensorCard from "@/components/farmer/sensor-card";
 import { formatDistanceToNow } from "date-fns";
-import dynamic from "next/dynamic";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useMemo } from "react";
-
-const Map = dynamic(() => import('@/components/shared/map'), {
-    ssr: false,
-    loading: () => <Skeleton className="h-[400px] w-full" />,
-});
+import Map from "@/components/shared/map";
 
 export default function FarmerDeviceDetailPage({ params }: { params: { id: string } }) {
     const device = deviceData.find(d => d.id === params.id);

@@ -4,14 +4,8 @@ import { Suspense, useMemo } from "react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ChevronLeft } from "lucide-react";
 import { deviceData } from "@/lib/data";
-import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const Map = dynamic(() => import('@/components/shared/map'), {
-    ssr: false,
-    loading: () => <Skeleton className="h-full w-full" />,
-});
-
+import Map from "@/components/shared/map";
 
 function FarmerMap() {
     const router = useRouter();
