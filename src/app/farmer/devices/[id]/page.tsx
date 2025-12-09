@@ -12,6 +12,14 @@ import { deviceData } from "@/lib/data";
 import { notFound, useRouter } from "next/navigation";
 import SensorCard from "@/components/farmer/sensor-card";
 import { formatDistanceToNow } from "date-fns";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useMemo } from "react";
+
+const Map = dynamic(() => import('@/components/shared/map'), {
+    ssr: false,
+    loading: () => <Skeleton className="h-[400px] w-full" />,
+});
 
 export default function FarmerDeviceDetailPage({ params }: { params: { id: string } }) {
     const device = deviceData.find(d => d.id === params.id);
@@ -20,6 +28,8 @@ export default function FarmerDeviceDetailPage({ params }: { params: { id: strin
     if (!device) {
         notFound();
     }
+    
+    const devices = useMemo(() => [device], [device]);
 
     const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
     const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
@@ -83,10 +93,14 @@ export default function FarmerDeviceDetailPage({ params }: { params: { id: strin
             <Card>
                 <CardHeader className="flex-row items-center justify-between">
                     <CardTitle>Location</CardTitle>
+                    <MapPin className="h-5 w-5 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                    <div className="text-muted-foreground">
+                    <div className="text-muted-foreground mb-4">
                         {device.location}, {device.region}
+                    </div>
+                    <div className="h-[400px] w-full rounded-lg overflow-hidden">
+                        <Map devices={devices} />
                     </div>
                 </CardContent>
             </Card>
