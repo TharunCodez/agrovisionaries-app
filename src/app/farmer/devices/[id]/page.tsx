@@ -33,17 +33,9 @@ const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   loading: () => <Skeleton className="h-full w-full" />,
 });
 
-export default function FarmerDeviceDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const device = deviceData.find((d) => d.id === params.id);
+// This is now the Client Component part of the page
+function DeviceDetailClientView({ device }: { device: (typeof deviceData)[0] }) {
   const [isMapOpen, setMapOpen] = useState(false);
-
-  if (!device) {
-    notFound();
-  }
 
   const markers = useMemo(
     () => [
@@ -169,4 +161,19 @@ export default function FarmerDeviceDetailPage({
       </Card>
     </div>
   );
+}
+
+// This is the main page component, which is now a Server Component.
+export default function FarmerDeviceDetailPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const device = deviceData.find((d) => d.id === params.id);
+
+  if (!device) {
+    notFound();
+  }
+
+  return <DeviceDetailClientView device={device} />;
 }
