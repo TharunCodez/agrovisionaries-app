@@ -27,9 +27,7 @@ export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
   }
 }
 
-type RegisterFarmerPayload = Omit<Farmer, 'id' | 'createdAt' | 'devices' | 'plots'> & {
-  plots: Omit<Plot, 'id'>[];
-};
+type RegisterFarmerPayload = Omit<Farmer, 'id' | 'createdAt' | 'devices'>;
 
 
 export async function registerFarmerAction(farmerData: RegisterFarmerPayload): Promise<{ id: string }> {
