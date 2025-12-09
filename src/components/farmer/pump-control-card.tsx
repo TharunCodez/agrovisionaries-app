@@ -27,7 +27,6 @@ export default function PumpControlCard() {
               checked={isPumpOn}
               onCheckedChange={setIsPumpOn}
               className="h-14 w-28 data-[state=checked]:bg-green-600"
-              thumbClassName="h-12 w-12 data-[state=checked]:translate-x-[3.25rem] transition-all duration-300"
               aria-label="Toggle irrigation pump"
           />
         </div>
