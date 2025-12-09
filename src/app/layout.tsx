@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { RoleProvider } from '@/contexts/role-context';
+import 'leaflet/dist/leaflet.css';
+
 
 export const metadata: Metadata = {
   title: 'Agro Visionaries',
