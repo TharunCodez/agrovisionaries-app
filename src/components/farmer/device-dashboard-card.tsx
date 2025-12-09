@@ -1,0 +1,91 @@
+
+'use client';
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { ChevronRight, HardDrive } from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import SensorCard from '@/components/farmer/sensor-card';
+import PumpControlCard from '@/components/farmer/pump-control-card';
+import WaterTank from '@/components/farmer/water-tank';
+import WeatherCard from '@/components/farmer/weather-card';
+import { type Device } from './device-card';
+import { cn } from '@/lib/utils';
+import { formatDistanceToNow } from 'date-fns';
+
+const getStatusBadgeClass = (status: string) => {
+    switch (status.toLowerCase()) {
+        case 'online':
+            return 'bg-green-600 hover:bg-green-700';
+        case 'warning':
+            return 'bg-yellow-500 hover:bg-yellow-600 text-black';
+        case 'critical':
+             return 'bg-orange-600 hover:bg-orange-700';
+        case 'offline':
+            return 'bg-red-600 hover:bg-red-700';
+        default:
+            return 'bg-gray-500';
+    }
+}
+
+export default function DeviceDashboardCard({ device }: { device: Device }) {
+
+  const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
+  const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
+
+  return (
+    <Card>
+      <CardHeader className='flex-row items-center justify-between'>
+        <div>
+            <div className='flex items-center gap-3'>
+                <HardDrive className='h-6 w-6 text-primary' />
+                <CardTitle>{device.name}</CardTitle>
+            </div>
+            <p className='text-sm text-muted-foreground ml-9'>{device.location}</p>
+        </div>
+         <div className='flex flex-col items-end gap-2'>
+            <Badge className={cn("text-white", getStatusBadgeClass(device.status))}>{device.status}</Badge>
+            <p className='text-xs text-muted-foreground'>{timeAgo}</p>
+         </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-1">
+            <WeatherCard lat={device.lat} lng={device.lng}/>
+          </div>
+          <div className="grid grid-cols-1 gap-6 lg:col-span-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+              <WaterTank level={device.waterLevel} />
+              <PumpControlCard />
+            </div>
+          </div>
+        </div>
+        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+          <SensorCard type="temperature" value={`${device.temperature}°C`} />
+          <SensorCard type="soil" value={`${device.soilMoisture}%`} />
+           <SensorCard
+              type="wind"
+              value={`${device.rssi > -85 ? 15 : 5}`}
+            />
+          <SensorCard
+              type="solar"
+              value={`${Math.round(device.rssi / -2 + 80)}`}
+            />
+        </div>
+         <div className="mt-4 flex justify-end border-t pt-4">
+            <Button asChild variant="outline">
+                <Link href={`/farmer/devices/${device.id}`}>
+                    View Details <ChevronRight className='ml-2 h-4 w-4' />
+                </Link>
+            </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
