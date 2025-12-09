@@ -1,12 +1,13 @@
+
 'use server';
 
 import { smartAlertingSystem } from '@/ai/flows/smart-alerting-system';
 import type { SmartAlertingSystemOutput } from '@/ai/flows/smart-alerting-system';
 import * as admin from 'firebase-admin';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
 import { firebaseConfig } from '@/firebase/config';
 import type { Farmer, Device } from '@/contexts/data-context';
-
 
 // Initialize Firebase Admin SDK
 if (!admin.apps.length) {
@@ -16,6 +17,7 @@ if (!admin.apps.length) {
 }
 
 const adminDb = getFirestore();
+const adminAuth = getAuth();
 
 
 export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
