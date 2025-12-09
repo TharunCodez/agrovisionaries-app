@@ -2,12 +2,9 @@
 
 import { smartAlertingSystem } from '@/ai/flows/smart-alerting-system';
 import type { SmartAlertingSystemOutput } from '@/ai/flows/smart-alerting-system';
-import { getFirestore } from 'firebase-admin/firestore';
-import { adminApp } from './firebase-admin';
+import { adminDb } from './firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
-import type { Farmer, Device } from '@/contexts/data-context';
-
-const db = getFirestore(adminApp);
+import type { Farmer, Device, Plot } from '@/contexts/data-context';
 
 export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
   try {
@@ -30,7 +27,12 @@ export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
   }
 }
 
-export async function registerFarmerAction(farmerData: Omit<Farmer, 'id' | 'createdAt' | 'devices'>): Promise<{ id: string }> {
+type RegisterFarmerPayload = Omit<Farmer, 'id' | 'createdAt' | 'devices' | 'plots'> & {
+  plots: Omit<Plot, 'id'>[];
+};
+
+
+export async function registerFarmerAction(farmerData: RegisterFarmerPayload): Promise<{ id: string }> {
     const farmerWithDefaults = {
         ...farmerData,
         devices: [],
@@ -38,12 +40,12 @@ export async function registerFarmerAction(farmerData: Omit<Farmer, 'id' | 'crea
     };
     
     // Check if farmer with phone already exists
-    const farmerQuery = await db.collection('farmers').where('phone', '==', farmerData.phone).get();
+    const farmerQuery = await adminDb.collection('farmers').where('phone', '==', farmerData.phone).get();
     if (!farmerQuery.empty) {
         throw new Error(`Farmer with phone number ${farmerData.phone} already exists.`);
     }
 
-    const docRef = await db.collection('farmers').add(farmerWithDefaults);
+    const docRef = await adminDb.collection('farmers').add(farmerWithDefaults);
     await docRef.update({ id: docRef.id });
     
     return { id: docRef.id };
@@ -53,15 +55,16 @@ export async function registerFarmerAction(farmerData: Omit<Farmer, 'id' | 'crea
 export async function addDeviceAction(deviceData: Omit<Device, 'id' | 'createdAt' | 'status' | 'lastUpdated' | 'temperature' | 'humidity' | 'soilMoisture' | 'rssi' | 'health' | 'waterLevel'> & { deviceId: string; }) {
     const { deviceId, farmerId, ...restOfDeviceData } = deviceData;
 
-    const deviceRef = db.collection('devices').doc(deviceId);
-    const farmerRef = db.collection('farmers').doc(farmerId);
+    const deviceRef = adminDb.collection('devices').doc(deviceId);
+    const farmerRef = adminDb.collection('farmers').doc(farmerId);
 
-    const batch = db.batch();
+    const batch = adminDb.batch();
 
     // 1. Set the device data
     batch.set(deviceRef, {
       ...restOfDeviceData,
       id: deviceId, // Ensure the ID is part of the document data
+      farmerId: farmerId,
       createdAt: FieldValue.serverTimestamp(),
       // Add mock sensor data on creation
       status: 'Online',
