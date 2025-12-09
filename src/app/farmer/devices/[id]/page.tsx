@@ -11,10 +11,6 @@ import {
   Share2,
   Settings,
   MapPin,
-  Rss,
-  Thermometer,
-  Droplets,
-  HardDrive,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -24,7 +20,7 @@ import { notFound } from 'next/navigation';
 import SensorCard from '@/components/farmer/sensor-card';
 import { formatDistanceToNow } from 'date-fns';
 import { useMemo, useState } from 'react';
-import StableMap from '@/components/shared/StableMap';
+import dynamic from 'next/dynamic';
 import {
   Dialog,
   DialogContent,
@@ -35,6 +31,14 @@ import {
 import PumpControlCard from '@/components/farmer/pump-control-card';
 import WaterTank from '@/components/farmer/water-tank';
 import WeatherCard from '@/components/farmer/weather-card';
+import { Skeleton } from '@/components/ui/skeleton';
+
+
+const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
+
 
 export default function FarmerDeviceDetailPage({
   params,
@@ -124,7 +128,6 @@ export default function FarmerDeviceDetailPage({
             <SensorCard type="temperature" value={`${device.temperature}°C`} />
             <SensorCard type="soil" value={`${device.soilMoisture}%`} />
             <SensorCard type="humidity" value={`${device.humidity}%`} />
-            <SensorCard type="rssi" value={`${device.rssi} dBm`} />
           </div>
         </CardContent>
       </Card>

@@ -5,7 +5,13 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { deviceData } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
-import StableMap from '@/components/shared/StableMap';
+import dynamic from 'next/dynamic';
+
+const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
+
 
 function GovernmentMap() {
   const router = useRouter();

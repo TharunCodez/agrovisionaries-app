@@ -1,12 +1,18 @@
 'use client';
 
-import { Suspense, useMemo, useState, useEffect } from 'react';
+import { Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { deviceData } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import StableMap from '@/components/shared/StableMap';
+import dynamic from 'next/dynamic';
+
+const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
+
 
 function FarmerMap() {
   const router = useRouter();

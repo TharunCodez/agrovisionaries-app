@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Device } from '../farmer/device-card';
 
 // This is a workaround for a known issue with Leaflet and Next.js/Webpack
 // It ensures that the marker icons are loaded correctly.
@@ -31,10 +30,11 @@ interface StableMapProps {
 
 export default function StableMap({ center, zoom, markers }: StableMapProps) {
   const mapRef = useRef<L.Map | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Ensure this code runs only in the browser
-    if (typeof window === 'undefined') {
+    if (typeof window === 'undefined' || !mapContainerRef.current) {
         return;
     }
 
@@ -45,7 +45,7 @@ export default function StableMap({ center, zoom, markers }: StableMapProps) {
     }
 
     // Initialize the map on the 'map-root' div
-    mapRef.current = L.map('map-root', {
+    mapRef.current = L.map(mapContainerRef.current, {
       center,
       zoom,
       zoomControl: true,
@@ -73,6 +73,6 @@ export default function StableMap({ center, zoom, markers }: StableMapProps) {
   }, [center, zoom, markers]);
 
   return (
-    <div id="map-root" style={{ width: '100%', height: '100%' }} />
+    <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
   );
 }
