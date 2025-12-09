@@ -2,13 +2,11 @@
 
 import { MapContainer, TileLayer, Marker, Popup, LayersControl, WMSTileLayer } from 'react-leaflet';
 import { LatLngExpression, Icon, point } from 'leaflet';
-import { deviceData } from '@/lib/data';
 import { Button } from '@/components/ui/button';
 import { HardDrive, Thermometer, Waves, Rss } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import 'leaflet/dist/leaflet.css';
-import { useMemo } from 'react';
 
 
 type Device = {
@@ -65,80 +63,70 @@ export default function Map({ devices, center, zoom = 10 }: MapProps) {
         router.push(`/farmer/devices/${deviceId}`);
     };
     
-    const displayMap = useMemo(
-        () => (
-            <MapContainer center={defaultCenter} zoom={zoom} style={{ height: '100%', width: '100%' }} scrollWheelZoom={true}>
-                <LayersControl position="topright">
-                    <LayersControl.BaseLayer checked name="OpenStreetMap">
-                        <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        />
-                    </LayersControl.BaseLayer>
-                    <LayersControl.BaseLayer name="Satellite View">
-                        <TileLayer
-                            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                            attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
-                        />
-                    </LayersControl.BaseLayer>
-                    <LayersControl.Overlay name="NDVI Layer (Sentinel Hub)">
-                        <WMSTileLayer
-                            url="https://services.sentinel-hub.com/ogc/wms/bd994a73-a8e1-48cf-959c-4e8998246537"
-                            params={{
-                                layers: 'NDVI',
-                                format: 'image/png',
-                                transparent: true,
-                            }}
-                            attribution='&copy; <a href="https://www.sentinel-hub.com/" target="_blank">Sentinel Hub</a>'
-                        />
-                    </LayersControl.Overlay>
-                </LayersControl>
-
-                {devices.map(device => (
-                    <Marker key={device.id} position={[device.lat, device.lng]} icon={createMarkerIcon(device.status)}>
-                        <Popup>
-                            <div className="w-[250px]">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <HardDrive className={cn("h-5 w-5", device.status === 'Online' ? 'text-primary' : 'text-muted-foreground')} />
-                                    <h3 className="font-bold text-md">{device.name}</h3>
-                                </div>
-                                <div className="text-sm text-muted-foreground mb-3">{device.location}</div>
-                                
-                                <div className="grid grid-cols-3 gap-2 text-xs mb-3 text-center">
-                                    <div className="flex flex-col items-center p-1 bg-muted/50 rounded-md">
-                                        <Thermometer className="h-4 w-4 text-red-500" />
-                                        <span className="font-bold mt-1">{device.temperature}°C</span>
-                                    </div>
-                                    <div className="flex flex-col items-center p-1 bg-muted/50 rounded-md">
-                                        <Waves className="h-4 w-4 text-green-600" />
-                                        <span className="font-bold mt-1">{device.soilMoisture}%</span>
-                                    </div>
-                                    <div className="flex flex-col items-center p-1 bg-muted/50 rounded-md">
-                                        <Rss className="h-4 w-4 text-purple-500" />
-                                        <span className="font-bold mt-1">{device.rssi}</span>
-                                    </div>
-                                </div>
-
-                                <Button 
-                                    size="sm" 
-                                    className="w-full"
-                                    onClick={() => handleViewDetails(device.id)}
-                                >
-                                    View Details
-                                </Button>
-                            </div>
-                        </Popup>
-                    </Marker>
-                ))}
-            </MapContainer>
-        ),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [devices, center, zoom]
-    );
-
     return (
-        <div style={{ height: '100%', width: '100%' }}>
-            {displayMap}
-        </div>
+        <MapContainer center={defaultCenter} zoom={zoom} style={{ height: '100%', width: '100%' }} scrollWheelZoom={true}>
+            <LayersControl position="topright">
+                <LayersControl.BaseLayer checked name="OpenStreetMap">
+                    <TileLayer
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                </LayersControl.BaseLayer>
+                <LayersControl.BaseLayer name="Satellite View">
+                    <TileLayer
+                        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                        attribution='&copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                    />
+                </LayersControl.BaseLayer>
+                <LayersControl.Overlay name="NDVI Layer (Sentinel Hub)">
+                    <WMSTileLayer
+                        url="https://services.sentinel-hub.com/ogc/wms/bd994a73-a8e1-48cf-959c-4e8998246537"
+                        params={{
+                            layers: 'NDVI',
+                            format: 'image/png',
+                            transparent: true,
+                        }}
+                        attribution='&copy; <a href="https://www.sentinel-hub.com/" target="_blank">Sentinel Hub</a>'
+                    />
+                </LayersControl.Overlay>
+            </LayersControl>
+
+            {devices.map(device => (
+                <Marker key={device.id} position={[device.lat, device.lng]} icon={createMarkerIcon(device.status)}>
+                    <Popup>
+                        <div className="w-[250px]">
+                            <div className="flex items-center gap-2 mb-2">
+                                <HardDrive className={cn("h-5 w-5", device.status === 'Online' ? 'text-primary' : 'text-muted-foreground')} />
+                                <h3 className="font-bold text-md">{device.name}</h3>
+                            </div>
+                            <div className="text-sm text-muted-foreground mb-3">{device.location}</div>
+                            
+                            <div className="grid grid-cols-3 gap-2 text-xs mb-3 text-center">
+                                <div className="flex flex-col items-center p-1 bg-muted/50 rounded-md">
+                                    <Thermometer className="h-4 w-4 text-red-500" />
+                                    <span className="font-bold mt-1">{device.temperature}°C</span>
+                                </div>
+                                <div className="flex flex-col items-center p-1 bg-muted/50 rounded-md">
+                                    <Waves className="h-4 w-4 text-green-600" />
+                                    <span className="font-bold mt-1">{device.soilMoisture}%</span>
+                                </div>
+                                <div className="flex flex-col items-center p-1 bg-muted/50 rounded-md">
+                                    <Rss className="h-4 w-4 text-purple-500" />
+                                    <span className="font-bold mt-1">{device.rssi}</span>
+                                </div>
+                            </div>
+
+                            <Button 
+                                size="sm" 
+                                className="w-full"
+                                onClick={() => handleViewDetails(device.id)}
+                            >
+                                View Details
+                            </Button>
+                        </div>
+                    </Popup>
+                </Marker>
+            ))}
+        </MapContainer>
     );
 }

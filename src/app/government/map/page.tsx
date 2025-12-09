@@ -1,6 +1,6 @@
 'use client';
 import { Button } from "@/components/ui/button";
-import { Suspense, useMemo } from "react";
+import { Suspense, useMemo, useState, useEffect } from "react";
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ChevronLeft } from "lucide-react";
 import { deviceData } from "@/lib/data";
@@ -15,6 +15,12 @@ const Map = dynamic(() => import('@/components/shared/map'), {
 function GovernmentMap() {
     const router = useRouter();
     const searchParams = useSearchParams();
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
+
     const lat = searchParams.get('lat');
     const lng = searchParams.get('lng');
     const zoom = searchParams.get('zoom');
@@ -31,11 +37,11 @@ function GovernmentMap() {
                 <div className="w-10"></div> 
             </div>
              <div className="flex-1 rounded-lg overflow-hidden border">
-                <Map 
+                {isClient && <Map 
                     devices={allDevices}
                     center={lat && lng ? [parseFloat(lat), parseFloat(lng)] : undefined}
                     zoom={zoom ? parseInt(zoom) : undefined}
-                />
+                />}
             </div>
         </div>
     );
