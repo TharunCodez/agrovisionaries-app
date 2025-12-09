@@ -10,7 +10,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import { useState, Fragment } from "react";
+import { useState, Fragment, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ChevronRight, HardDrive, Waves, Thermometer, Rss, Battery, MapPin, Droplets } from "lucide-react";
 import { Button } from "../ui/button";
@@ -47,19 +47,23 @@ export function GovDeviceTable() {
         router.push(`/government/map?lat=${lat}&lng=${lng}&zoom=15`);
     };
 
-    const devicesWithFarmer = devices.map(device => {
-        const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
-        const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
-        return {
-            ...device,
-            lastUpdated: timeAgo,
-        };
-    }).sort((a, b) => {
-      const aNum = parseInt(a.id.split('-')[1]);
-      const bNum = parseInt(b.id.split('-')[1]);
-      if(isNaN(aNum) || isNaN(bNum)) return 0;
-      return aNum - bNum;
-    });
+    const devicesWithFarmer = useMemo(() => {
+        if (!devices) return [];
+        return devices.map(device => {
+            const lastUpdated = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
+            const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
+            return {
+                ...device,
+                lastUpdated: timeAgo,
+            };
+        }).sort((a, b) => {
+          const aNum = parseInt(a.id.split('-')[1]);
+          const bNum = parseInt(b.id.split('-')[1]);
+          if(isNaN(aNum) || isNaN(bNum)) return 0;
+          return aNum - bNum;
+        });
+    }, [devices]);
+
 
   return (
     <Card>

@@ -22,11 +22,9 @@ import {
   doc,
   addDoc,
   serverTimestamp,
+  getDocs,
 } from 'firebase/firestore';
-import {
-  addDocumentNonBlocking,
-  setDocumentNonBlocking,
-} from '@/firebase/non-blocking-updates';
+import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useRole } from './role-context';
 
 export type Device = {
@@ -60,13 +58,15 @@ export type Farmer = {
 };
 
 interface DataContextType {
-  devices: Device[];
-  farmers: Farmer[];
+  devices: Device[] | null;
+  farmers: Farmer[] | null;
   addDeviceAndFarmer: (
-    device: Omit<
-      Device,
-      'id' | 'farmerId' | 'status' | 'lastUpdated' | 'region' | 'health' | 'humidity' | 'rssi' | 'waterLevel' | 'temperature' | 'soilMoisture'
-    >,
+    device: {
+      deviceId: string;
+      lat: number;
+      lng: number;
+      notes?: string;
+    },
     farmerInfo: { name: string; phone: string }
   ) => Promise<void>;
   getNextDeviceId: () => string;
@@ -84,14 +84,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     () => (firestore && role === 'government' ? collection(firestore, 'farmers') : null),
     [firestore, role]
   );
-  const { data: farmers = [] } = useCollection<Farmer>(allFarmersQuery);
+  const { data: farmers } = useCollection<Farmer>(allFarmersQuery);
 
   // Fetch all devices - for government user
   const allDevicesQuery = useMemoFirebase(
     () => (firestore && role === 'government' ? collection(firestore, 'devices') : null),
     [firestore, role]
   );
-  const { data: allDevices = [] } = useCollection<Device>(allDevicesQuery);
+  const { data: allDevices } = useCollection<Device>(allDevicesQuery);
 
   // Fetch devices for a specific farmer
   const farmerDevicesQuery = useMemoFirebase(
@@ -101,12 +101,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         : null,
     [firestore, user, role]
   );
-  const { data: farmerDevices = [] } = useCollection<Device>(farmerDevicesQuery);
+  const { data: farmerDevices } = useCollection<Device>(farmerDevicesQuery);
 
   const devices = role === 'government' ? allDevices : farmerDevices;
 
   const getNextDeviceId = useCallback(() => {
-    const allDeviceIds = (allDevices || []).map((d) =>
+    const allCurrentDevices = allDevices || [];
+    const allDeviceIds = allCurrentDevices.map((d) =>
       parseInt(d.id.split('-')[1])
     ).filter((n) => !isNaN(n));
     const lastId = allDeviceIds.length > 0 ? Math.max(...allDeviceIds) : 0;
@@ -115,10 +116,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   const addDeviceAndFarmer = useCallback(
     async (
-      device: Omit<
-        Device,
-        'id' | 'farmerId' | 'status' | 'lastUpdated' | 'region' | 'health' | 'humidity' | 'rssi' | 'waterLevel' | 'temperature' | 'soilMoisture'
-      >,
+      device: {
+        deviceId: string;
+        lat: number;
+        lng: number;
+        notes?: string;
+      },
       farmerInfo: { name: string; phone: string }
     ) => {
       if (!firestore) return;
@@ -135,13 +138,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         const newFarmerData = {
           name: farmerInfo.name,
           phone: farmerInfo.phone,
-          region: 'Unknown',
+          region: 'Unknown', // You might want to get this from a form
           status: 'Active',
           createdAt: serverTimestamp(),
         };
         const farmerDocRef = await addDoc(farmersRef, newFarmerData);
         farmerId = farmerDocRef.id;
-        // Also create the auth user if needed, or link if they already signed up
       } else {
         // Farmer exists
         const farmerDoc = querySnapshot.docs[0];
@@ -149,27 +151,32 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         farmerRegion = farmerDoc.data().region || 'Unknown';
       }
 
-      const deviceId = getNextDeviceId();
+      const deviceId = device.deviceId;
       const deviceRef = doc(firestore, 'devices', deviceId);
-      const newDeviceData = {
-        ...device,
-        id: deviceId,
+
+      const newDeviceData: Omit<Device, 'lastUpdated' | 'id'> & { createdAt: any } = {
         farmerId: farmerId,
+        name: `Device ${deviceId}`,
+        location: `Lat: ${device.lat.toFixed(4)}, Lng: ${device.lng.toFixed(4)}`,
+        lat: device.lat,
+        lng: device.lng,
+        notes: device.notes,
         status: 'Online',
-        lastUpdated: serverTimestamp(),
         region: farmerRegion,
         health: 'Good',
-        humidity: 60,
-        rssi: -80,
-        temperature: 28,
-        soilMoisture: 55,
-        waterLevel: 75,
+        temperature: 28 + Math.floor(Math.random() * 5),
+        humidity: 60 + Math.floor(Math.random() * 10),
+        soilMoisture: 55 + Math.floor(Math.random() * 10),
+        waterLevel: 75 + Math.floor(Math.random() * 10),
+        rssi: -80 + Math.floor(Math.random() * 10),
+        farmerName: farmerInfo.name,
+        farmerPhone: farmerInfo.phone,
         createdAt: serverTimestamp(),
       };
 
-      setDocumentNonBlocking(deviceRef, newDeviceData, { merge: true });
+      setDocumentNonBlocking(deviceRef, { ...newDeviceData, id: deviceId }, { merge: true });
     },
-    [firestore, getNextDeviceId]
+    [firestore]
   );
 
   const value = useMemo(
@@ -189,6 +196,3 @@ export const useData = () => {
   }
   return context;
 };
-
-// Need to import getDocs for the query
-import { getDocs } from 'firebase/firestore';

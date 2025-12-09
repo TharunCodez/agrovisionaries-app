@@ -4,17 +4,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useData } from "@/contexts/data-context";
+import { useMemo } from "react";
 
 export default function FarmerList() {
   const { farmers, devices } = useData();
 
-  const farmersWithDeviceCount = farmers.map(farmer => {
-    const deviceCount = devices.filter(d => d.farmerPhone === farmer.phone).length;
-    return {
-      ...farmer,
-      devices: deviceCount,
-    }
-  }).sort((a, b) => a.name.localeCompare(b.name));
+  const farmersWithDeviceCount = useMemo(() => {
+    if (!farmers || !devices) return [];
+    return farmers.map(farmer => {
+      const deviceCount = devices.filter(d => d.farmerId === farmer.id).length;
+      return {
+        ...farmer,
+        devices: deviceCount,
+      }
+    }).sort((a, b) => a.name.localeCompare(b.name));
+  }, [farmers, devices]);
+
+  if (!farmers) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle>Farmer Database</CardTitle>
+                <CardDescription>Overview of farmers in the region.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <p>Loading farmer data...</p>
+            </CardContent>
+        </Card>
+    )
+  }
 
   return (
     <Card>
