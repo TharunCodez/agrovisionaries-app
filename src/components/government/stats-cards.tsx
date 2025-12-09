@@ -12,7 +12,7 @@ export default function StatsCards() {
 
     const stats = [
         { title: "Total Farmers", value: totalFarmers, icon: Users, description: "+2 this month" },
-        { title: "Devices Online", value: `${devicesOnline} / ${totalDevices}`, icon: HardDrive, description: `${totalDevices > 0 ? Math.round(onlineDevices/totalDevices * 100) : 0}% uptime` },
+        { title: "Devices Online", value: `${onlineDevices} / ${totalDevices}`, icon: HardDrive, description: `${totalDevices > 0 ? Math.round(onlineDevices/totalDevices * 100) : 0}% uptime` },
         { title: "Critical Alerts", value: "2", icon: Siren, description: "Last 24 hours" },
     ];
 
