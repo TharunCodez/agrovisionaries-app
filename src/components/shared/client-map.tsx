@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { HardDrive, Thermometer, Waves, Rss } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import 'leaflet/dist/leaflet.css';
 
 type Device = {
     id: string;
