@@ -6,12 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  ChevronLeft,
-  Share2,
-  Settings,
-  MapPin,
-} from 'lucide-react';
+import { ChevronLeft, Share2, Settings, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -33,12 +28,10 @@ import WaterTank from '@/components/farmer/water-tank';
 import WeatherCard from '@/components/farmer/weather-card';
 import { Skeleton } from '@/components/ui/skeleton';
 
-
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full" />,
 });
-
 
 export default function FarmerDeviceDetailPage({
   params,
@@ -99,7 +92,9 @@ export default function FarmerDeviceDetailPage({
             <span className="text-muted-foreground">Status</span>
             <Badge
               className={
-                device.status === 'Online' ? 'bg-green-600' : 'bg-red-600'
+                device.status === 'Online'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-red-600 text-white'
               }
             >
               {device.status}
@@ -127,8 +122,14 @@ export default function FarmerDeviceDetailPage({
           <div className="grid grid-cols-2 gap-4">
             <SensorCard type="temperature" value={`${device.temperature}°C`} />
             <SensorCard type="soil" value={`${device.soilMoisture}%`} />
-            <SensorCard type="wind" value={`${device.rssi > -85 ? 15: 5} km/h`} />
-            <SensorCard type="solar" value={`${Math.round(device.rssi/-2 + 80)}%`} />
+            <SensorCard
+              type="wind"
+              value={`${device.rssi > -85 ? 15 : 5} km/h`}
+            />
+            <SensorCard
+              type="solar"
+              value={`${Math.round(device.rssi / -2 + 80)}%`}
+            />
           </div>
         </CardContent>
       </Card>
@@ -142,21 +143,21 @@ export default function FarmerDeviceDetailPage({
                 <MapPin className="h-5 w-5" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-[90vw] lg:max-w-[70vw] h-[70vh] p-2">
-                <DialogHeader className="p-4">
-                    <DialogTitle>Device Location: {device.name}</DialogTitle>
-                </DialogHeader>
-                <div className="h-full w-full rounded-lg overflow-hidden">
-                    {isMapOpen && (
-                         <div key={device.id} className="h-full w-full">
-                            <StableMap
-                                center={[device.lat, device.lng]}
-                                zoom={14}
-                                markers={markers}
-                            />
-                         </div>
-                    )}
-                </div>
+            <DialogContent className="h-[70vh] max-w-[90vw] p-2 lg:max-w-[70vw]">
+              <DialogHeader className="p-4">
+                <DialogTitle>Device Location: {device.name}</DialogTitle>
+              </DialogHeader>
+              <div className="h-full w-full overflow-hidden rounded-lg">
+                {isMapOpen && (
+                  <div key={device.id} className="h-full w-full">
+                    <StableMap
+                      center={[device.lat, device.lng]}
+                      zoom={14}
+                      markers={markers}
+                    />
+                  </div>
+                )}
+              </div>
             </DialogContent>
           </Dialog>
         </CardHeader>
