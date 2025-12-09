@@ -1,4 +1,8 @@
 /**
+ * WARNING: These rules are insecure and are configured for development purposes only.
+ * They allow read and write access to all data by any user.
+ * Before deploying to production, you MUST secure these rules.
+ *
  * This ruleset enforces a strict, user-centric security model for the Agro Visionaries application,
  * distinguishing between two primary user roles: Farmers and Admins (government users).
  *
@@ -34,6 +38,12 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    // Allow all reads and writes for development purposes.
+    // WARNING: This is insecure and should be changed for production.
+    match /{document=**} {
+      allow read, write: if true;
+    }
 
     // -------------------------------------------------------------------------
     // Helper Functions
