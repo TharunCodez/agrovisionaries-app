@@ -1,7 +1,20 @@
+
+'use client';
 import FarmerBottomNav from '@/components/farmer/farmer-bottom-nav';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { useUser } from '@/firebase';
+import { setupFCM } from '@/lib/notifications';
+import { useEffect } from 'react';
 
 export default function FarmerLayout({ children }: { children: React.ReactNode }) {
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user && process.env.NEXT_PUBLIC_FCM_VAPID_KEY) {
+      setupFCM(user.uid);
+    }
+  }, [user]);
+
   return (
     <SidebarProvider>
       <div className="flex min-h-screen flex-col">

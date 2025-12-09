@@ -15,19 +15,33 @@ import { useRole } from '@/contexts/role-context';
 import { Leaf, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { sendOTP } from '@/lib/auth';
+import { sendOTP, signInWithEmailAndPassword } from '@/lib/auth';
 
 export default function LoginPage() {
-  const { setRole } = useRole();
+  const { setRole, setUser } = useRole();
   const router = useRouter();
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState('');
 
-  const handleGovLogin = (e: React.FormEvent) => {
+  const handleGovLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setRole('government');
-    router.push(`/government/dashboard`);
+    setError('');
+    setIsSending(true);
+    try {
+      const user = await signInWithEmailAndPassword(email, password);
+      setUser(user);
+      setRole('government');
+      router.push(`/government/dashboard`);
+    } catch (err) {
+      const e = err as Error;
+      setError(e.message || 'Failed to login.');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
@@ -35,16 +49,19 @@ export default function LoginPage() {
     setError('');
     // Basic validation for Indian/Nepalese numbers
     if (!/^\+?(91|977)\d{9,10}$/.test(phone.replace(/\s/g, ''))) {
-      setError('Please enter a valid Indian (+91) or Nepalese (+977) phone number.');
+      setError(
+        'Please enter a valid Indian (+91) or Nepalese (+977) phone number.'
+      );
       return;
     }
-    
+
     setIsSending(true);
     try {
       await sendOTP(phone);
       router.push(`/auth/verify-otp?phone=${encodeURIComponent(phone)}`);
     } catch (err) {
-      setError('Failed to send OTP. Please try again.');
+      const e = err as Error;
+      setError(e.message || 'Failed to send OTP. Please try again.');
       console.error(err);
     } finally {
       setIsSending(false);
@@ -82,11 +99,17 @@ export default function LoginPage() {
                       onChange={(e) => setPhone(e.target.value)}
                       required
                     />
-                     <div id="recaptcha-container" className="my-2"></div>
+                    <div id="recaptcha-container" className="my-2"></div>
                   </div>
-                   {error && <p className="text-sm text-destructive">{error}</p>}
-                  <Button type="submit" className="w-full font-bold" disabled={isSending}>
-                    {isSending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {error && <p className="text-sm text-destructive">{error}</p>}
+                  <Button
+                    type="submit"
+                    className="w-full font-bold"
+                    disabled={isSending}
+                  >
+                    {isSending && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Send OTP
                   </Button>
                 </div>
@@ -101,14 +124,31 @@ export default function LoginPage() {
                       id="email"
                       type="email"
                       placeholder="user@gov.in"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input id="password" type="password" required />
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
                   </div>
-                  <Button type="submit" className="w-full font-bold" variant="secondary">
+                  {error && <p className="text-sm text-destructive">{error}</p>}
+                  <Button
+                    type="submit"
+                    className="w-full font-bold"
+                    variant="secondary"
+                    disabled={isSending}
+                  >
+                    {isSending && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     Login
                   </Button>
                 </div>

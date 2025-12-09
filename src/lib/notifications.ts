@@ -1,57 +1,78 @@
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  limit,
+  updateDoc,
+  doc,
+} from 'firebase/firestore';
+import { getMessaging, getToken, onMessage } from 'firebase/messaging';
+import { initializeFirebase, useFirestore } from '@/firebase';
+
 export interface AppNotification {
   id: string;
-  type: 'pump_on' | 'pump_off' | 'rain_alert' | 'water_low' | 'soil_low' | 'device_offline';
+  type:
+    | 'pump_on'
+    | 'pump_off'
+    | 'rain_alert'
+    | 'water_low'
+    | 'soil_low'
+    | 'device_offline';
   title: string;
   message: string;
-  timestamp: number;
+  timestamp: any; // Firestore Timestamp
   read: boolean;
   urgency: 'high' | 'medium' | 'low';
 }
 
-// Mock data for notifications
-const mockNotifications: AppNotification[] = [
-  {
-    id: '1',
-    type: 'water_low',
-    title: 'Reservoir Water Low',
-    message: 'Water level in North Field Pump is at 20%. Consider refilling.',
-    timestamp: Date.now() - 1000 * 60 * 30, // 30 minutes ago
-    read: false,
-    urgency: 'high',
-  },
-  {
-    id: '2',
-    type: 'soil_low',
-    title: 'Dry Soil Detected',
-    message: 'Soil moisture in East Field Sensor is below 30%. Irrigation may be needed.',
-    timestamp: Date.now() - 1000 * 60 * 60 * 2, // 2 hours ago
-    read: false,
-    urgency: 'medium',
-  },
-  {
-    id: '3',
-    type: 'pump_on',
-    title: 'Pump Activated',
-    message: 'Irrigation pump for North Field Pump was turned ON.',
-    timestamp: Date.now() - 1000 * 60 * 60 * 5, // 5 hours ago
-    read: true,
-    urgency: 'low',
-  },
-   {
-    id: '4',
-    type: 'rain_alert',
-    title: 'Heavy Rain Forecasted',
-    message: 'Heavy rain is expected in your area in the next 3 hours. Consider pausing irrigation schedules.',
-    timestamp: Date.now() - 1000 * 60 * 60 * 24, // 1 day ago
-    read: true,
-    urgency: 'medium',
-  },
-];
+/**
+ * Requests permission to send push notifications and saves the token.
+ * @param userId The ID of the current user.
+ */
+export async function setupFCM(userId: string) {
+  const { firebaseApp, firestore } = initializeFirebase();
+  const messaging = getMessaging(firebaseApp);
 
+  // Request permission
+  const permission = await Notification.requestPermission();
+  if (permission === 'granted') {
+    console.log('Notification permission granted.');
+    // Get token
+    const fcmToken = await getToken(messaging, {
+      vapidKey: process.env.NEXT_PUBLIC_FCM_VAPID_KEY,
+    });
+    if (fcmToken) {
+      console.log('FCM Token:', fcmToken);
+      // Save token to Firestore
+      const tokenRef = doc(firestore, `farmers/${userId}/fcmTokens`, fcmToken);
+      // setDocumentNonBlocking from @/firebase/non-blocking-updates is not available here
+      // so we use setDoc directly with a catch block.
+      await setDoc(tokenRef, { token: fcmToken, createdAt: new Date() }).catch(
+        (err) => console.error('Failed to save FCM token', err)
+      );
+    } else {
+      console.log('No registration token available. Request permission to generate one.');
+    }
+  } else {
+    console.log('Unable to get permission to notify.');
+  }
+
+  onMessage(messaging, (payload) => {
+    console.log('Message received. ', payload);
+    // Customize notification here
+    const notificationTitle = payload.notification?.title || 'New Alert';
+    const notificationOptions = {
+      body: payload.notification?.body || '',
+      icon: '/firebase-logo.png', // a default icon
+    };
+
+    new Notification(notificationTitle, notificationOptions);
+  });
+}
 
 /**
- * Placeholder function to listen for new notifications.
- * In a real app, this would subscribe to Firestore or an FCM topic.
+ * Listens for new notifications for a specific user from Firestore.
  * @param userId The ID of the user to fetch notifications for.
  * @param callback A function to call with the new notifications.
  * @returns An unsubscribe function.
@@ -60,47 +81,52 @@ export function listenForNotifications(
   userId: string,
   callback: (notifications: AppNotification[]) => void
 ): () => void {
-  console.log(`Setting up notification listener for user ${userId}...`);
+  const { firestore } = initializeFirebase();
+  if (!firestore || !userId) {
+    return () => {};
+  }
 
-  // Immediately invoke callback with mock data
-  callback(mockNotifications);
+  const notificationsRef = collection(
+    firestore,
+    `farmers/${userId}/notifications`
+  );
+  const q = query(notificationsRef, orderBy('timestamp', 'desc'), limit(50));
 
-  // Simulate a new notification arriving after 15 seconds
-  const interval = setInterval(() => {
-    const newNotification: AppNotification = {
-      id: Math.random().toString(36).substring(2),
-      type: 'pump_off',
-      title: 'Pump Deactivated',
-      message: 'Irrigation pump for North Field Pump was turned OFF automatically.',
-      timestamp: Date.now(),
-      read: false,
-      urgency: 'low',
-    };
-    // Add to the top of the list
-    mockNotifications.unshift(newNotification);
-    callback([...mockNotifications]); // Pass a new array to trigger re-render
-     console.log('Simulated new notification received.');
-  }, 30000); // every 30 seconds
+  const unsubscribe = onSnapshot(
+    q,
+    (querySnapshot) => {
+      const notifications: AppNotification[] = [];
+      querySnapshot.forEach((doc) => {
+        notifications.push({ id: doc.id, ...doc.data() } as AppNotification);
+      });
+      callback(notifications);
+    },
+    (error) => {
+      console.error('Error listening for notifications:', error);
+    }
+  );
 
-  // Return an "unsubscribe" function
-  return () => {
-    console.log('Tearing down notification listener.');
-    clearInterval(interval);
-  };
+  return unsubscribe;
 }
 
-
 /**
- * Placeholder to mark a notification as read.
+ * Marks a notification as read in Firestore.
  * @param userId The user's ID.
  * @param notificationId The ID of the notification to mark as read.
  */
-export async function markNotificationAsRead(userId: string, notificationId: string): Promise<void> {
-    console.log(`Marking notification ${notificationId} as read for user ${userId}`);
-    const notification = mockNotifications.find(n => n.id === notificationId);
-    if (notification) {
-        notification.read = true;
-    }
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 300));
+export async function markNotificationAsRead(
+  userId: string,
+  notificationId: string
+): Promise<void> {
+  const { firestore } = initializeFirebase();
+  if (!firestore || !userId || !notificationId) return;
+
+  const notifRef = doc(
+    firestore,
+    `farmers/${userId}/notifications`,
+    notificationId
+  );
+  await updateDoc(notifRef, { read: true }).catch((err) =>
+    console.error('Failed to mark notification as read', err)
+  );
 }

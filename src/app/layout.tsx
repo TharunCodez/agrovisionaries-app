@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { RoleProvider } from '@/contexts/role-context';
 import { ThemeProvider } from '@/contexts/theme-provider';
 import { DataProvider } from '@/contexts/data-context';
+import { FirebaseClientProvider } from '@/firebase';
 
 export const metadata: Metadata = {
   title: 'Agro Visionaries',
@@ -31,14 +32,14 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <ThemeProvider>
-          <RoleProvider>
-            <DataProvider>
-              {children}
-            </DataProvider>
-          </RoleProvider>
-        </ThemeProvider>
-        <Toaster />
+        <FirebaseClientProvider>
+          <ThemeProvider>
+            <RoleProvider>
+              <DataProvider>{children}</DataProvider>
+            </RoleProvider>
+          </ThemeProvider>
+          <Toaster />
+        </FirebaseClientProvider>
       </body>
     </html>
   );
