@@ -1,11 +1,12 @@
 'use client';
 
 import { MapContainer, TileLayer, Marker, Popup, LayersControl, WMSTileLayer } from 'react-leaflet';
-import { LatLngExpression, Icon, point } from 'leaflet';
+import { LatLngExpression, Icon, point, Map as LeafletMap } from 'leaflet';
 import { Button } from '@/components/ui/button';
 import { HardDrive, Thermometer, Waves, Rss } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 type Device = {
     id: string;
@@ -52,6 +53,7 @@ const createMarkerIcon = (status: string) => {
 
 export default function ClientMap({ devices, center, zoom = 10 }: MapProps) {
     const router = useRouter();
+    const [map, setMap] = useState<LeafletMap | null>(null);
 
     const defaultCenter: LatLngExpression = center || (devices.length > 0
         ? [devices[0].lat, devices[0].lng]
@@ -61,8 +63,19 @@ export default function ClientMap({ devices, center, zoom = 10 }: MapProps) {
         router.push(`/farmer/devices/${deviceId}`);
     };
     
+    useEffect(() => {
+        // This effect runs when the component unmounts.
+        // It's a cleanup function to explicitly destroy the map instance.
+        return () => {
+            if (map) {
+                map.remove();
+            }
+        };
+    }, [map]);
+
+
     return (
-        <MapContainer center={defaultCenter} zoom={zoom} style={{ height: '100%', width: '100%' }} scrollWheelZoom={true}>
+        <MapContainer center={defaultCenter} zoom={zoom} style={{ height: '100%', width: '100%' }} scrollWheelZoom={true} whenCreated={setMap}>
             <LayersControl position="topright">
                 <LayersControl.BaseLayer checked name="OpenStreetMap">
                     <TileLayer
