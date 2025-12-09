@@ -1,16 +1,34 @@
+'use client';
+
 import PumpControlCard from "@/components/farmer/pump-control-card";
 import WaterTank from "@/components/farmer/water-tank";
+import WeatherCard from "@/components/farmer/weather-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ChevronLeft, Share2, Settings } from "lucide-react";
+import { ChevronLeft, Share2, Settings, MapPin } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Badge } from "@/components/ui/badge";
-
+import { deviceData } from "@/lib/data";
+import { notFound, useRouter } from "next/navigation";
+import SensorCard from "@/components/farmer/sensor-card";
+import { formatDistanceToNow } from "date-fns";
 
 export default function FarmerDeviceDetailPage({ params }: { params: { id: string } }) {
-    const mapImage = PlaceHolderImages.find(img => img.id === 'map-placeholder');
+    const device = deviceData.find(d => d.id === params.id);
+    const router = useRouter();
+
+    if (!device) {
+        notFound();
+    }
+
+    const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
+    const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
+
+    const handleViewOnMap = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        router.push(`/farmer/map?lat=${device.lat}&lng=${device.lng}&zoom=18`);
+    };
 
     return (
         <div className="flex flex-col gap-6 pb-20">
@@ -20,7 +38,7 @@ export default function FarmerDeviceDetailPage({ params }: { params: { id: strin
                         <ChevronLeft />
                     </Link>
                 </Button>
-                <h1 className="font-headline text-xl font-bold">Sensor LIV-001</h1>
+                <h1 className="font-headline text-xl font-bold text-center flex-1">{device.name}</h1>
                 <div className="flex gap-2">
                     <Button variant="ghost" size="icon">
                         <Share2 />
@@ -38,36 +56,53 @@ export default function FarmerDeviceDetailPage({ params }: { params: { id: strin
                 <CardContent>
                     <div className="flex items-center justify-between">
                         <span className="text-muted-foreground">Status</span>
-                        <Badge className="bg-green-600">Online</Badge>
+                        <Badge className={device.status === 'Online' ? "bg-green-600" : "bg-red-600"}>{device.status}</Badge>
                     </div>
                      <div className="flex items-center justify-between mt-2">
                         <span className="text-muted-foreground">Last updated</span>
-                        <span>2 minutes ago</span>
+                        <span>{timeAgo}</span>
                     </div>
                 </CardContent>
             </Card>
 
-            <div className="grid grid-cols-1 gap-6">
-                <WaterTank level={53} />
+            <WeatherCard lat={device.lat} lng={device.lng} />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <WaterTank level={device.waterLevel} />
                 <PumpControlCard />
             </div>
-            
+
             <Card>
-                <CardHeader>
-                    <CardTitle>Location</CardTitle>
+                 <CardHeader>
+                    <CardTitle className="text-lg">Live Sensor Readings</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    {mapImage && (
-                         <div className="relative h-64 w-full overflow-hidden rounded-md">
-                            <Image
-                                src={mapImage.imageUrl}
-                                alt="Device location on map"
-                                fill
-                                className="object-cover"
-                                data-ai-hint={mapImage.imageHint}
-                            />
-                        </div>
-                    )}
+                    <div className="grid grid-cols-2 gap-4">
+                        <SensorCard type="temperature" value={`${device.temperature}°C`} />
+                        <SensorCard type="soil" value={`${device.soilMoisture}%`} />
+                        <SensorCard type="humidity" value={`${device.humidity}%`} />
+                        <SensorCard type="rssi" value={`${device.rssi} dBm`} />
+                    </div>
+                </CardContent>
+            </Card>
+            
+            <Card>
+                <CardHeader className="flex-row items-center justify-between">
+                    <CardTitle>Location</CardTitle>
+                     <Button variant="outline" size="sm" onClick={handleViewOnMap}>
+                        <MapPin className="mr-2 h-4 w-4" />
+                        Show Location
+                    </Button>
+                </CardHeader>
+                <CardContent>
+                    <div className="text-muted-foreground">
+                        {device.location}, {device.region}
+                    </div>
+                     <div className="text-sm mt-2">
+                        <a href={`/farmer/map?lat=${device.lat}&lng=${device.lng}&zoom=18`} className="text-primary hover:underline">
+                           View on Map
+                        </a>
+                    </div>
                 </CardContent>
             </Card>
 

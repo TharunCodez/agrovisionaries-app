@@ -7,7 +7,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { ChevronLeft, Layers, Minus, Plus } from "lucide-react";
 import { deviceData } from "@/lib/data";
 
-export default function GovernmentMapPage() {
+export default function FarmerMapPage() {
     const mapRef = useRef<HTMLIFrameElement>(null);
     const [mapError, setMapError] = useState<string | null>(null);
     const [token, setToken] = useState<string | null>(null);
@@ -18,9 +18,10 @@ export default function GovernmentMapPage() {
     const lng = searchParams.get('lng');
     const zoom = searchParams.get('zoom');
     
+    // Default to a central location if no params
     const initialLat = lat ? parseFloat(lat) : 28.6139;
     const initialLng = lng ? parseFloat(lng) : 77.2090;
-    const initialZoom = zoom ? parseInt(zoom) : 5;
+    const initialZoom = zoom ? parseInt(zoom) : 10;
     
     const [view, setView] = useState({ lat: initialLat, lng: initialLng, zoom: initialZoom });
 
@@ -59,7 +60,7 @@ export default function GovernmentMapPage() {
     if (mapError) {
         return (
              <div className="flex flex-col gap-6 p-4">
-                <h1 className="font-headline text-3xl font-bold">Device Map View</h1>
+                <h1 className="font-headline text-3xl font-bold">Farm Map</h1>
                 <Card>
                     <CardContent className="p-6">
                         <p className="text-destructive">{mapError}</p>
@@ -70,12 +71,12 @@ export default function GovernmentMapPage() {
     }
 
     return (
-        <div className="flex flex-col gap-6 h-[calc(100vh-8rem)] pb-4 md:h-[calc(100vh-4rem)] md:pb-0">
+        <div className="flex flex-col gap-6 h-[calc(100vh-8rem)] pb-20 md:h-[calc(100vh-4rem)] md:pb-0">
              <div className="flex items-center justify-between">
                 <Button variant="ghost" size="icon" onClick={() => router.back()}>
                     <ChevronLeft />
                 </Button>
-                <h1 className="font-headline text-xl font-bold">Device Map View</h1>
+                <h1 className="font-headline text-xl font-bold">Farm Map</h1>
                 <Button variant="ghost" size="icon">
                     <Layers />
                 </Button>

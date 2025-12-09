@@ -2,23 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Cloud, CloudRain, Sun, Cloudy, Wind, Sunrise, Sunset, Eye, Gauge } from "lucide-react";
+import { Cloud, CloudRain, Sun, Cloudy, Wind, Sunrise, Sunset, Eye, Gauge, AlertTriangle } from "lucide-react";
 import { Skeleton } from '../ui/skeleton';
 import { cn } from '@/lib/utils';
 
 const iconMap: { [key: number]: React.ElementType } = {
   1000: Sun, // Clear
+  1001: Cloud, // Cloudy
   1100: Sun, // Mostly Clear
   1101: Cloudy, // Partly Cloudy
   1102: Cloud, // Mostly Cloudy
-  1001: Cloud, // Cloudy
   2000: Wind, // Fog
   2100: Wind, // Light Fog
   4000: CloudRain, // Drizzle
   4001: CloudRain, // Rain
   4200: CloudRain, // Light Rain
   4201: CloudRain, // Heavy Rain
-  // Add more mappings as needed
 };
 
 interface WeatherData {
@@ -31,40 +30,47 @@ interface WeatherData {
   sunsetTime: string;
 }
 
-export default function WeatherCard() {
+interface WeatherCardProps {
+    lat?: number;
+    lng?: number;
+}
+
+export default function WeatherCard({ lat = 28.6139, lng = 77.2090 }: WeatherCardProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchWeather = async () => {
+      setLoading(true);
+      setError(null);
       const apiKey = process.env.NEXT_PUBLIC_TOMORROW_IO_API_KEY;
       if (!apiKey) {
-        setError("API key not found.");
+        setError("API key for weather service is not configured.");
         setLoading(false);
         return;
       }
 
-      // Using a fixed location for demonstration (New Delhi, India)
-      const lat = 28.6139;
-      const lon = 77.2090;
-      const url = `https://api.tomorrow.io/v4/weather/realtime?location=${lat},${lon}&apikey=${apiKey}&units=metric`;
+      const url = `https://api.tomorrow.io/v4/weather/realtime?location=${lat},${lng}&apikey=${apiKey}&units=metric`;
 
       try {
         const response = await fetch(url);
         if (!response.ok) {
-          throw new Error(`Failed to fetch weather data: ${response.statusText}`);
+          const errorData = await response.json();
+          throw new Error(errorData.message || `Failed to fetch weather data: ${response.statusText}`);
         }
         const data = await response.json();
         const values = data.data.values;
+        const times = data.data.time;
+
         setWeather({
           temperature: Math.round(values.temperature),
           weatherCode: values.weatherCode,
           windSpeed: values.windSpeed,
           humidity: values.humidity,
           visibility: values.visibility,
-          sunriseTime: new Date(values.sunriseTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          sunsetTime: new Date(values.sunsetTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          sunriseTime: values.sunriseTime ? new Date(values.sunriseTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A',
+          sunsetTime: values.sunsetTime ? new Date(values.sunsetTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'N/A',
         });
       } catch (err: any) {
         setError(err.message);
@@ -74,7 +80,7 @@ export default function WeatherCard() {
     };
 
     fetchWeather();
-  }, []);
+  }, [lat, lng]);
 
   if (loading) {
     return (
@@ -98,8 +104,11 @@ export default function WeatherCard() {
   if (error || !weather) {
     return (
       <Card>
-        <CardHeader><CardTitle>Weather</CardTitle></CardHeader>
-        <CardContent><p className='text-destructive'>Could not load weather data. {error}</p></CardContent>
+        <CardHeader><CardTitle>Live Weather</CardTitle></CardHeader>
+        <CardContent className='flex items-center gap-4 text-destructive'>
+            <AlertTriangle />
+            <p>Could not load weather data. <br/> {error}</p>
+        </CardContent>
       </Card>
     )
   }
@@ -121,14 +130,17 @@ export default function WeatherCard() {
             <div className="flex flex-col items-center gap-1 rounded-lg bg-muted/50 p-2">
                 <Wind className="h-5 w-5 text-muted-foreground" />
                 <span className='font-bold'>{weather.windSpeed} km/h</span>
+                <span className='text-muted-foreground'>Wind</span>
             </div>
             <div className="flex flex-col items-center gap-1 rounded-lg bg-muted/50 p-2">
                 <Gauge className="h-5 w-5 text-muted-foreground" />
                 <span className='font-bold'>{weather.humidity}%</span>
+                <span className='text-muted-foreground'>Humidity</span>
             </div>
              <div className="flex flex-col items-center gap-1 rounded-lg bg-muted/50 p-2">
                 <Eye className="h-5 w-5 text-muted-foreground" />
                 <span className='font-bold'>{weather.visibility} km</span>
+                <span className='text-muted-foreground'>Visibility</span>
             </div>
         </div>
          <div className="grid w-full grid-cols-2 gap-2 text-sm">

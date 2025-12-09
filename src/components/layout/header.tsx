@@ -27,12 +27,14 @@ function getPageTitle(pathname: string, role: 'farmer' | 'government' | null): s
         if (pathname.startsWith('/government/map')) return 'Device Map';
         if (pathname.startsWith('/government/notifications')) return 'Notifications';
         if (pathname.startsWith('/government/farmers')) return 'Farmer Database';
+        if (pathname.startsWith('/government/analytics')) return 'Analytics';
         if (pathname.startsWith('/government/settings')) return 'Settings';
         return 'Government Portal';
     }
      if (role === 'farmer') {
         if (pathname.startsWith('/farmer/dashboard')) return 'Dashboard';
         if (pathname.startsWith('/farmer/devices')) return 'My Devices';
+        if (pathname.startsWith('/farmer/map')) return 'Farm Map';
         if (pathname.startsWith('/farmer/notifications')) return 'Alerts';
         if (pathname.startsWith('/farmer/settings')) return 'Settings';
         return 'Farmer Portal';

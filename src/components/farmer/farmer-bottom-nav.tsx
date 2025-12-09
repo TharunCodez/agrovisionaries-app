@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, HardDrive, Bell, Settings, Globe } from 'lucide-react';
+import { LayoutDashboard, HardDrive, Bell, Settings, Map } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LanguageSwitcher from '../layout/language-switcher';
 
 const navItems = [
   { href: '/farmer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { href: '/farmer/devices', icon: HardDrive, label: 'Devices' },
+  { href: '/farmer/map', icon: Map, label: 'Map' },
   { href: '/farmer/notifications', icon: Bell, label: 'Alerts' },
   { href: '/farmer/settings', icon: Settings, label: 'Settings' },
 ];
@@ -20,7 +21,7 @@ export default function FarmerBottomNav() {
     <div className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm md:hidden">
       <nav className="flex h-16 items-center justify-around">
         {navItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+          const isActive = pathname === item.href || (item.href !== '/farmer/dashboard' && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}

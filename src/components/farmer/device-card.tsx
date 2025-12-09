@@ -1,34 +1,113 @@
+'use client';
 import Link from "next/link";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, HardDrive } from "lucide-react";
+import { ChevronRight, HardDrive, Thermometer, Droplets, Waves, Rss, CloudRain, Battery, MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { formatDistanceToNow } from 'date-fns';
+import { Button } from "../ui/button";
+import { useRouter } from "next/navigation";
 
-type Device = {
+export type Device = {
     id: string;
     name: string;
     location: string;
-    status: 'Online' | 'Offline';
-}
+    status: 'Online' | 'Offline' | 'Warning' | 'Critical';
+    lastUpdated: Date | string;
+    temperature: number;
+    humidity: number;
+    soilMoisture: number;
+    rssi: number;
+    health: 'Good' | 'Excellent' | 'Warning' | 'Poor';
+    lat: number;
+    lng: number;
+    waterLevel: number;
+};
 
 export default function DeviceCard({ device }: { device: Device }) {
     const isOnline = device.status === 'Online';
+    const router = useRouter();
+
+    const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
+    const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
+
+    const getHealthBadgeClass = () => {
+        switch (device.health) {
+            case 'Excellent': return 'bg-green-600';
+            case 'Good': return 'bg-blue-500';
+            case 'Warning': return 'bg-yellow-500';
+            case 'Poor': return 'bg-red-600';
+            default: return 'bg-gray-400';
+        }
+    };
+    
+    const getStatusBadgeClass = () => {
+        switch (device.status) {
+            case 'Online': return 'bg-green-600';
+            case 'Warning': return 'bg-yellow-500 text-black';
+            case 'Critical': return 'bg-orange-600';
+            case 'Offline': return 'bg-red-600';
+            default: return 'bg-gray-500';
+        }
+    };
+
+    const handleViewOnMap = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        router.push(`/farmer/map?lat=${device.lat}&lng=${device.lng}&zoom=15`);
+    };
+
     return (
-        <Link href={`/farmer/devices/${device.id}`}>
-            <Card className="flex items-center p-4 transition-all hover:bg-accent">
-                <div className="mr-4 rounded-full bg-muted p-3">
-                    <HardDrive className={`h-6 w-6 ${isOnline ? 'text-primary' : 'text-muted-foreground'}`} />
-                </div>
+        <Card className="p-4 transition-all hover:bg-card/90 hover:shadow-lg bg-card text-card-foreground">
+            <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                    <CardTitle className="text-lg">{device.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{device.location}</p>
+                    <Link href={`/farmer/devices/${device.id}`} className="block">
+                        <div className="flex items-center gap-3 mb-2">
+                             <HardDrive className={cn("h-6 w-6", isOnline ? 'text-primary' : 'text-muted-foreground')} />
+                             <div>
+                                <h3 className="font-bold text-lg">{device.name}</h3>
+                                <p className="text-xs text-muted-foreground">{device.id}</p>
+                             </div>
+                        </div>
+                    </Link>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm mt-4">
+                        <div className="flex items-center gap-2" title="Temperature">
+                            <Thermometer className="h-5 w-5 text-red-400" />
+                            <span>{device.temperature}°C</span>
+                        </div>
+                         <div className="flex items-center gap-2" title="Humidity">
+                            <Droplets className="h-5 w-5 text-blue-400" />
+                            <span>{device.humidity}%</span>
+                        </div>
+                         <div className="flex items-center gap-2" title="Soil Moisture">
+                            <Waves className="h-5 w-5 text-green-400" />
+                            <span>{device.soilMoisture}%</span>
+                        </div>
+                         <div className="flex items-center gap-2" title="LoRa RSSI">
+                            <Rss className="h-5 w-5 text-purple-400" />
+                            <span>{device.rssi} dBm</span>
+                        </div>
+                    </div>
                 </div>
-                <div className="flex items-center gap-4">
-                    <Badge variant={isOnline ? 'default' : 'secondary'} className={isOnline ? 'bg-green-600' : ''}>
+                <div className="flex flex-col items-end gap-2 shrink-0">
+                     <Badge variant={'default'} className={cn('text-white', getStatusBadgeClass())}>
                         {device.status}
                     </Badge>
-                    <ChevronRight className="h-6 w-6 text-muted-foreground" />
+                     <Badge className={cn(getHealthBadgeClass(), 'text-white')}>{device.health}</Badge>
+                     <p className="text-xs text-muted-foreground mt-2">{timeAgo}</p>
                 </div>
-            </Card>
-        </Link>
+            </div>
+             <div className="flex justify-between items-center mt-4 border-t border-border pt-3">
+                 <Button variant="link" size="sm" onClick={handleViewOnMap}>
+                    <MapPin className="mr-2 h-4 w-4" />
+                    View on Map
+                </Button>
+                <Link href={`/farmer/devices/${device.id}`} passHref>
+                     <Button variant="ghost" size="icon" className="h-8 w-8">
+                        <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    </Button>
+                </Link>
+            </div>
+        </Card>
     );
 }

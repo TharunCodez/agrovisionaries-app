@@ -1,14 +1,14 @@
-import DeviceCard from "@/components/farmer/device-card";
+'use client';
+import DeviceCard, { type Device } from "@/components/farmer/device-card";
 import { Button } from "@/components/ui/button";
 import { PlusCircle } from "lucide-react";
-
-const devices = [
-    { id: '1', name: 'LIV-001', location: 'North Field', status: 'Online' },
-    { id: '2', name: 'LIV-002', location: 'South Field', status: 'Offline' },
-    { id: '3', name: 'LIV-003', location: 'West Field', status: 'Online' },
-]
+import { deviceData } from "@/lib/data"; // Using mock data for now
+import { useUser } from "@/hooks/use-user"; // Will be used for real data
 
 export default function DevicesPage() {
+    // This would be replaced with a firestore query based on the logged-in farmer
+    const userDevices = deviceData.filter(d => d.farmerId === 'F001');
+
     return (
         <div className="flex flex-col gap-6 pb-20">
             <div className="flex items-center justify-between">
@@ -19,8 +19,8 @@ export default function DevicesPage() {
                  </Button>
             </div>
             <div className="grid grid-cols-1 gap-4">
-                {devices.map(device => (
-                    <DeviceCard key={device.id} device={device} />
+                {userDevices.map(device => (
+                    <DeviceCard key={device.id} device={device as Device} />
                 ))}
             </div>
         </div>

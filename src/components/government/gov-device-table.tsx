@@ -13,9 +13,10 @@ import { deviceData, farmerData } from "@/lib/data"
 import { cn } from "@/lib/utils"
 import { useState, Fragment } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronRight, HardDrive, Waves, Thermometer, CloudRain } from "lucide-react";
+import { ChevronDown, ChevronRight, HardDrive, Waves, Thermometer, CloudRain, Rss, Battery, MapPin } from "lucide-react";
 import { Button } from "../ui/button";
-import PumpControlCard from "../farmer/pump-control-card";
+import { useRouter } from "next/navigation";
+import { formatDistanceToNow } from 'date-fns';
 
 
 const getStatusBadge = (status: string) => {
@@ -23,7 +24,7 @@ const getStatusBadge = (status: string) => {
         case 'online':
             return 'bg-green-600 hover:bg-green-700';
         case 'warning':
-            return 'bg-yellow-500 hover:bg-yellow-600';
+            return 'bg-yellow-500 hover:bg-yellow-600 text-black';
         case 'critical':
              return 'bg-orange-600 hover:bg-orange-700';
         case 'offline':
@@ -35,29 +36,27 @@ const getStatusBadge = (status: string) => {
 
 export function GovDeviceTable() {
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
+    const router = useRouter();
 
     const toggleRow = (id: string) => {
         setExpandedRow(expandedRow === id ? null : id);
     };
 
+    const handleViewOnMap = (e: React.MouseEvent, lat: number, lng: number) => {
+        e.stopPropagation();
+        router.push(`/government/map?lat=${lat}&lng=${lng}&zoom=18`);
+    };
+
     const devicesWithFarmer = deviceData.map(device => {
         const farmer = farmerData.find(f => f.id === device.farmerId);
+        const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
+        const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
         return {
             ...device,
-            farmerName: farmer?.name || 'N/A'
+            farmerName: farmer?.name || 'N/A',
+            lastUpdated: timeAgo,
         };
     });
-    
-    // Simple pseudo-random data for sensors
-    const getSensorData = (deviceId: string) => {
-        const hash = deviceId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-        return {
-            waterLevel: (hash % 50) + 20, // 20-70%
-            soilMoisture: (hash % 60) + 30, // 30-90%
-            temperature: (hash % 15) + 20, // 20-35 C
-            rain: (hash % 3 === 0) ? 'None' : (hash % 3 === 1) ? 'Low' : 'Medium'
-        }
-    }
 
   return (
     <Card>
@@ -79,7 +78,6 @@ export function GovDeviceTable() {
             </TableHeader>
             <TableBody>
                 {devicesWithFarmer.map((device) => {
-                    const sensorData = getSensorData(device.id);
                     const isExpanded = expandedRow === device.id;
 
                     return (
@@ -113,35 +111,45 @@ export function GovDeviceTable() {
                                             transition={{ duration: 0.3, ease: 'easeInOut' }}
                                             className="overflow-hidden"
                                         >
-                                            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4">
-                                                <div className="md:col-span-1">
-                                                    <h4 className="font-bold mb-2">Device Controls</h4>
-                                                    <PumpControlCard />
+                                            <div className="p-4">
+                                                <div className="flex justify-between items-center mb-4">
+                                                    <h4 className="font-bold text-lg">Live Sensor Readings</h4>
+                                                    <Button variant="outline" size="sm" onClick={(e) => handleViewOnMap(e, device.lat, device.lng)}>
+                                                        <MapPin className="mr-2 h-4 w-4" />
+                                                        Show on Map
+                                                    </Button>
                                                 </div>
-                                                <div className="md:col-span-3">
-                                                    <h4 className="font-bold mb-2">Live Sensor Readings</h4>
-                                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                                                        <Card className="flex flex-col items-center justify-center p-4">
-                                                            <Waves className="h-8 w-8 text-blue-500 mb-2"/>
-                                                            <p className="text-xl font-bold">{sensorData.waterLevel}%</p>
-                                                            <p className="text-xs text-muted-foreground">Water Level</p>
-                                                        </Card>
-                                                        <Card className="flex flex-col items-center justify-center p-4">
-                                                            <Thermometer className="h-8 w-8 text-red-500 mb-2"/>
-                                                            <p className="text-xl font-bold">{sensorData.temperature}°C</p>
-                                                            <p className="text-xs text-muted-foreground">Temperature</p>
-                                                        </Card>
-                                                        <Card className="flex flex-col items-center justify-center p-4">
-                                                            <HardDrive className="h-8 w-8 text-green-600 mb-2"/>
-                                                            <p className="text-xl font-bold">{sensorData.soilMoisture}%</p>
-                                                            <p className="text-xs text-muted-foreground">Soil Moisture</p>
-                                                        </Card>
-                                                        <Card className="flex flex-col items-center justify-center p-4">
-                                                            <CloudRain className="h-8 w-8 text-gray-500 mb-2"/>
-                                                            <p className="text-xl font-bold">{sensorData.rain}</p>
-                                                            <p className="text-xs text-muted-foreground">Rain</p>
-                                                        </Card>
-                                                    </div>
+                                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                                                    <Card className="flex flex-col items-center justify-center p-3 text-center">
+                                                        <Waves className="h-7 w-7 text-blue-500 mb-2"/>
+                                                        <p className="text-lg font-bold">{device.waterLevel}%</p>
+                                                        <p className="text-xs text-muted-foreground">Water Level</p>
+                                                    </Card>
+                                                    <Card className="flex flex-col items-center justify-center p-3 text-center">
+                                                        <Waves className="h-7 w-7 text-green-600 mb-2"/>
+                                                        <p className="text-lg font-bold">{device.soilMoisture}%</p>
+                                                        <p className="text-xs text-muted-foreground">Soil Moisture</p>
+                                                    </Card>
+                                                    <Card className="flex flex-col items-center justify-center p-3 text-center">
+                                                        <Thermometer className="h-7 w-7 text-red-500 mb-2"/>
+                                                        <p className="text-lg font-bold">{device.temperature}°C</p>
+                                                        <p className="text-xs text-muted-foreground">Temperature</p>
+                                                    </Card>
+                                                     <Card className="flex flex-col items-center justify-center p-3 text-center">
+                                                        <Droplets className="h-7 w-7 text-sky-500 mb-2"/>
+                                                        <p className="text-lg font-bold">{device.humidity}%</p>
+                                                        <p className="text-xs text-muted-foreground">Humidity</p>
+                                                    </Card>
+                                                    <Card className="flex flex-col items-center justify-center p-3 text-center">
+                                                        <Rss className="h-7 w-7 text-purple-500 mb-2"/>
+                                                        <p className="text-lg font-bold">{device.rssi} dBm</p>
+                                                        <p className="text-xs text-muted-foreground">LoRa RSSI</p>
+                                                    </Card>
+                                                     <Card className="flex flex-col items-center justify-center p-3 text-center">
+                                                        <Battery className="h-7 w-7 text-yellow-500 mb-2"/>
+                                                        <p className="text-lg font-bold">{Math.round(device.rssi/-2 + 80)}%</p>
+                                                        <p className="text-xs text-muted-foreground">Battery</p>
+                                                    </Card>
                                                 </div>
                                             </div>
                                         </motion.div>

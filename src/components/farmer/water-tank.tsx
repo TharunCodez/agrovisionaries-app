@@ -1,4 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+'use client';
+
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Waves } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -9,33 +11,42 @@ interface WaterTankProps {
 export default function WaterTank({ level }: WaterTankProps) {
   const waterHeight = Math.max(0, Math.min(100, level));
 
+  const getWaterColor = () => {
+    if (level < 20) return "bg-red-500";
+    if (level < 50) return "bg-yellow-500";
+    return "bg-blue-500";
+  };
+
+  const getTextColor = () => {
+    if (level < 20) return "text-red-500";
+    if (level < 50) return "text-yellow-500";
+    return "text-blue-500";
+  }
+
   return (
     <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle className="text-lg">Reservoir Level</CardTitle>
+        <CardDescription>Live water level status</CardDescription>
       </CardHeader>
-      <CardContent className="flex items-center justify-center pt-4">
-        <div className="relative h-48 w-32 rounded-t-lg border-x-4 border-t-4 border-primary bg-muted/20 overflow-hidden">
+      <CardContent className="flex flex-col items-center justify-center gap-4 pt-4">
+        <div className="relative h-48 w-40 rounded-t-lg border-x-4 border-t-4 border-primary bg-muted/20 overflow-hidden">
+          {/* Water fill animation */}
           <div
             className={cn(
               "absolute bottom-0 left-0 right-0 transition-all duration-1000 ease-in-out",
-              level > 50 ? "bg-blue-500" : level > 20 ? "bg-yellow-500" : "bg-red-500"
+              getWaterColor()
             )}
             style={{ height: `${waterHeight}%` }}
           >
-            <div className="absolute top-0 left-0 right-0 h-4 bg-black/10"></div>
-            <Waves className="absolute -top-4 left-1/2 h-8 w-8 -translate-x-1/2 text-white/50 animate-[wave_4s_ease-in-out_infinite]" />
-            <Waves className="absolute -top-4 left-1/4 h-8 w-8 -translate-x-1/2 text-white/50 animate-[wave_4s_ease-in-out_infinite_1s]" />
-             <Waves className="absolute -top-4 left-3/4 h-8 w-8 -translate-x-1/2 text-white/50 animate-[wave_4s_ease-in-out_infinite_2s]" />
+            {/* Wave animation */}
+            <div className="absolute -top-1 w-full h-4 overflow-hidden">
+                <div className="absolute w-[200%] h-8 bg-black/10 -bottom-4 animate-[wave_4s_ease-in-out_infinite] rounded-[45%]"></div>
+            </div>
           </div>
-           <div
-            className={cn(
-                "absolute -right-16 top-1/2 -translate-y-1/2 text-3xl font-bold transition-colors",
-                level > 50 ? "text-primary" : "text-destructive"
-            )}
-          >
-            {level}%
-          </div>
+        </div>
+        <div className={cn("text-4xl font-bold", getTextColor())}>
+          {level}%
         </div>
       </CardContent>
     </Card>

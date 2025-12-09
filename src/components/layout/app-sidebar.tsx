@@ -5,12 +5,13 @@ import { usePathname } from 'next/navigation';
 import {
   Bell,
   HardDrive,
-  Landmark,
+  BarChart,
   LayoutDashboard,
   Leaf,
   LogOut,
   Map,
   Settings,
+  Users,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -27,7 +28,8 @@ const governmentMenuItems = [
   { href: '/government/devices', label: 'Devices', icon: HardDrive },
   { href: '/government/map', label: 'Map View', icon: Map },
   { href: '/government/notifications', label: 'Notifications', icon: Bell },
-  { href: '/government/farmers', label: 'Farmer Database', icon: Landmark },
+  { href: '/government/farmers', label: 'Farmers', icon: Users },
+  { href: '/government/analytics', label: 'Analytics', icon: BarChart },
   { href: '/government/settings', label: 'Settings', icon: Settings },
 ];
 
