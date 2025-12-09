@@ -34,49 +34,29 @@ declare global {
 export async function sendOTP(
   phoneNumber: string
 ): Promise<{ verificationId: string }> {
-  const { auth } = initializeFirebase();
-  // Ensure reCAPTCHA is rendered
-  if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new RecaptchaVerifier(
-      auth,
-      'recaptcha-container',
-      {
-        size: 'invisible',
-        callback: (response: any) => {
-          // reCAPTCHA solved, allow signInWithPhoneNumber.
-          console.log('reCAPTCHA solved');
-        },
-      }
-    );
-  }
-
-  const confirmationResult = await signInWithPhoneNumber(
-    auth,
-    phoneNumber,
-    window.recaptchaVerifier
-  );
-  window.confirmationResult = confirmationResult;
-  return { verificationId: confirmationResult.verificationId };
+  // Mock implementation
+  console.log(`[MOCK] OTP sent to ${phoneNumber}`);
+  return Promise.resolve({ verificationId: 'mock-verification-id' });
 }
 
 /**
  * Verifies the OTP code and creates a user record in Firestore if it's a new user.
  * @param code The 6-digit OTP code entered by the user.
  */
-export async function verifyOTP(code: string): Promise<User> {
+export async function verifyOTP(
+  verificationId: string,
+  code: string
+): Promise<User> {
   const { firestore } = initializeFirebase();
-  if (!window.confirmationResult) {
-    throw new Error('No confirmation result found. Please send OTP first.');
+  if (verificationId !== 'mock-verification-id') {
+    throw new Error('Invalid verification ID for mock user.');
   }
 
-  const result = await window.confirmationResult.confirm(code);
-  const firebaseUser = result.user;
+  // Mock user creation
+  const mockUserId = `mock-user-${new Date().getTime()}`;
+  const mockPhoneNumber = '+919876543210'; // Using a fixed number for mock
 
-  if (!firebaseUser) {
-    throw new Error('User not found after OTP verification.');
-  }
-
-  const userRef = doc(firestore, 'farmers', firebaseUser.uid);
+  const userRef = doc(firestore, 'farmers', mockUserId);
   const userDoc = await getDoc(userRef);
 
   let user: User;
@@ -84,9 +64,9 @@ export async function verifyOTP(code: string): Promise<User> {
   if (!userDoc.exists()) {
     // New farmer, create a profile
     const newFarmerProfile = {
-      id: firebaseUser.uid,
-      name: `Farmer ${firebaseUser.uid.substring(0, 5)}`, // Placeholder name
-      phone: firebaseUser.phoneNumber,
+      id: mockUserId,
+      name: `Farmer ${mockUserId.substring(0, 5)}`, // Placeholder name
+      phone: mockPhoneNumber,
       region: 'Unknown',
       language: 'en',
       deviceIds: [],
@@ -94,15 +74,15 @@ export async function verifyOTP(code: string): Promise<User> {
     };
     setDocumentNonBlocking(userRef, newFarmerProfile, { merge: true });
     user = {
-      uid: firebaseUser.uid,
-      phoneNumber: firebaseUser.phoneNumber,
+      uid: mockUserId,
+      phoneNumber: mockPhoneNumber,
       role: 'farmer',
     };
   } else {
     // Existing farmer
     const data = userDoc.data();
     user = {
-      uid: firebaseUser.uid,
+      uid: mockUserId,
       phoneNumber: data.phone,
       role: 'farmer',
     };
