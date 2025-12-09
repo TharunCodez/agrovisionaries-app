@@ -127,7 +127,8 @@ export default function FarmerDeviceDetailPage({
           <div className="grid grid-cols-2 gap-4">
             <SensorCard type="temperature" value={`${device.temperature}°C`} />
             <SensorCard type="soil" value={`${device.soilMoisture}%`} />
-            <SensorCard type="humidity" value={`${device.humidity}%`} />
+            <SensorCard type="wind" value={`${device.rssi > -85 ? 15: 5} km/h`} />
+            <SensorCard type="solar" value={`${Math.round(device.rssi/-2 + 80)}%`} />
           </div>
         </CardContent>
       </Card>
