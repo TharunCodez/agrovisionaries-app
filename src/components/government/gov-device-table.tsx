@@ -37,7 +37,7 @@ const getStatusBadge = (status: string) => {
 export function GovDeviceTable() {
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
     const router = useRouter();
-    const { devices, farmers } = useData();
+    const { devices } = useData();
 
     const toggleRow = (id: string) => {
         setExpandedRow(expandedRow === id ? null : id);
@@ -48,17 +48,16 @@ export function GovDeviceTable() {
     };
 
     const devicesWithFarmer = devices.map(device => {
-        const farmer = farmers.find(f => f.id === device.farmerId);
         const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
         const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
         return {
             ...device,
-            farmerName: farmer?.name || 'N/A',
             lastUpdated: timeAgo,
         };
     }).sort((a, b) => {
       const aNum = parseInt(a.id.split('-')[1]);
       const bNum = parseInt(b.id.split('-')[1]);
+      if(isNaN(aNum) || isNaN(bNum)) return 0;
       return aNum - bNum;
     });
 
@@ -76,7 +75,7 @@ export function GovDeviceTable() {
                     <TableHead>Device ID</TableHead>
                     <TableHead>Farmer</TableHead>
                     <TableHead>Region</TableHead>
-                    <TableHead>Type</TableHead>
+                    <TableHead>Last Update</TableHead>
                     <TableHead className="text-right">Status</TableHead>
                     <TableHead className="w-[120px] text-center">Actions</TableHead>
                     </TableRow>
@@ -99,7 +98,7 @@ export function GovDeviceTable() {
                                     </TableCell>
                                     <TableCell>{device.farmerName}</TableCell>
                                     <TableCell>{device.region}</TableCell>
-                                    <TableCell>{device.type || 'N/A'}</TableCell>
+                                    <TableCell>{device.lastUpdated}</TableCell>
                                     <TableCell className="text-right">
                                         <Badge className={cn("text-white", getStatusBadge(device.status))}>{device.status}</Badge>
                                     </TableCell>
@@ -146,7 +145,7 @@ export function GovDeviceTable() {
                                                             <Droplets className="h-7 w-7 text-sky-500 mb-2"/>
                                                             <p className="text-lg font-bold">{device.humidity}%</p>
                                                             <p className="text-xs text-muted-foreground">Humidity</p>
-                                                        </Card>
+                                                         </Card>
                                                         <Card className="flex flex-col items-center justify-center p-3 text-center">
                                                             <Rss className="h-7 w-7 text-purple-500 mb-2"/>
                                                             <p className="text-lg font-bold">{device.rssi} dBm</p>

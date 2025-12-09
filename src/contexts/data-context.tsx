@@ -2,42 +2,100 @@
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { deviceData as initialDeviceData, farmerData as initialFarmerData } from '@/lib/data';
-import { Device } from '@/components/farmer/device-card';
 
-// Extend the initial farmer data with a phone property for the form
-const initialFarmers = initialFarmerData.map((f, i) => ({
-    ...f,
-    phone: `+91987654321${i}`
-}));
+// Define types based on new requirements
+export type Device = {
+    id: string;
+    farmerId: string;
+    name: string;
+    location: string;
+    status: 'Online' | 'Offline' | 'Warning' | 'Critical';
+    lastUpdated: Date | string;
+    region: string;
+    lat: number;
+    lng: number;
+    temperature: number;
+    humidity: number;
+    soilMoisture: number;
+    rssi: number;
+    health: 'Good' | 'Excellent' | 'Warning' | 'Poor';
+    waterLevel: number;
+    farmerName: string;
+    farmerPhone: string;
+    notes?: string;
+    type?: string; // Keep for compatibility with existing components if needed, but not used in new forms
+};
 
-type Farmer = typeof initialFarmers[0];
+export type Farmer = {
+  id: string;
+  name: string;
+  region: string;
+  status: 'Active' | 'Inactive';
+  phone: string;
+};
 
 interface DataContextType {
   devices: Device[];
   farmers: Farmer[];
-  addDevice: (device: Device) => void;
+  addDeviceAndFarmer: (device: Omit<Device, 'farmerId' | 'status' | 'lastUpdated' | 'region' | 'health' | 'humidity' | 'rssi'>, farmerInfo: { name: string, phone: string}) => void;
   getNextDeviceId: () => string;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const [devices, setDevices] = useState<Device[]>(initialDeviceData.map(d => ({ ...d, type: 'Multi-Sensor' })));
-  const [farmers, setFarmers] = useState<Farmer[]>(initialFarmers);
+  const [devices, setDevices] = useState<Device[]>(initialDeviceData);
+  const [farmers, setFarmers] = useState<Farmer[]>(initialFarmerData);
 
-  const addDevice = useCallback((device: Device) => {
-    setDevices(prevDevices => [...prevDevices, device]);
+ const addDeviceAndFarmer = useCallback((device: Omit<Device, 'farmerId' | 'status' | 'lastUpdated' | 'region' | 'health' | 'humidity' | 'rssi'>, farmerInfo: { name: string, phone: string}) => {
+    setFarmers(prevFarmers => {
+        let farmer = prevFarmers.find(f => f.phone === farmerInfo.phone);
+        let newFarmerCreated = false;
+        
+        if (!farmer) {
+            const newFarmerId = `F${String(prevFarmers.length + 1).padStart(3, '0')}`;
+            farmer = {
+                id: newFarmerId,
+                name: farmerInfo.name,
+                phone: farmerInfo.phone,
+                region: 'Unknown', // Default region
+                status: 'Active'
+            };
+            newFarmerCreated = true;
+        }
+
+        const newDevice: Device = {
+            ...device,
+            farmerId: farmer.id,
+            status: 'Online',
+            lastUpdated: new Date(),
+            region: farmer.region,
+            health: 'Good',
+            humidity: 60, // Mock initial data
+            rssi: -80, // Mock initial data
+            farmerName: farmer.name,
+            farmerPhone: farmer.phone
+        };
+        
+        setDevices(prevDevices => [...prevDevices, newDevice]);
+
+        if (newFarmerCreated) {
+            return [...prevFarmers, farmer];
+        }
+        return prevFarmers;
+    });
   }, []);
 
   const getNextDeviceId = useCallback(() => {
     const lastId = devices
         .map(d => parseInt(d.id.split('-')[1]))
+        .filter(n => !isNaN(n))
         .sort((a,b) => b - a)[0] || 0;
     return `LIV-${String(lastId + 1).padStart(3, '0')}`;
   }, [devices]);
 
   return (
-    <DataContext.Provider value={{ devices, farmers, addDevice, getNextDeviceId }}>
+    <DataContext.Provider value={{ devices, farmers, addDeviceAndFarmer, getNextDeviceId }}>
       {children}
     </DataContext.Provider>
   );

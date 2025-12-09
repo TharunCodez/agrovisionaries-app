@@ -14,7 +14,7 @@ export default function FarmerList() {
       ...farmer,
       devices: deviceCount,
     }
-  })
+  }).sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <Card>
@@ -27,6 +27,7 @@ export default function FarmerList() {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead>Phone</TableHead>
               <TableHead>Region</TableHead>
               <TableHead className="text-right">Devices</TableHead>
               <TableHead className="text-right">Status</TableHead>
@@ -36,6 +37,7 @@ export default function FarmerList() {
             {farmersWithDeviceCount.map((farmer) => (
               <TableRow key={farmer.id}>
                 <TableCell className="font-medium">{farmer.name}</TableCell>
+                <TableCell>{farmer.phone}</TableCell>
                 <TableCell>{farmer.region}</TableCell>
                 <TableCell className="text-right">{farmer.devices}</TableCell>
                 <TableCell className="text-right">

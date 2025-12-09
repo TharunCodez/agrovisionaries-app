@@ -6,24 +6,7 @@ import { ChevronRight, HardDrive, Thermometer, Droplets, Waves, Rss } from "luci
 import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from "../ui/button";
-
-export type Device = {
-    id: string;
-    name: string;
-    location: string;
-    status: 'Online' | 'Offline' | 'Warning' | 'Critical';
-    lastUpdated: Date | string;
-    temperature: number;
-    humidity: number;
-    soilMoisture: number;
-    rssi: number;
-    health: 'Good' | 'Excellent' | 'Warning' | 'Poor';
-    lat: number;
-    lng: number;
-    waterLevel: number;
-    farmerId: string;
-    region: string;
-};
+import { type Device } from '@/contexts/data-context';
 
 export default function DeviceCard({ device }: { device: Device }) {
     const isOnline = device.status === 'Online';

@@ -12,10 +12,10 @@ export default function FarmerDashboardPage() {
   const { devices } = useData();
 
   const userDevices = useMemo(() => {
-    // In a real app, user.uid would be the farmerId. For now, we mock it.
-    const farmerId = "F001"; 
-    return devices.filter(d => d.farmerId === farmerId);
-  }, [devices]);
+    if (!user?.phoneNumber) return [];
+    // Filter devices based on the logged-in farmer's phone number
+    return devices.filter(d => d.farmerPhone === user.phoneNumber);
+  }, [devices, user]);
 
   return (
     <div className="flex flex-col gap-6 pb-20 md:pb-6">

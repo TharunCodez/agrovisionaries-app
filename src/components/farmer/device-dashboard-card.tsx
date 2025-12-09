@@ -14,7 +14,7 @@ import SensorCard from '@/components/farmer/sensor-card';
 import PumpControlCard from '@/components/farmer/pump-control-card';
 import WaterTank from '@/components/farmer/water-tank';
 import WeatherCard from '@/components/farmer/weather-card';
-import { type Device } from './device-card';
+import { type Device } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { useState } from 'react';
@@ -72,11 +72,11 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
           <SensorCard type="soil" value={device.soilMoisture} />
            <SensorCard
               type="wind"
-              value={`${device.rssi > -85 ? 15 : 5}`}
+              value={device.rssi > -85 ? 15 : 5}
             />
           <SensorCard
               type="solar"
-              value={`${Math.round(device.rssi / -2 + 80)}`}
+              value={Math.round(device.rssi / -2 + 80)}
             />
         </div>
          <div className="mt-4 flex justify-end border-t pt-4">
