@@ -29,10 +29,12 @@ export const weatherForecastData = [
 export const farmerData = [
   { id: 'F001', name: 'Ravi Kumar', region: 'Punjab', devices: 2, status: 'Active' },
   { id: 'F002', name: 'Priya Sharma', region: 'Haryana', devices: 1, status: 'Active' },
-  { id: 'F003', name: 'Amit Singh', region: 'Uttar Pradesh', devices: 1, status: 'Inactive' },
+  { id: 'F003', name: 'Amit Singh', region: 'Uttar Pradesh', devices: 3, status: 'Inactive' },
   { id: 'F004', name: 'Sunita Devi', region: 'Punjab', devices: 1, status: 'Active' },
-  { id: 'F005', name: 'Vijay Patel', region: 'Gujarat', devices: 2, status: 'Active' },
-  { id: 'F006', name: 'Meena Kumari', region: 'Rajasthan', devices: 1, status: 'Active' },
+  { id: 'F005', name: 'Vijay Patel', region: 'Gujarat', devices: 4, status: 'Active' },
+  { id: 'F006', name: 'Meena Kumari', region: 'Rajasthan', devices: 2, status: 'Active' },
+  { id: 'F007', name: 'Sanjay Reddy', region: 'Andhra Pradesh', devices: 3, status: 'Active' },
+  { id: 'F008', name: 'Anjali Desai', region: 'Maharashtra', devices: 2, status: 'Inactive' },
 ];
 
 export const deviceData = [
@@ -44,6 +46,14 @@ export const deviceData = [
     { id: 'LIV-006', farmerId: 'F005', name: 'Cotton Field 1', location: 'Cotton Field 1', status: 'Online', lastUpdated: new Date(Date.now() - 10 * 60 * 1000), region: 'Gujarat', lat: 22.3094, lng: 72.1362, temperature: 36, humidity: 38, soilMoisture: 50, rssi: -85, health: 'Good' as const, waterLevel: 60 },
     { id: 'LIV-007', farmerId: 'F005', name: 'Cotton Field 2', location: 'Cotton Field 2', status: 'Critical', lastUpdated: new Date(Date.now() - 30 * 60 * 1000), region: 'Gujarat', lat: 22.3100, lng: 72.1400, temperature: 38, humidity: 35, soilMoisture: 45, rssi: -95, health: 'Warning' as const, waterLevel: 25 },
     { id: 'LIV-008', farmerId: 'F006', name: 'Desert Plot', location: 'Desert Plot', status: 'Online', lastUpdated: new Date(Date.now() - 12 * 60 * 1000), region: 'Rajasthan', lat: 26.9124, lng: 75.7873, temperature: 39, humidity: 25, soilMoisture: 35, rssi: -88, health: 'Good' as const, waterLevel: 55 },
+    { id: 'LIV-009', farmerId: 'F007', name: 'Paddy Field East', location: 'Paddy Field East', status: 'Online', lastUpdated: new Date(Date.now() - 3 * 60 * 1000), region: 'Andhra Pradesh', lat: 16.5062, lng: 80.6480, temperature: 33, humidity: 60, soilMoisture: 75, rssi: -80, health: 'Excellent' as const, waterLevel: 85 },
+    { id: 'LIV-010', farmerId: 'F007', name: 'Paddy Field West', location: 'Paddy Field West', status: 'Warning', lastUpdated: new Date(Date.now() - 25 * 60 * 1000), region: 'Andhra Pradesh', lat: 16.5070, lng: 80.6450, temperature: 34, humidity: 58, soilMoisture: 70, rssi: -88, health: 'Good' as const, waterLevel: 50 },
+    { id: 'LIV-011', farmerId: 'F008', name: 'Sugarcane North', location: 'Sugarcane North', status: 'Offline', lastUpdated: new Date(Date.now() - 8 * 60 * 60 * 1000), region: 'Maharashtra', lat: 18.5204, lng: 73.8567, temperature: 31, humidity: 55, soilMoisture: 62, rssi: -105, health: 'Poor' as const, waterLevel: 40 },
+    { id: 'LIV-012', farmerId: 'F003', name: 'Vegetable Patch', location: 'Vegetable Patch', status: 'Online', lastUpdated: new Date(Date.now() - 7 * 60 * 1000), region: 'Uttar Pradesh', lat: 27.1850, lng: 78.0250, temperature: 30, humidity: 52, soilMoisture: 68, rssi: -81, health: 'Excellent' as const, waterLevel: 78 },
+    { id: 'LIV-013', farmerId: 'F003', name: 'Grain Silo', location: 'Grain Silo', status: 'Critical', lastUpdated: new Date(Date.now() - 45 * 60 * 1000), region: 'Uttar Pradesh', lat: 27.1750, lng: 78.0300, temperature: 29, humidity: 54, soilMoisture: 66, rssi: -92, health: 'Warning' as const, waterLevel: 20 },
+    { id: 'LIV-014', farmerId: 'F005', name: 'New Plot', location: 'New Plot', status: 'Online', lastUpdated: new Date(Date.now() - 9 * 60 * 1000), region: 'Gujarat', lat: 22.3150, lng: 72.1420, temperature: 35, humidity: 40, soilMoisture: 58, rssi: -84, health: 'Good' as const, waterLevel: 65 },
+    { id: 'LIV-015', farmerId: 'F006', name: 'Secondary Well', location: 'Secondary Well', status: 'Online', lastUpdated: new Date(Date.now() - 11 * 60 * 1000), region: 'Rajasthan', lat: 26.9180, lng: 75.7900, temperature: 38, humidity: 28, soilMoisture: 40, rssi: -86, health: 'Excellent' as const, waterLevel: 70 },
+    { id: 'LIV-016', farmerId: 'F007', name: 'Fish Farm Monitor', location: 'Fish Farm', status: 'Online', lastUpdated: new Date(Date.now() - 1 * 60 * 1000), region: 'Andhra Pradesh', lat: 16.5100, lng: 80.6500, temperature: 28, humidity: 70, soilMoisture: 80, rssi: -79, health: 'Excellent' as const, waterLevel: 95 },
 ];
 
 
@@ -53,4 +63,6 @@ export const regionalAnalyticsData = [
     { region: 'Uttar Pradesh', waterUsage: 5100, farmers: 150 },
     { region: 'Gujarat', waterUsage: 4000, farmers: 110 },
     { region: 'Rajasthan', waterUsage: 2800, farmers: 70 },
+    { region: 'Andhra Pradesh', waterUsage: 6200, farmers: 95 },
+    { region: 'Maharashtra', waterUsage: 5800, farmers: 130 },
 ];

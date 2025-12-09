@@ -12,6 +12,7 @@ import {
   Map,
   Settings,
   Users,
+  Satellite,
 } from 'lucide-react';
 import {
   Sidebar,
@@ -27,6 +28,7 @@ const governmentMenuItems = [
   { href: '/government/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/government/devices', label: 'Devices', icon: HardDrive },
   { href: '/government/map', label: 'Map View', icon: Map },
+  { href: '/government/satellite', label: 'Satellite', icon: Satellite },
   { href: '/government/notifications', label: 'Notifications', icon: Bell },
   { href: '/government/farmers', label: 'Farmers', icon: Users },
   { href: '/government/analytics', label: 'Analytics', icon: BarChart },
@@ -52,7 +54,7 @@ export default function AppSidebar() {
             <SidebarMenuItem key={item.href}>
               <SidebarMenuButton
                 asChild
-                isActive={pathname === item.href}
+                isActive={pathname.startsWith(item.href)}
                 tooltip={{ children: item.label, side: 'right' }}
               >
                 <Link href={item.href}>

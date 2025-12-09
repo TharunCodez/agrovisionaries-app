@@ -22,6 +22,8 @@ export type Device = {
     lat: number;
     lng: number;
     waterLevel: number;
+    farmerId: string;
+    region: string;
 };
 
 export default function DeviceCard({ device }: { device: Device }) {

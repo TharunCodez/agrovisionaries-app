@@ -36,6 +36,8 @@ function FarmerMap() {
         lat: d.lat,
         lng: d.lng,
         name: d.name,
+        id: d.id,
+        isDevice: true,
       })),
     [userDevices]
   );

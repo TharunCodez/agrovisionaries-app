@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { useRouter } from 'next/navigation';
 
 // This is a workaround for a known issue with Leaflet and Next.js/Webpack
 // It ensures that the marker icons are loaded correctly.
@@ -20,57 +21,92 @@ type MarkerData = {
     lat: number;
     lng: number;
     name: string;
+    id?: string;
+    isDevice?: boolean;
 }
 
 interface StableMapProps {
     center: [number, number];
     zoom: number;
     markers?: MarkerData[];
+    tileLayerUrl?: string;
+    tileLayerAttribution?: string;
 }
 
-export default function StableMap({ center, zoom, markers }: StableMapProps) {
+export default function StableMap({ center, zoom, markers, tileLayerUrl, tileLayerAttribution }: StableMapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+
 
   useEffect(() => {
-    // Ensure this code runs only in the browser
     if (typeof window === 'undefined' || !mapContainerRef.current) {
         return;
     }
 
-    // Destroy previous map instance if it exists
     if (mapRef.current !== null) {
       mapRef.current.remove();
       mapRef.current = null;
     }
 
-    // Initialize the map on the 'map-root' div
     mapRef.current = L.map(mapContainerRef.current, {
       center,
       zoom,
       zoomControl: true,
     });
 
-    // Add the tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(mapRef.current);
-
-    // Add markers to the map
-    markers?.forEach((m) => {
-      L.marker([m.lat, m.lng]).addTo(mapRef.current!)
-        .bindPopup(`<b>${m.name}</b>`);
     });
 
-    // Cleanup function to remove the map instance when the component unmounts
+    const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+
+    const baseMaps = {
+        "Street View": streetLayer,
+        "Satellite View": satelliteLayer
+    };
+
+    L.control.layers(baseMaps).addTo(mapRef.current);
+    
+    // Default to satellite view if available, else street view
+    satelliteLayer.addTo(mapRef.current);
+
+
+    markers?.forEach((m) => {
+      const marker = L.marker([m.lat, m.lng]).addTo(mapRef.current!);
+      
+      let popupContent = `<b>${m.name}</b>`;
+      if (m.isDevice && m.id) {
+          const detailUrl = `/farmer/devices/${m.id}`;
+          popupContent += `<br/><a href="${detailUrl}" class="text-primary hover:underline">View Details</a>`;
+      }
+      
+      const popup = marker.bindPopup(popupContent);
+
+      if (m.isDevice && m.id) {
+        marker.on('popupopen', () => {
+            const link = document.querySelector(`a[href="/farmer/devices/${m.id}"]`);
+            if (link) {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    router.push(`/farmer/devices/${m.id}`);
+                });
+            }
+        });
+      }
+    });
+
     return () => {
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
       }
     };
-  }, [center, zoom, markers]);
+  }, [center, zoom, markers, router]);
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />

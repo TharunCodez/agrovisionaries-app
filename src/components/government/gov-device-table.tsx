@@ -42,6 +42,10 @@ export function GovDeviceTable() {
         setExpandedRow(expandedRow === id ? null : id);
     };
 
+    const handleViewOnMap = (lat: number, lng: number) => {
+        router.push(`/government/map?lat=${lat}&lng=${lng}&zoom=15`);
+    };
+
     const devicesWithFarmer = deviceData.map(device => {
         const farmer = farmerData.find(f => f.id === device.farmerId);
         const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
@@ -66,9 +70,8 @@ export function GovDeviceTable() {
                 <TableHead>Device ID</TableHead>
                 <TableHead>Farmer</TableHead>
                 <TableHead>Region</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Last Updated</TableHead>
                 <TableHead className="text-right">Status</TableHead>
+                <TableHead className="w-[120px] text-center">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -77,9 +80,9 @@ export function GovDeviceTable() {
 
                     return (
                         <Fragment key={device.id}>
-                            <TableRow onClick={() => toggleRow(device.id)} className="cursor-pointer">
+                            <TableRow>
                                 <TableCell>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8">
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => toggleRow(device.id)}>
                                         {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                                     </Button>
                                 </TableCell>
@@ -89,10 +92,14 @@ export function GovDeviceTable() {
                                 </TableCell>
                                 <TableCell>{device.farmerName}</TableCell>
                                 <TableCell>{device.region}</TableCell>
-                                <TableCell>{device.location}</TableCell>
-                                <TableCell>{device.lastUpdated}</TableCell>
                                 <TableCell className="text-right">
                                     <Badge className={cn("text-white", getStatusBadge(device.status))}>{device.status}</Badge>
+                                </TableCell>
+                                <TableCell className="text-center">
+                                    <Button variant="outline" size="sm" onClick={() => handleViewOnMap(device.lat, device.lng)}>
+                                        <MapPin className="mr-2 h-4 w-4"/>
+                                        Map
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                             <AnimatePresence>
@@ -109,6 +116,7 @@ export function GovDeviceTable() {
                                             <div className="p-4">
                                                 <div className="flex justify-between items-center mb-4">
                                                     <h4 className="font-bold text-lg">Live Sensor Readings</h4>
+                                                    <p className="text-sm text-muted-foreground">Last updated: {device.lastUpdated}</p>
                                                 </div>
                                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                                     <Card className="flex flex-col items-center justify-center p-3 text-center">
