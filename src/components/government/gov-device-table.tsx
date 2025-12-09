@@ -42,11 +42,6 @@ export function GovDeviceTable() {
         setExpandedRow(expandedRow === id ? null : id);
     };
 
-    const handleViewOnMap = (e: React.MouseEvent, lat: number, lng: number) => {
-        e.stopPropagation();
-        router.push(`/government/map?lat=${lat}&lng=${lng}&zoom=18`);
-    };
-
     const devicesWithFarmer = deviceData.map(device => {
         const farmer = farmerData.find(f => f.id === device.farmerId);
         const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
@@ -114,10 +109,6 @@ export function GovDeviceTable() {
                                             <div className="p-4">
                                                 <div className="flex justify-between items-center mb-4">
                                                     <h4 className="font-bold text-lg">Live Sensor Readings</h4>
-                                                    <Button variant="outline" size="sm" onClick={(e) => handleViewOnMap(e, device.lat, device.lng)}>
-                                                        <MapPin className="mr-2 h-4 w-4" />
-                                                        Show on Map
-                                                    </Button>
                                                 </div>
                                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
                                                     <Card className="flex flex-col items-center justify-center p-3 text-center">

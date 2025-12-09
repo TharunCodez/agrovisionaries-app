@@ -51,12 +51,6 @@ export default function DeviceCard({ device }: { device: Device }) {
         }
     };
 
-    const handleViewOnMap = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        router.push(`/farmer/map?lat=${device.lat}&lng=${device.lng}&zoom=15`);
-    };
-
     return (
         <Card className="p-4 transition-all hover:bg-card/90 hover:shadow-lg bg-card text-card-foreground">
             <div className="flex items-start justify-between gap-4">
@@ -97,11 +91,7 @@ export default function DeviceCard({ device }: { device: Device }) {
                      <p className="text-xs text-muted-foreground mt-2">{timeAgo}</p>
                 </div>
             </div>
-             <div className="flex justify-between items-center mt-4 border-t border-border pt-3">
-                 <Button variant="link" size="sm" onClick={handleViewOnMap}>
-                    <MapPin className="mr-2 h-4 w-4" />
-                    View on Map
-                </Button>
+             <div className="flex justify-end items-center mt-4 border-t border-border pt-3">
                 <Link href={`/farmer/devices/${device.id}`} passHref>
                      <Button variant="ghost" size="icon" className="h-8 w-8">
                         <ChevronRight className="h-5 w-5 text-muted-foreground" />

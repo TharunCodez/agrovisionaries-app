@@ -24,12 +24,6 @@ export default function FarmerDeviceDetailPage({ params }: { params: { id: strin
     const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
     const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
-    const handleViewOnMap = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        router.push(`/farmer/map?lat=${device.lat}&lng=${device.lng}&zoom=18`);
-    };
-
     return (
         <div className="flex flex-col gap-6 pb-20">
             <div className="flex items-center justify-between">
@@ -89,19 +83,10 @@ export default function FarmerDeviceDetailPage({ params }: { params: { id: strin
             <Card>
                 <CardHeader className="flex-row items-center justify-between">
                     <CardTitle>Location</CardTitle>
-                     <Button variant="outline" size="sm" onClick={handleViewOnMap}>
-                        <MapPin className="mr-2 h-4 w-4" />
-                        Show Location
-                    </Button>
                 </CardHeader>
                 <CardContent>
                     <div className="text-muted-foreground">
                         {device.location}, {device.region}
-                    </div>
-                     <div className="text-sm mt-2">
-                        <a href={`/farmer/map?lat=${device.lat}&lng=${device.lng}&zoom=18`} className="text-primary hover:underline">
-                           View on Map
-                        </a>
                     </div>
                 </CardContent>
             </Card>
