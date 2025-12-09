@@ -1,9 +1,22 @@
+'use client';
+
 import FarmerList from "@/components/government/farmer-list";
+import { Button } from "@/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function GovernmentFarmersPage() {
     return (
         <div className="flex flex-col gap-6">
-            <h1 className="font-headline text-2xl md:text-3xl font-bold">Farmer Database</h1>
+            <div className="flex items-center justify-between">
+                <h1 className="font-headline text-2xl md:text-3xl font-bold">Farmer Database</h1>
+                 <Button asChild>
+                    <Link href="/government/farmers/register">
+                        <PlusCircle className="mr-2 h-4 w-4"/>
+                        Register Farmer
+                    </Link>
+                 </Button>
+            </div>
             <div className="grid grid-cols-1 gap-6">
                 <FarmerList />
             </div>

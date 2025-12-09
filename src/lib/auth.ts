@@ -16,7 +16,6 @@ import {
   query,
   where,
   getDocs,
-  arrayUnion,
   writeBatch,
 } from 'firebase/firestore';
 import { initializeFirebase } from '@/firebase';
@@ -26,6 +25,7 @@ export type User = {
   phoneNumber?: string | null;
   email?: string | null;
   role: 'farmer' | 'government';
+  isAdmin?: boolean; // Custom claim for government users
 };
 
 declare global {
@@ -77,37 +77,47 @@ export async function verifyOTP(code: string): Promise<User> {
   const firebaseUser = userCredential.user;
   const { firestore } = initializeFirebase();
 
-  const userRef = doc(firestore, 'farmers', firebaseUser.uid);
-  const userDoc = await getDoc(userRef);
+  // Here, we can't create the farmer document on client,
+  // because the server action to register a farmer does that.
+  // We just need to verify the user exists or not.
+  // The farmer document 'id' is NOT the firebaseUser.uid.
+  
+  // We will check if a farmer exists with this phone number.
+  const farmersRef = collection(firestore, 'farmers');
+  const q = query(farmersRef, where('phone', '==', firebaseUser.phoneNumber));
+  const querySnapshot = await getDocs(q);
 
   let user: User;
 
-  if (!userDoc.exists()) {
-    // New farmer, create a profile
-    const newFarmerProfile = {
-      id: firebaseUser.uid,
-      name: null, // Name will be set by gov user
-      phone: firebaseUser.phoneNumber,
-      deviceIds: [],
-      createdAt: serverTimestamp(),
-    };
-    await setDoc(userRef, newFarmerProfile);
-    user = {
-      uid: firebaseUser.uid,
+  if (querySnapshot.empty) {
+    // This case should ideally not happen if farmers are pre-registered.
+    // But if it does, we can consider them a valid user but without a farmer record yet.
+     user = {
+      uid: firebaseUser.uid, // Use firebase auth UID for session
       phoneNumber: firebaseUser.phoneNumber,
       role: 'farmer',
     };
   } else {
-    // Existing farmer
-    const data = userDoc.data();
+    // Existing farmer, get their firestore doc id.
+    const farmerDoc = querySnapshot.docs[0];
     user = {
-      uid: firebaseUser.uid,
-      phoneNumber: data.phone,
+      uid: farmerDoc.id, // Use Firestore document ID as the main identifier
+      phoneNumber: farmerDoc.data().phone,
       role: 'farmer',
     };
   }
+  
+  // For the client-side user object, we can use the firebase uid. The DataContext will use this to fetch data.
+  // The role context needs a consistent UID. Let's use firebaseUser.uid throughout.
+  // The farmer document will have a phone field for matching.
 
-  return user;
+  const finalUser = {
+      uid: firebaseUser.uid,
+      phoneNumber: firebaseUser.phoneNumber,
+      role: 'farmer',
+  } as User
+
+  return finalUser;
 }
 
 /**
@@ -131,7 +141,9 @@ export async function signInWithEmailAndPassword(
   const adminDoc = await getDoc(adminRef);
 
   if (!adminDoc.exists()) {
-    await auth.signOut(); // Sign out user if no admin record found
+    // To be secure, you should not give specific error messages.
+    // But for this project, we can be more descriptive.
+    await auth.signOut();
     throw new Error('This account is not authorized for government access.');
   }
 
@@ -139,83 +151,6 @@ export async function signInWithEmailAndPassword(
     uid: firebaseUser.uid,
     email: firebaseUser.email,
     role: 'government',
+    isAdmin: true,
   };
-}
-
-export async function addDeviceAndFarmerAction(
-  device: {
-    deviceId: string;
-    lat: number;
-    lng: number;
-    notes?: string;
-  },
-  farmerInfo: { name: string; phone: string }
-) {
-  const { firestore } = initializeFirebase();
-  const batch = writeBatch(firestore);
-
-  const farmersRef = collection(firestore, 'farmers');
-  const q = query(farmersRef, where('phone', '==', farmerInfo.phone));
-  const querySnapshot = await getDocs(q);
-
-  let farmerId: string;
-  let farmerRef;
-  let farmerRegion = 'Unknown'; // Default region
-
-  if (querySnapshot.empty) {
-    // Farmer does not exist, create a new one.
-    // Firestore can auto-generate an ID if we use addDoc, but here we want a specific ref.
-    farmerRef = doc(collection(firestore, 'farmers'));
-    farmerId = farmerRef.id;
-    const newFarmerData = {
-      id: farmerId,
-      name: farmerInfo.name,
-      phone: farmerInfo.phone,
-      region: farmerRegion,
-      status: 'Active',
-      deviceIds: [device.deviceId], // Add the first device
-      createdAt: serverTimestamp(),
-    };
-    batch.set(farmerRef, newFarmerData);
-  } else {
-    // Farmer exists, update their record.
-    const farmerDoc = querySnapshot.docs[0];
-    farmerRef = farmerDoc.ref;
-    farmerId = farmerDoc.id;
-    farmerRegion = farmerDoc.data().region || 'Unknown';
-    batch.update(farmerRef, {
-      deviceIds: arrayUnion(device.deviceId),
-    });
-  }
-
-  // Create the device document
-  const deviceRef = doc(firestore, 'devices', device.deviceId);
-  const newDeviceData = {
-    id: device.deviceId,
-    farmerId: farmerId,
-    name: `Device ${device.deviceId}`,
-    location: `Lat: ${device.lat.toFixed(4)}, Lng: ${device.lng.toFixed(4)}`,
-    lat: device.lat,
-lng: device.lng,
-    notes: device.notes,
-    status: 'Online',
-    region: farmerRegion,
-    health: 'Good',
-    temperature: 28 + Math.floor(Math.random() * 5),
-    humidity: 60 + Math.floor(Math.random() * 10),
-    soilMoisture: 55 + Math.floor(Math.random() * 10),
-    waterLevel: 75 + Math.floor(Math.random() * 10),
-    rssi: -80 + Math.floor(Math.random() * 10),
-    farmerName: farmerInfo.name,
-    farmerPhone: farmerInfo.phone,
-    createdAt: serverTimestamp(),
-    lastUpdated: serverTimestamp(),
-  };
-
-  batch.set(deviceRef, newDeviceData);
-
-  // Commit all writes at once
-  await batch.commit();
-
-  return { deviceId: device.deviceId, farmerId: farmerId };
 }

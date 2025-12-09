@@ -2,6 +2,12 @@
 
 import { smartAlertingSystem } from '@/ai/flows/smart-alerting-system';
 import type { SmartAlertingSystemOutput } from '@/ai/flows/smart-alerting-system';
+import { getFirestore } from 'firebase-admin/firestore';
+import { adminApp } from './firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
+import type { Farmer, Device } from '@/contexts/data-context';
+
+const db = getFirestore(adminApp);
 
 export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
   try {
@@ -23,6 +29,61 @@ export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
     };
   }
 }
+
+export async function registerFarmerAction(farmerData: Omit<Farmer, 'id' | 'createdAt' | 'devices'>): Promise<{ id: string }> {
+    const farmerWithDefaults = {
+        ...farmerData,
+        devices: [],
+        createdAt: FieldValue.serverTimestamp(),
+    };
+    
+    // Check if farmer with phone already exists
+    const farmerQuery = await db.collection('farmers').where('phone', '==', farmerData.phone).get();
+    if (!farmerQuery.empty) {
+        throw new Error(`Farmer with phone number ${farmerData.phone} already exists.`);
+    }
+
+    const docRef = await db.collection('farmers').add(farmerWithDefaults);
+    await docRef.update({ id: docRef.id });
+    
+    return { id: docRef.id };
+}
+
+
+export async function addDeviceAction(deviceData: Omit<Device, 'id' | 'createdAt' | 'status' | 'lastUpdated' | 'temperature' | 'humidity' | 'soilMoisture' | 'rssi' | 'health' | 'waterLevel'> & { deviceId: string; }) {
+    const { deviceId, farmerId, ...restOfDeviceData } = deviceData;
+
+    const deviceRef = db.collection('devices').doc(deviceId);
+    const farmerRef = db.collection('farmers').doc(farmerId);
+
+    const batch = db.batch();
+
+    // 1. Set the device data
+    batch.set(deviceRef, {
+      ...restOfDeviceData,
+      id: deviceId, // Ensure the ID is part of the document data
+      createdAt: FieldValue.serverTimestamp(),
+      // Add mock sensor data on creation
+      status: 'Online',
+      lastUpdated: FieldValue.serverTimestamp(),
+      temperature: 28 + Math.floor(Math.random() * 5),
+      humidity: 60 + Math.floor(Math.random() * 10),
+      soilMoisture: 55 + Math.floor(Math.random() * 10),
+      waterLevel: 75 + Math.floor(Math.random() * 10),
+      rssi: -80 + Math.floor(Math.random() * 10),
+      health: 'Good',
+    });
+
+    // 2. Add deviceId to farmer's devices array
+    batch.update(farmerRef, {
+        devices: FieldValue.arrayUnion(deviceId)
+    });
+
+    await batch.commit();
+
+    return { success: true, deviceId: deviceId };
+}
+
 
 export async function getSentinelHubToken(): Promise<{ access_token?: string; error?: string }> {
     const clientId = process.env.SENTINELHUB_CLIENT_ID;

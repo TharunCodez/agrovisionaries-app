@@ -20,40 +20,66 @@ import {
 } from 'firebase/firestore';
 import { useRole } from './role-context';
 
-export type Device = {
+export type Plot = {
+  surveyNumber: string;
+  areaAcres: number;
+  landType: 'Irrigated' | 'Unirrigated';
+  soilType: string;
+}
+
+export type Farmer = {
   id: string; // Firestore document ID
-  farmerId: string;
   name: string;
-  location: string;
+  phone: string;
+  aadhaar: string;
+  address: string;
+  village: string;
+  district: string;
+  plots: Plot[];
+  devices: string[]; // array of device IDs
+  createdAt: Timestamp;
+};
+
+export type Device = {
+  id: string; // Firestore document ID which is the deviceId
+  nickname: string;
+  farmerId: string;
+  location: { lat: number; lng: number; };
+  jalkundMaxQuantity: number;
+  surveyNumber: string;
+  areaAcres: number;
+  landType: 'Irrigated' | 'Unirrigated';
+  soilType: string;
+  createdAt: Timestamp;
+
+  // Mock sensor data for now
   status: 'Online' | 'Offline' | 'Warning' | 'Critical';
   lastUpdated: Timestamp;
-  region: string;
-  lat: number;
-  lng: number;
   temperature: number;
   humidity: number;
   soilMoisture: number;
   rssi: number;
   health: 'Good' | 'Excellent' | 'Warning' | 'Poor';
   waterLevel: number;
-  farmerName: string;
-  farmerPhone: string;
-  notes?: string;
-  type?: string;
+  farmerName?: string; // Denormalized for convenience
+  farmerPhone?: string; // Denormalized for convenience
 };
 
-export type Farmer = {
-  id: string; // Firestore document ID
-  name: string;
-  region: string;
-  status: 'Active' | 'Inactive';
-  phone: string;
-  deviceIds: string[];
-};
+export type SensorData = {
+    id: string; // {deviceId}-{timestamp}
+    deviceId: string;
+    timestamp: Timestamp;
+    waterLevel: number;
+    temperature: number;
+    moisture: number;
+    rain: number;
+    pumpState: 'ON' | 'OFF';
+}
 
 interface DataContextType {
   devices: Device[] | null;
   farmers: Farmer[] | null;
+  sensorData: SensorData[] | null;
   isLoading: boolean;
 }
 
@@ -87,14 +113,33 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     [firestore, user, role]
   );
   const { data: farmerDevices, isLoading: farmerDevicesLoading } = useCollection<Device>(farmerDevicesQuery);
+  
+  // For now, sensorData is mock. In a real app, you might fetch this per-device or as a stream.
+  const sensorData: SensorData[] | null = useMemo(() => {
+    const devicesToUse = role === 'government' ? allDevices : farmerDevices;
+    if (!devicesToUse) return null;
+
+    return devicesToUse.map(device => ({
+        id: `${device.id}-${Date.now()}`,
+        deviceId: device.id,
+        timestamp: Timestamp.now(),
+        waterLevel: device.waterLevel,
+        temperature: device.temperature,
+        moisture: device.soilMoisture,
+        rain: Math.random() > 0.8 ? 5 : 0, // Mock rain
+        pumpState: Math.random() > 0.5 ? 'ON' : 'OFF',
+    }));
+
+  }, [allDevices, farmerDevices, role]);
+
 
   const devices = role === 'government' ? allDevices : farmerDevices;
 
   const isLoading = isAuthLoading || farmersLoading || allDevicesLoading || farmerDevicesLoading;
 
   const value = useMemo(
-    () => ({ devices, farmers, isLoading }),
-    [devices, farmers, isLoading]
+    () => ({ devices, farmers, sensorData, isLoading }),
+    [devices, farmers, sensorData, isLoading]
   );
 
   return (
