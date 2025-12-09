@@ -3,11 +3,8 @@
 import React, {
   createContext,
   useContext,
-  useState,
   ReactNode,
-  useCallback,
   useMemo,
-  useEffect,
 } from 'react';
 import {
   useCollection,
@@ -19,12 +16,8 @@ import {
   collection,
   query,
   where,
-  doc,
-  addDoc,
-  serverTimestamp,
-  getDocs,
+  Timestamp,
 } from 'firebase/firestore';
-import { setDocumentNonBlocking } from '@/firebase/non-blocking-updates';
 import { useRole } from './role-context';
 
 export type Device = {
@@ -33,7 +26,7 @@ export type Device = {
   name: string;
   location: string;
   status: 'Online' | 'Offline' | 'Warning' | 'Critical';
-  lastUpdated: any; // Can be Date or Firestore Timestamp
+  lastUpdated: Timestamp;
   region: string;
   lat: number;
   lng: number;
@@ -55,28 +48,20 @@ export type Farmer = {
   region: string;
   status: 'Active' | 'Inactive';
   phone: string;
+  deviceIds: string[];
 };
 
 interface DataContextType {
   devices: Device[] | null;
   farmers: Farmer[] | null;
-  addDeviceAndFarmer: (
-    device: {
-      deviceId: string;
-      lat: number;
-      lng: number;
-      notes?: string;
-    },
-    farmerInfo: { name: string; phone: string }
-  ) => Promise<void>;
-  getNextDeviceId: () => string;
+  isLoading: boolean;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const { firestore } = useFirebase();
-  const { user } = useUser();
+  const { user, isUserLoading: isAuthLoading } = useUser();
   const { role } = useRole();
 
   // Fetch all farmers - for government user
@@ -84,14 +69,14 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     () => (firestore && role === 'government' ? collection(firestore, 'farmers') : null),
     [firestore, role]
   );
-  const { data: farmers } = useCollection<Farmer>(allFarmersQuery);
+  const { data: farmers, isLoading: farmersLoading } = useCollection<Farmer>(allFarmersQuery);
 
   // Fetch all devices - for government user
   const allDevicesQuery = useMemoFirebase(
     () => (firestore && role === 'government' ? collection(firestore, 'devices') : null),
     [firestore, role]
   );
-  const { data: allDevices } = useCollection<Device>(allDevicesQuery);
+  const { data: allDevices, isLoading: allDevicesLoading } = useCollection<Device>(allDevicesQuery);
 
   // Fetch devices for a specific farmer
   const farmerDevicesQuery = useMemoFirebase(
@@ -101,87 +86,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         : null,
     [firestore, user, role]
   );
-  const { data: farmerDevices } = useCollection<Device>(farmerDevicesQuery);
+  const { data: farmerDevices, isLoading: farmerDevicesLoading } = useCollection<Device>(farmerDevicesQuery);
 
   const devices = role === 'government' ? allDevices : farmerDevices;
 
-  const getNextDeviceId = useCallback(() => {
-    const allCurrentDevices = allDevices || [];
-    const allDeviceIds = allCurrentDevices.map((d) =>
-      parseInt(d.id.split('-')[1])
-    ).filter((n) => !isNaN(n));
-    const lastId = allDeviceIds.length > 0 ? Math.max(...allDeviceIds) : 0;
-    return `LIV-${String(lastId + 1).padStart(3, '0')}`;
-  }, [allDevices]);
-
-  const addDeviceAndFarmer = useCallback(
-    async (
-      device: {
-        deviceId: string;
-        lat: number;
-        lng: number;
-        notes?: string;
-      },
-      farmerInfo: { name: string; phone: string }
-    ) => {
-      if (!firestore) return;
-
-      const farmersRef = collection(firestore, 'farmers');
-      const q = query(farmersRef, where('phone', '==', farmerInfo.phone));
-      const querySnapshot = await getDocs(q);
-
-      let farmerId: string;
-      let farmerRegion = 'Unknown';
-
-      if (querySnapshot.empty) {
-        // Farmer does not exist, create a new one
-        const newFarmerData = {
-          name: farmerInfo.name,
-          phone: farmerInfo.phone,
-          region: 'Unknown', // You might want to get this from a form
-          status: 'Active',
-          createdAt: serverTimestamp(),
-        };
-        const farmerDocRef = await addDoc(farmersRef, newFarmerData);
-        farmerId = farmerDocRef.id;
-      } else {
-        // Farmer exists
-        const farmerDoc = querySnapshot.docs[0];
-        farmerId = farmerDoc.id;
-        farmerRegion = farmerDoc.data().region || 'Unknown';
-      }
-
-      const deviceId = device.deviceId;
-      const deviceRef = doc(firestore, 'devices', deviceId);
-
-      const newDeviceData: Omit<Device, 'lastUpdated' | 'id'> & { createdAt: any } = {
-        farmerId: farmerId,
-        name: `Device ${deviceId}`,
-        location: `Lat: ${device.lat.toFixed(4)}, Lng: ${device.lng.toFixed(4)}`,
-        lat: device.lat,
-        lng: device.lng,
-        notes: device.notes,
-        status: 'Online',
-        region: farmerRegion,
-        health: 'Good',
-        temperature: 28 + Math.floor(Math.random() * 5),
-        humidity: 60 + Math.floor(Math.random() * 10),
-        soilMoisture: 55 + Math.floor(Math.random() * 10),
-        waterLevel: 75 + Math.floor(Math.random() * 10),
-        rssi: -80 + Math.floor(Math.random() * 10),
-        farmerName: farmerInfo.name,
-        farmerPhone: farmerInfo.phone,
-        createdAt: serverTimestamp(),
-      };
-
-      setDocumentNonBlocking(deviceRef, { ...newDeviceData, id: deviceId }, { merge: true });
-    },
-    [firestore]
-  );
+  const isLoading = isAuthLoading || farmersLoading || allDevicesLoading || farmerDevicesLoading;
 
   const value = useMemo(
-    () => ({ devices, farmers, addDeviceAndFarmer, getNextDeviceId }),
-    [devices, farmers, addDeviceAndFarmer, getNextDeviceId]
+    () => ({ devices, farmers, isLoading }),
+    [devices, farmers, isLoading]
   );
 
   return (

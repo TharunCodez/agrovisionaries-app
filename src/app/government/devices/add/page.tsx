@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,11 +12,11 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useData } from '@/contexts/data-context';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Label } from '@/components/ui/label';
+import { addDeviceAndFarmerAction } from '@/lib/auth';
 
 const AddDeviceMap = dynamic(() => import('@/components/government/add-device-map'), {
   ssr: false,
@@ -24,8 +24,8 @@ const AddDeviceMap = dynamic(() => import('@/components/government/add-device-ma
 });
 
 const formSchema = z.object({
-  farmerName: z.string().nonempty({ message: 'Farmer name is required.' }),
-  farmerPhone: z.string().nonempty({ message: 'Farmer phone number is required.' }),
+  farmerName: z.string().min(2, { message: 'Farmer name must be at least 2 characters.' }),
+  farmerPhone: z.string().regex(/^\+?[1-9]\d{1,14}$/, { message: 'Please enter a valid phone number with country code.' }),
   deviceId: z.string().nonempty({ message: 'Device ID is required.' }),
   lat: z.coerce.number(),
   lng: z.coerce.number(),
@@ -35,18 +35,15 @@ const formSchema = z.object({
 export default function AddDevicePage() {
   const router = useRouter();
   const { toast } = useToast();
-  const { addDeviceAndFarmer, getNextDeviceId } = useData();
   const [isMapOpen, setMapOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const defaultDeviceId = useMemo(() => getNextDeviceId(), [getNextDeviceId]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       farmerName: '',
       farmerPhone: '',
-      deviceId: defaultDeviceId,
+      deviceId: '',
       lat: 28.6139,
       lng: 77.209,
       notes: '',
@@ -61,29 +58,33 @@ export default function AddDevicePage() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      await addDeviceAndFarmerAction(
+        {
+          deviceId: values.deviceId,
+          lat: values.lat,
+          lng: values.lng,
+          notes: values.notes,
+        },
+        { name: values.farmerName, phone: values.farmerPhone }
+      );
 
-    const newDevice = {
-        id: values.deviceId,
-        name: `Device ${values.deviceId}`, // Generic name
-        location: `Lat: ${values.lat.toFixed(4)}, Lng: ${values.lng.toFixed(4)}`,
-        lat: values.lat,
-        lng: values.lng,
-        notes: values.notes,
-        farmerName: values.farmerName,
-        farmerPhone: values.farmerPhone
-    };
+      toast({
+        title: 'Device Registered Successfully!',
+        description: `${values.deviceId} has been registered for ${values.farmerName}.`,
+      });
 
-    addDeviceAndFarmer(newDevice, { name: values.farmerName, phone: values.farmerPhone });
-
-    toast({
-      title: 'Device Added Successfully!',
-      description: `${newDevice.id} has been registered for ${values.farmerName}.`,
-    });
-    
-    setIsLoading(false);
-    router.push('/government/devices');
+      router.push('/government/devices');
+    } catch (error) {
+      console.error("Failed to add device and farmer: ", error);
+      toast({
+        variant: "destructive",
+        title: 'Registration Failed',
+        description: (error as Error).message || 'An unexpected error occurred.',
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (

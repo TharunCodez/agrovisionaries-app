@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, Suspense } from 'react';
+import { useState, useRef, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,17 +9,25 @@ import { Label } from '@/components/ui/label';
 import { Leaf, Loader2 } from 'lucide-react';
 import { useRole } from '@/contexts/role-context';
 import { verifyOTP } from '@/lib/auth';
+import { useToast } from '@/hooks/use-toast';
 
 function VerifyOtpComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phone = searchParams.get('phone') || '';
   const { setRole, setUser } = useRole();
+  const { toast } = useToast();
 
   const [otp, setOtp] = useState(new Array(6).fill(''));
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  useEffect(() => {
+    if (inputRefs.current[0]) {
+      inputRefs.current[0].focus();
+    }
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const { value } = e.target;
@@ -52,14 +60,19 @@ function VerifyOtpComponent() {
     setLoading(true);
 
     try {
-      // In a real app, you'd use the verificationId from the previous step
-      const user = await verifyOTP('mock-verification-id', otpCode);
-      setUser(user); // Assuming user object contains role
-      setRole(user.role);
+      const user = await verifyOTP(otpCode);
+      setUser(user);
+      setRole('farmer');
+      toast({
+        title: 'Login Successful!',
+        description: 'You are now logged in.',
+      });
       router.replace('/farmer/dashboard');
     } catch (err) {
       const e = err as Error;
       setError(e.message || 'OTP verification failed. Please try again.');
+      setOtp(new Array(6).fill('')); // Clear OTP fields
+      inputRefs.current[0]?.focus(); // Focus first input
     } finally {
       setLoading(false);
     }
@@ -94,16 +107,17 @@ function VerifyOtpComponent() {
                     ref={(el) => (inputRefs.current[index] = el)}
                     className="h-14 w-12 text-center text-2xl"
                     required
+                    disabled={loading}
                   />
                 ))}
               </div>
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && <p className="text-sm text-destructive text-center">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Verify OTP'}
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Verify & Login'}
             </Button>
             <div className="text-center">
-              <Button variant="link" type="button" onClick={() => router.back()}>
+              <Button variant="link" type="button" onClick={() => router.back()} disabled={loading}>
                 Change phone number
               </Button>
             </div>

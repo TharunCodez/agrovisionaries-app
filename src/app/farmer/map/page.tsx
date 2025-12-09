@@ -7,7 +7,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import dynamic from 'next/dynamic';
 import { useData } from '@/contexts/data-context';
-import { useRole } from '@/contexts/role-context';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -19,30 +18,24 @@ function FarmerMap() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { devices } = useData();
-  const { user } = useRole();
 
   const lat = searchParams.get('lat');
   const lng = searchParams.get('lng');
   const zoom = searchParams.get('zoom');
 
-  const userDevices = useMemo(
-    () => (devices || []).filter((d) => d.farmerPhone === user?.phoneNumber),
-    [devices, user]
-  );
-
   const defaultCenter: [number, number] =
-    lat && lng ? [parseFloat(lat), parseFloat(lng)] : (userDevices.length > 0 ? [userDevices[0].lat, userDevices[0].lng] : [28.6139, 77.209]);
+    lat && lng ? [parseFloat(lat), parseFloat(lng)] : (devices && devices.length > 0 ? [devices[0].lat, devices[0].lng] : [28.6139, 77.209]);
 
   const markers = useMemo(
     () =>
-      userDevices.map((d) => ({
+      (devices || []).map((d) => ({
         lat: d.lat,
         lng: d.lng,
         name: d.name,
         id: d.id,
         isDevice: true,
       })),
-    [userDevices]
+    [devices]
   );
 
   return (

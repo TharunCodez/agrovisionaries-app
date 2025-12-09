@@ -5,26 +5,29 @@ import SmartAlert from "@/components/dashboard/smart-alert";
 import DeviceDashboardCard from "@/components/farmer/device-dashboard-card";
 import { useRole } from "@/contexts/role-context";
 import { useData } from "@/contexts/data-context";
-import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from 'next/link';
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function FarmerDashboardPage() {
   const { user } = useRole();
-  const { devices } = useData();
+  const { devices, isLoading } = useData();
 
-  const userDevices = useMemo(() => {
-    if (!user?.phoneNumber || !devices) return [];
-    // Filter devices based on the logged-in farmer's phone number
-    return devices.filter(d => d.farmerPhone === user.phoneNumber);
-  }, [devices, user]);
+  if (isLoading) {
+    return (
+        <div className="flex flex-col gap-6">
+            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-48 w-full" />
+        </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6 pb-20 md:pb-6">
        <div className="flex flex-col gap-6">
-        {userDevices.length > 0 ? (
-          userDevices.map(device => (
+        {devices && devices.length > 0 ? (
+          devices.map(device => (
             <DeviceDashboardCard key={device.id} device={device} />
           ))
         ) : (

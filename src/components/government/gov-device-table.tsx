@@ -17,10 +17,11 @@ import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from 'date-fns';
 import { useData } from "@/contexts/data-context";
+import { Skeleton } from "../ui/skeleton";
 
 
 const getStatusBadge = (status: string) => {
-    switch (status.toLowerCase()) {
+    switch (status?.toLowerCase()) {
         case 'online':
             return 'bg-green-600 hover:bg-green-700';
         case 'warning':
@@ -37,7 +38,7 @@ const getStatusBadge = (status: string) => {
 export function GovDeviceTable() {
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
     const router = useRouter();
-    const { devices } = useData();
+    const { devices, isLoading } = useData();
 
     const toggleRow = (id: string) => {
         setExpandedRow(expandedRow === id ? null : id);
@@ -50,8 +51,8 @@ export function GovDeviceTable() {
     const devicesWithFarmer = useMemo(() => {
         if (!devices) return [];
         return devices.map(device => {
-            const lastUpdated = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
-            const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
+            const lastUpdatedDate = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
+            const timeAgo = formatDistanceToNow(lastUpdatedDate, { addSuffix: true });
             return {
                 ...device,
                 lastUpdated: timeAgo,
@@ -63,6 +64,24 @@ export function GovDeviceTable() {
           return aNum - bNum;
         });
     }, [devices]);
+
+    if(isLoading) {
+        return (
+            <Card>
+                <CardHeader>
+                    <CardTitle>All Registered Devices</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-2">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
 
 
   return (
@@ -170,6 +189,11 @@ export function GovDeviceTable() {
                             </Fragment>
                         )
                     })}
+                     {(!devices || devices.length === 0) && (
+                        <TableRow>
+                            <TableCell colSpan={7} className="text-center">No devices found.</TableCell>
+                        </TableRow>
+                    )}
                 </TableBody>
                 </Table>
             </div>
@@ -211,6 +235,9 @@ export function GovDeviceTable() {
                         </div>
                     </Card>
                 ))}
+                 {(!devices || devices.length === 0) && (
+                    <p className="text-muted-foreground text-center p-4">No devices found.</p>
+                )}
             </div>
         </CardContent>
     </Card>
