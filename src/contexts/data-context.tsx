@@ -87,10 +87,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const getNextDeviceId = useCallback(() => {
-    const lastId = devices
-        .map(d => parseInt(d.id.split('-')[1]))
-        .filter(n => !isNaN(n))
-        .sort((a,b) => b - a)[0] || 0;
+    const ids = devices.map(d => parseInt(d.id.split('-')[1])).filter(n => !isNaN(n));
+    const lastId = ids.length > 0 ? Math.max(...ids) : 0;
     return `LIV-${String(lastId + 1).padStart(3, '0')}`;
   }, [devices]);
 
