@@ -14,7 +14,7 @@ import { deviceData } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import SensorCard from '@/components/farmer/sensor-card';
 import { formatDistanceToNow } from 'date-fns';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, use } from 'react';
 import dynamic from 'next/dynamic';
 import {
   Dialog,
@@ -43,6 +43,8 @@ function DeviceDetailClientView({ device }: { device: (typeof deviceData)[0] }) 
         lat: device.lat,
         lng: device.lng,
         name: device.name,
+        id: device.id,
+        isDevice: true,
       },
     ],
     [device]
@@ -167,9 +169,10 @@ function DeviceDetailClientView({ device }: { device: (typeof deviceData)[0] }) 
 export default function FarmerDeviceDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const device = deviceData.find((d) => d.id === params.id);
+  const { id } = use(params);
+  const device = deviceData.find((d) => d.id === id);
 
   if (!device) {
     notFound();
