@@ -2,9 +2,21 @@
 
 import { smartAlertingSystem } from '@/ai/flows/smart-alerting-system';
 import type { SmartAlertingSystemOutput } from '@/ai/flows/smart-alerting-system';
-import { adminDb } from '@/lib/firebase-admin';
-import { FieldValue } from 'firebase-admin/firestore';
+import * as admin from 'firebase-admin';
+import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { firebaseConfig } from '@/firebase/config';
 import type { Farmer, Device } from '@/contexts/data-context';
+
+
+// Initialize Firebase Admin SDK
+if (!admin.apps.length) {
+  admin.initializeApp({
+    projectId: firebaseConfig.projectId,
+  });
+}
+
+const adminDb = getFirestore();
+
 
 export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
   try {
