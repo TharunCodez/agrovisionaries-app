@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Leaf, Droplets, Eye, Info } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
