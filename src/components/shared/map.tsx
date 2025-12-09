@@ -8,7 +8,7 @@ import { HardDrive, Thermometer, Waves, Rss } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import 'leaflet/dist/leaflet.css';
-import { useRef, useEffect } from 'react';
+import { useMemo } from 'react';
 
 
 type Device = {
@@ -56,7 +56,6 @@ const createMarkerIcon = (status: string) => {
 
 export default function Map({ devices, center, zoom = 10 }: MapProps) {
     const router = useRouter();
-    const mapContainerRef = useRef<HTMLDivElement>(null);
 
     const defaultCenter: LatLngExpression = center || (devices.length > 0
         ? [devices[0].lat, devices[0].lng]
@@ -65,16 +64,9 @@ export default function Map({ devices, center, zoom = 10 }: MapProps) {
     const handleViewDetails = (deviceId: string) => {
         router.push(`/farmer/devices/${deviceId}`);
     };
-
-    // By using a ref, we ensure the container div isn't re-created on re-renders,
-    // which prevents the "Map container is already initialized" error.
-    useEffect(() => {
-        // This effect ensures that we have a stable container for the map.
-        // It's a common pattern to avoid issues with hot-reloading in development.
-    }, []);
     
-    return (
-        <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }}>
+    const displayMap = useMemo(
+        () => (
             <MapContainer center={defaultCenter} zoom={zoom} style={{ height: '100%', width: '100%' }} scrollWheelZoom={true}>
                 <LayersControl position="topright">
                     <LayersControl.BaseLayer checked name="OpenStreetMap">
@@ -139,6 +131,14 @@ export default function Map({ devices, center, zoom = 10 }: MapProps) {
                     </Marker>
                 ))}
             </MapContainer>
+        ),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [devices, center, zoom]
+    );
+
+    return (
+        <div style={{ height: '100%', width: '100%' }}>
+            {displayMap}
         </div>
     );
 }
