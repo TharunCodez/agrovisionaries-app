@@ -18,7 +18,7 @@ function GovernmentMap() {
 
     const lat = searchParams.get('lat');
     const lng = searchParams.get('lng');
-    const zoom = search_params.get('zoom');
+    const zoom = searchParams.get('zoom');
 
     const allDevices = useMemo(() => deviceData, []);
 
