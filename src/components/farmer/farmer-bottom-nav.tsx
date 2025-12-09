@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { LayoutDashboard, HardDrive, Bell, Settings, Map } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LanguageSwitcher from '../layout/language-switcher';
+import NotificationBell from '../notifications/NotificationBell';
 
 const navItems = [
   { href: '/farmer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
@@ -17,10 +18,27 @@ const navItems = [
 export default function FarmerBottomNav() {
   const pathname = usePathname();
 
+  const isNotificationsPage = pathname === '/farmer/notifications';
+
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm md:hidden">
-      <nav className="flex h-16 items-center justify-around">
+      <nav className="grid h-16 grid-cols-5 items-center justify-around">
         {navItems.map((item) => {
+          if (item.label === 'Alerts') {
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                'flex flex-col items-center gap-1 rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground',
+                isNotificationsPage && 'text-primary'
+              )}>
+                <NotificationBell isMobile={true} />
+                <span className="text-xs font-medium">{item.label}</span>
+              </Link>
+            )
+          }
+
           const isActive = pathname === item.href || (item.href !== '/farmer/dashboard' && pathname.startsWith(item.href));
           return (
             <Link
@@ -36,10 +54,6 @@ export default function FarmerBottomNav() {
             </Link>
           );
         })}
-        <div className="flex flex-col items-center gap-1 p-2 text-muted-foreground">
-            <LanguageSwitcher />
-            <span className="text-xs font-medium">Language</span>
-        </div>
       </nav>
     </div>
   );

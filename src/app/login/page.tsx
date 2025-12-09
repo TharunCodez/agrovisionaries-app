@@ -1,23 +1,58 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRole } from '@/contexts/role-context';
-import { Leaf } from 'lucide-react';
-import Link from 'next/link';
+import { Leaf, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { sendOTP } from '@/lib/auth';
 
 export default function LoginPage() {
   const { setRole } = useRole();
   const router = useRouter();
+  const [phone, setPhone] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleRoleSelection = (role: 'farmer' | 'government') => {
-    setRole(role);
-    router.push(`/${role}/dashboard`);
+  const handleGovLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setRole('government');
+    router.push(`/government/dashboard`);
+  };
+
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    // Basic validation for Indian/Nepalese numbers
+    if (!/^\+?(91|977)\d{9,10}$/.test(phone.replace(/\s/g, ''))) {
+      setError('Please enter a valid Indian (+91) or Nepalese (+977) phone number.');
+      return;
+    }
+    
+    setIsSending(true);
+    try {
+      await sendOTP(phone);
+      router.push(`/auth/verify-otp?phone=${encodeURIComponent(phone)}`);
+    } catch (err) {
+      setError('Failed to send OTP. Please try again.');
+      console.error(err);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4 dark:bg-gray-900">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mb-4 flex justify-center">
@@ -29,23 +64,57 @@ export default function LoginPage() {
           <CardDescription>Select your portal to continue</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col gap-4">
-            <Button
-              size="lg"
-              className="w-full font-bold"
-              onClick={() => handleRoleSelection('farmer')}
-            >
-              Farmer Portal
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              className="w-full font-bold"
-              onClick={() => handleRoleSelection('government')}
-            >
-              Government Portal
-            </Button>
-          </div>
+          <Tabs defaultValue="farmer" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="farmer">Farmer Portal</TabsTrigger>
+              <TabsTrigger value="government">Government Portal</TabsTrigger>
+            </TabsList>
+            <TabsContent value="farmer" className="pt-4">
+              <form onSubmit={handlePhoneSubmit}>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone Number</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+91 98765 43210"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      required
+                    />
+                     <div id="recaptcha-container" className="my-2"></div>
+                  </div>
+                   {error && <p className="text-sm text-destructive">{error}</p>}
+                  <Button type="submit" className="w-full font-bold" disabled={isSending}>
+                    {isSending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Send OTP
+                  </Button>
+                </div>
+              </form>
+            </TabsContent>
+            <TabsContent value="government" className="pt-4">
+              <form onSubmit={handleGovLogin}>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="user@gov.in"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input id="password" type="password" required />
+                  </div>
+                  <Button type="submit" className="w-full font-bold" variant="secondary">
+                    Login
+                  </Button>
+                </div>
+              </form>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

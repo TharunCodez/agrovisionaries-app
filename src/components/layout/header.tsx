@@ -15,10 +15,10 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Bell } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import LanguageSwitcher from './language-switcher';
 import { useRole } from '@/contexts/role-context';
+import NotificationBell from '../notifications/NotificationBell';
 
 function getPageTitle(pathname: string, role: 'farmer' | 'government' | null): string {
     if (role === 'government') {
@@ -57,12 +57,9 @@ export default function Header() {
         {isMobile && <SidebarTrigger />}
         <h1 className="font-headline text-lg font-semibold">{pageTitle}</h1>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2 md:gap-4">
          {role === 'farmer' && <LanguageSwitcher />}
-        <Button variant="ghost" size="icon" className="rounded-full">
-            <Bell className="h-5 w-5" />
-            <span className="sr-only">Notifications</span>
-        </Button>
+         <NotificationBell />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-10 w-10 rounded-full">

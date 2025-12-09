@@ -1,11 +1,14 @@
 'use client';
 
+import type { User } from '@/lib/auth';
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type Role = 'farmer' | 'government' | null;
 
 interface RoleContextType {
+  user: User | null;
   role: Role;
+  setUser: (user: User | null) => void;
   setRole: (role: Role) => void;
   isLoading: boolean;
 }
@@ -13,6 +16,7 @@ interface RoleContextType {
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export const RoleProvider = ({ children }: { children: ReactNode }) => {
+  const [user, setUserState] = useState<User | null>(null);
   const [role, setRoleState] = useState<Role>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -21,6 +25,10 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
       const storedRole = localStorage.getItem('userRole') as Role;
       if (storedRole) {
         setRoleState(storedRole);
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          setUserState(JSON.parse(storedUser));
+        }
       }
     } catch (error) {
       console.error("Failed to access localStorage", error);
@@ -29,23 +37,35 @@ export const RoleProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const setRole = (newRole: Role) => {
-    setIsLoading(true);
     setRoleState(newRole);
     try {
       if (newRole) {
         localStorage.setItem('userRole', newRole);
       } else {
         localStorage.removeItem('userRole');
+        localStorage.removeItem('user');
       }
     } catch (error) {
         console.error("Failed to access localStorage", error);
     }
-    setIsLoading(false);
   };
+  
+  const setUser = (newUser: User | null) => {
+      setUserState(newUser);
+      try {
+          if(newUser) {
+              localStorage.setItem('user', JSON.stringify(newUser));
+          } else {
+              localStorage.removeItem('user');
+          }
+      } catch (error) {
+          console.error("Failed to access localStorage", error);
+      }
+  }
 
   return (
-    <RoleContext.Provider value={{ role, setRole, isLoading }}>
-      {children}
+    <RoleContext.Provider value={{ user, role, setUser, setRole, isLoading }}>
+      {isLoading ? <div className="flex h-screen items-center justify-center">Loading...</div> : children}
     </RoleContext.Provider>
   );
 };
