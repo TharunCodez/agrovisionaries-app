@@ -9,7 +9,7 @@ export default function FarmerList() {
   const { farmers, devices } = useData();
 
   const farmersWithDeviceCount = farmers.map(farmer => {
-    const deviceCount = devices.filter(d => d.farmerId === farmer.id).length;
+    const deviceCount = devices.filter(d => d.farmerPhone === farmer.phone).length;
     return {
       ...farmer,
       devices: deviceCount,

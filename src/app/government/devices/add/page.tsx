@@ -16,6 +16,7 @@ import { useData } from '@/contexts/data-context';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Label } from '@/components/ui/label';
 
 const AddDeviceMap = dynamic(() => import('@/components/government/add-device-map'), {
   ssr: false,
@@ -69,9 +70,6 @@ export default function AddDevicePage() {
         location: `Lat: ${values.lat.toFixed(4)}, Lng: ${values.lng.toFixed(4)}`,
         lat: values.lat,
         lng: values.lng,
-        temperature: 25, // Mock initial data
-        soilMoisture: 50,
-        waterLevel: 70,
         notes: values.notes,
         farmerName: values.farmerName,
         farmerPhone: values.farmerPhone
@@ -149,7 +147,7 @@ export default function AddDevicePage() {
                             name="lat"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="text-xs text-muted-foreground">Latitude</FormLabel>
+                                <Label className="text-xs text-muted-foreground">Latitude</Label>
                                 <FormControl>
                                 <Input type="number" step="any" placeholder="e.g., 28.6139" {...field} />
                                 </FormControl>
@@ -162,7 +160,7 @@ export default function AddDevicePage() {
                             name="lng"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel className="text-xs text-muted-foreground">Longitude</FormLabel>
+                                <Label className="text-xs text-muted-foreground">Longitude</Label>
                                 <FormControl>
                                 <Input type="number" step="any" placeholder="e.g., 77.2090" {...field} />
                                 </FormControl>
@@ -177,11 +175,11 @@ export default function AddDevicePage() {
                                 <MapPin className="mr-2 h-4 w-4" /> Pick on Map
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="h-[70vh] max-w-[90vw] p-2 lg:max-w-[70vw]">
-                            <DialogHeader className="p-4">
+                        <DialogContent className="h-[70vh] max-w-[90vw] p-2 flex flex-col lg:max-w-[70vw]">
+                            <DialogHeader className="p-4 flex-shrink-0">
                                 <DialogTitle>Click on the map to set location</DialogTitle>
                             </DialogHeader>
-                            <div className="h-full w-full overflow-hidden rounded-lg">
+                            <div className="flex-grow w-full overflow-hidden rounded-lg">
                                 {isMapOpen && <AddDeviceMap onLocationSelect={handleLocationSelect} />}
                             </div>
                         </DialogContent>

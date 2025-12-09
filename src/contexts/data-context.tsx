@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
 import { deviceData as initialDeviceData, farmerData as initialFarmerData } from '@/lib/data';
 
 // Define types based on new requirements
@@ -23,7 +23,7 @@ export type Device = {
     farmerName: string;
     farmerPhone: string;
     notes?: string;
-    type?: string; // Keep for compatibility with existing components if needed, but not used in new forms
+    type?: string; 
 };
 
 export type Farmer = {
@@ -37,7 +37,7 @@ export type Farmer = {
 interface DataContextType {
   devices: Device[];
   farmers: Farmer[];
-  addDeviceAndFarmer: (device: Omit<Device, 'farmerId' | 'status' | 'lastUpdated' | 'region' | 'health' | 'humidity' | 'rssi'>, farmerInfo: { name: string, phone: string}) => void;
+  addDeviceAndFarmer: (device: Omit<Device, 'farmerId' | 'status' | 'lastUpdated' | 'region' | 'health' | 'humidity' | 'rssi' | 'waterLevel' | 'temperature' | 'soilMoisture'>, farmerInfo: { name: string, phone: string}) => void;
   getNextDeviceId: () => string;
 }
 
@@ -47,7 +47,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [devices, setDevices] = useState<Device[]>(initialDeviceData);
   const [farmers, setFarmers] = useState<Farmer[]>(initialFarmerData);
 
- const addDeviceAndFarmer = useCallback((device: Omit<Device, 'farmerId' | 'status' | 'lastUpdated' | 'region' | 'health' | 'humidity' | 'rssi'>, farmerInfo: { name: string, phone: string}) => {
+  const addDeviceAndFarmer = useCallback((device: Omit<Device, 'farmerId' | 'status' | 'lastUpdated' | 'region' | 'health' | 'humidity' | 'rssi' | 'waterLevel' | 'temperature' | 'soilMoisture'>, farmerInfo: { name: string, phone: string}) => {
     setFarmers(prevFarmers => {
         let farmer = prevFarmers.find(f => f.phone === farmerInfo.phone);
         let newFarmerCreated = false;
@@ -73,6 +73,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
             health: 'Good',
             humidity: 60, // Mock initial data
             rssi: -80, // Mock initial data
+            temperature: 28,
+            soilMoisture: 55,
+            waterLevel: 75,
             farmerName: farmer.name,
             farmerPhone: farmer.phone
         };
@@ -91,9 +94,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const lastId = ids.length > 0 ? Math.max(...ids) : 0;
     return `LIV-${String(lastId + 1).padStart(3, '0')}`;
   }, [devices]);
+  
+  const value = useMemo(() => ({ devices, farmers, addDeviceAndFarmer, getNextDeviceId }), [devices, farmers, addDeviceAndFarmer, getNextDeviceId]);
 
   return (
-    <DataContext.Provider value={{ devices, farmers, addDeviceAndFarmer, getNextDeviceId }}>
+    <DataContext.Provider value={value}>
       {children}
     </DataContext.Provider>
   );

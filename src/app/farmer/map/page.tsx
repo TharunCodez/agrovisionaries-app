@@ -3,10 +3,11 @@
 import { Suspense, useMemo } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
-import { deviceData } from '@/lib/data';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import dynamic from 'next/dynamic';
+import { useData } from '@/contexts/data-context';
+import { useRole } from '@/contexts/role-context';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -17,18 +18,20 @@ const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
 function FarmerMap() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { devices } = useData();
+  const { user } = useRole();
 
   const lat = searchParams.get('lat');
   const lng = searchParams.get('lng');
   const zoom = searchParams.get('zoom');
 
   const userDevices = useMemo(
-    () => deviceData.filter((d) => d.farmerId === 'F001'),
-    []
+    () => devices.filter((d) => d.farmerPhone === user?.phoneNumber),
+    [devices, user]
   );
 
   const defaultCenter: [number, number] =
-    lat && lng ? [parseFloat(lat), parseFloat(lng)] : [28.6139, 77.209];
+    lat && lng ? [parseFloat(lat), parseFloat(lng)] : (userDevices.length > 0 ? [userDevices[0].lat, userDevices[0].lng] : [28.6139, 77.209]);
 
   const markers = useMemo(
     () =>
