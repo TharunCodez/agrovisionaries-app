@@ -1,21 +1,26 @@
 'use server';
 import * as admin from 'firebase-admin';
+import { config } from 'dotenv';
+
+config();
 
 let app: admin.app.App;
 
 if (admin.apps.length === 0) {
   if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    app = admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
-  } else if (process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID) {
-    // For local development with emulators or auto-detection in GCP environments
-    app = admin.initializeApp({
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    });
+    try {
+      const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+      app = admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+      });
+    } catch (e) {
+      console.error('Error parsing FIREBASE_SERVICE_ACCOUNT:', e);
+      // Fallback to default credentials if parsing fails
+      app = admin.initializeApp();
+    }
   } else {
-    throw new Error('Firebase Admin SDK initialization failed. Set FIREBASE_SERVICE_ACCOUNT or NEXT_PUBLIC_FIREBASE_PROJECT_ID.');
+    // Use application default credentials if service account is not provided
+    app = admin.initializeApp();
   }
 } else {
   app = admin.app();
