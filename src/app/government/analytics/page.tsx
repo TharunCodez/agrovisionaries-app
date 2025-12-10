@@ -14,6 +14,15 @@ export default function GovernmentAnalyticsPage() {
     const { devices, farmers } = useData();
 
     const stats = useMemo(() => {
+        if (!devices || !farmers) {
+            return {
+                totalFarmers: 0,
+                totalDevices: 0,
+                onlineDevices: 0,
+                onlinePercentage: 0,
+                criticalAlerts: 0,
+            }
+        }
         const onlineDevices = devices.filter(d => d.status === 'Online').length;
         const criticalAlerts = 2; // Mock data for now
         const totalFarmers = farmers.length;
