@@ -21,7 +21,7 @@ interface AddDeviceMapProps {
   initialCenter?: [number, number];
 }
 
-export default function AddDeviceMap({ onLocationSelect, initialCenter = [28.6139, 77.2090] }: AddDeviceMapProps) {
+export default function AddDeviceMap({ onLocationSelect, initialCenter = [27.1067, 88.3233] }: AddDeviceMapProps) {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -31,7 +31,7 @@ export default function AddDeviceMap({ onLocationSelect, initialCenter = [28.613
     if (mapRef.current === null && mapContainerRef.current) {
       mapRef.current = L.map(mapContainerRef.current, {
         center: initialCenter,
-        zoom: 10,
+        zoom: 13,
         zoomControl: true,
       });
 
@@ -73,12 +73,13 @@ export default function AddDeviceMap({ onLocationSelect, initialCenter = [28.613
       }
     }
 
-    return () => {
-      if (mapRef.current) {
-        mapRef.current.remove();
-        mapRef.current = null;
-      }
-    };
+    // No map removal on cleanup to preserve state on dialog close/reopen
+    // return () => {
+    //   if (mapRef.current) {
+    //     mapRef.current.remove();
+    //     mapRef.current = null;
+    //   }
+    // };
   }, [initialCenter, onLocationSelect, theme]);
 
   return <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />;

@@ -5,7 +5,7 @@ import StatsCards from "@/components/government/stats-cards";
 export default function GovernmentDashboardPage() {
     return (
         <div className="flex flex-col gap-6">
-            <h1 className="font-headline text-2xl md:text-3xl font-bold">Regional Agriculture Overview</h1>
+            <h1 className="font-headline text-2xl md:text-3xl font-bold">South Sikkim Agriculture Overview</h1>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 <StatsCards />
             </div>

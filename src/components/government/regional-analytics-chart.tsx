@@ -16,7 +16,7 @@ export default function RegionalAnalyticsChart() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Regional Water Usage</CardTitle>
+        <CardTitle>Regional Water Usage (South Sikkim)</CardTitle>
         <CardDescription>Comparison of water consumption across regions.</CardDescription>
       </CardHeader>
       <CardContent>

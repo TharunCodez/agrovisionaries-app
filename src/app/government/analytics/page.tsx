@@ -46,7 +46,7 @@ export default function GovernmentAnalyticsPage() {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <KpiCard title="Total Farmers" value={stats.totalFarmers} icon={Users} trend={2} trendDirection="up" description="vs last month" />
+                <KpiCard title="Total Farmers" value={stats.totalFarmers} icon={Users} trend={2} trendDirection="up" description="in South Sikkim" />
                 <KpiCard title="Total Devices" value={stats.totalDevices} icon={HardDrive} trend={15} trendDirection="up" description="vs last month" />
                 <KpiCard title="Online Devices" value={`${stats.onlinePercentage}%`} icon={Activity} trend={stats.onlinePercentage - 95} trendDirection={stats.onlinePercentage - 95 > 0 ? "up" : "down"} description="uptime" />
                 <KpiCard title="Critical Alerts" value={stats.criticalAlerts} icon={Siren} trend={-1} trendDirection="down" description="in last 24h" />

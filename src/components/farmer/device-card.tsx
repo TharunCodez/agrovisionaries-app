@@ -10,8 +10,8 @@ import { type Device } from '@/contexts/data-context';
 
 export default function DeviceCard({ device }: { device: Device }) {
     const isOnline = device.status === 'Online';
-
-    const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
+    
+    const lastUpdated = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
     const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
     const getHealthBadgeClass = () => {
@@ -43,7 +43,7 @@ export default function DeviceCard({ device }: { device: Device }) {
                         <div className="flex items-center gap-3 mb-2">
                              <HardDrive className={cn("h-6 w-6", isOnline ? 'text-primary' : 'text-muted-foreground')} />
                              <div>
-                                <h3 className="font-bold text-lg">{device.name}</h3>
+                                <h3 className="font-bold text-lg">{device.nickname}</h3>
                                 <p className="text-xs text-muted-foreground">{device.id}</p>
                              </div>
                         </div>

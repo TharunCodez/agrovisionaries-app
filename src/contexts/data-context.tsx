@@ -52,7 +52,7 @@ export type Device = {
   soilType: string;
   createdAt: Timestamp;
 
-  // Mock sensor data for now
+  // Mock sensor data
   status: 'Online' | 'Offline' | 'Warning' | 'Critical';
   lastUpdated: Timestamp;
   temperature: number;
@@ -95,7 +95,15 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     () => (firestore && role === 'government' ? collection(firestore, 'farmers') : null),
     [firestore, role]
   );
-  const { data: farmers, isLoading: farmersLoading } = useCollection<Farmer>(allFarmersQuery);
+  const { data: allFarmers, isLoading: farmersLoading } = useCollection<Farmer>(allFarmersQuery);
+
+  // Fetch farmer data for the current user
+  const currentFarmerQuery = useMemoFirebase(
+    () => (firestore && user && role === 'farmer' ? query(collection(firestore, 'farmers'), where('phone', '==', user.phoneNumber)) : null),
+    [firestore, user, role]
+  );
+  const { data: currentFarmer, isLoading: currentFarmerLoading } = useCollection<Farmer>(currentFarmerQuery);
+
 
   // Fetch all devices - for government user
   const allDevicesQuery = useMemoFirebase(
@@ -132,10 +140,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   }, [allDevices, farmerDevices, role]);
 
-
+  const farmers = role === 'government' ? allFarmers : currentFarmer;
   const devices = role === 'government' ? allDevices : farmerDevices;
 
-  const isLoading = isAuthLoading || farmersLoading || allDevicesLoading || farmerDevicesLoading;
+  const isLoading = isAuthLoading || farmersLoading || allDevicesLoading || farmerDevicesLoading || currentFarmerLoading;
 
   const value = useMemo(
     () => ({ devices, farmers, sensorData, isLoading }),

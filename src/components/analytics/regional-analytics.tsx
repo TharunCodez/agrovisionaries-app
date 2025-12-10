@@ -16,22 +16,17 @@ const chartConfig = {
   }
 };
 
-const mockData = regionalAnalyticsData.map(d => ({
-    ...d,
-    soilMoisture: Math.floor(Math.random() * (70 - 40 + 1)) + 40,
-}));
-
 export function RegionalAnalytics() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Regional Agriculture Insights</CardTitle>
+        <CardTitle>South Sikkim Agriculture Insights</CardTitle>
         <CardDescription>Water usage and soil moisture across key regions.</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={mockData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                <BarChart data={regionalAnalyticsData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
                     <XAxis dataKey="region" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
                     <YAxis yAxisId="left" orientation="left" stroke={chartConfig.waterUsage.color} tickFormatter={(value) => `${Number(value) / 1000}k`} tickLine={false} axisLine={false} tickMargin={8} />

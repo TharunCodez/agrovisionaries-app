@@ -32,8 +32,8 @@ const formSchema = z.object({
   farmerId: z.string().nonempty({ message: 'You must select a farmer.' }),
   deviceId: z.string().nonempty({ message: 'Device ID is required.' }),
   nickname: z.string().nonempty({ message: 'Device nickname is required.' }),
-  lat: z.coerce.number(),
-  lng: z.coerce.number(),
+  lat: z.coerce.number().min(-90).max(90),
+  lng: z.coerce.number().min(-180).max(180),
   jalkundMaxQuantity: z.coerce.number().positive({ message: 'Jalkund quantity must be a positive number.' }),
   surveyNumber: z.string().nonempty({ message: 'You must select a plot.'}),
 });
@@ -52,8 +52,8 @@ export default function AddDevicePage() {
       farmerId: '',
       deviceId: '',
       nickname: '',
-      lat: 28.6139,
-      lng: 77.209,
+      lat: 27.1067, // Jorethang, South Sikkim
+      lng: 88.3233, // Jorethang, South Sikkim
       jalkundMaxQuantity: 1000,
       surveyNumber: '',
     },
@@ -267,7 +267,7 @@ export default function AddDevicePage() {
                             <FormItem>
                                 <Label className="text-xs text-muted-foreground">Latitude</Label>
                                 <FormControl>
-                                <Input type="number" step="any" placeholder="e.g., 28.6139" {...field} />
+                                <Input type="number" step="any" placeholder="e.g., 27.1067" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -280,7 +280,7 @@ export default function AddDevicePage() {
                             <FormItem>
                                 <Label className="text-xs text-muted-foreground">Longitude</Label>
                                 <FormControl>
-                                <Input type="number" step="any" placeholder="e.g., 77.2090" {...field} />
+                                <Input type="number" step="any" placeholder="e.g., 88.3233" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

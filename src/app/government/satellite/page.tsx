@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState, useMemo } from 'react';
+import { Suspense, useState, useMemo, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Leaf, Droplets, Eye, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { getSentinelHubToken } from '@/lib/actions';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -38,14 +39,68 @@ const dataLayers = {
 type DataLayer = keyof typeof dataLayers;
 
 function SatelliteView() {
-  const [lat, setLat] = useState(25.0961);
-  const [lng, setLng] = useState(85.3131);
-  const [zoom, setZoom] = useState(14);
+  const [lat, setLat] = useState(27.1067);
+  const [lng, setLng] = useState(88.3233);
+  const [zoom, setZoom] = useState(13);
   const [dataLayer, setDataLayer] = useState<DataLayer>('trueColor');
+  const [tileUrl, setTileUrl] = useState<string | undefined>(undefined);
 
   const CurrentDataLayer = dataLayers[dataLayer];
 
   const center: [number, number] = useMemo(() => [lat, lng], [lat, lng]);
+
+  const handleMapMove = useCallback((newLat: number, newLng: number, newZoom: number) => {
+    setLat(newLat);
+    setLng(newLng);
+    setZoom(newZoom);
+  }, []);
+
+  const fetchSatelliteData = async () => {
+    console.log("Fetching satellite data for", lat, lng);
+    const { access_token, error } = await getSentinelHubToken();
+    if(error || !access_token) {
+        console.error("Could not fetch Sentinel token", error);
+        return;
+    }
+
+    const bbox = `${lng - 0.05},${lat - 0.05},${lng + 0.05},${lat + 0.05}`;
+
+    const url = new URL('https://services.sentinel-hub.com/api/v1/process');
+    url.searchParams.set('bbox', bbox);
+    url.searchParams.set('width', '512');
+    url.searchParams.set('height', '512');
+
+    const evalscript = `
+      //VERSION=3
+      function setup() {
+        return {
+          input: ["B02", "B03", "B04"],
+          output: { bands: 3 }
+        };
+      }
+
+      function evaluatePixel(sample) {
+        return [2.5 * sample.B04, 2.5 * sample.B03, 2.5 * sample.B02];
+      }
+    `;
+
+    const requestBody = `
+        {
+            "input": {
+                "bounds": { "bbox": [${lng-0.05}, ${lat-0.05}, ${lng+0.05}, ${lat+0.05}] },
+                "data": [{ "type": "sentinel-2-l1c" }]
+            },
+            "output": { "width": 512, "height": 512 },
+            "evalscript": \`${evalscript}\`
+        }
+    `;
+    
+    // For now, we will just log this. In a real app we'd fetch an image and overlay it.
+    console.log("Sentinel Hub request would be:", url.toString());
+
+    setTileUrl(`https://services.sentinel-hub.com/ogc/wms/${access_token}?REQUEST=GetMap&SERVICE=WMS&VERSION=1.1.1&LAYERS=TRUE-COLOR-S2-L1C&BBOX=${bbox}&WIDTH=512&HEIGHT=512&FORMAT=image/png&SRS=EPSG:4326`);
+
+  }
   
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
@@ -53,29 +108,17 @@ function SatelliteView() {
       <Card className="lg:col-span-1 h-fit">
         <CardHeader>
           <CardTitle>Location Settings</CardTitle>
+          <CardDescription>Centered on South Sikkim</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="state">Select State</Label>
-            <Select defaultValue="bihar">
-              <SelectTrigger id="state">
-                <SelectValue placeholder="Select a state" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="bihar">Bihar</SelectItem>
-                <SelectItem value="punjab">Punjab</SelectItem>
-                <SelectItem value="haryana">Haryana</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="lat">Latitude</Label>
-              <Input id="lat" value={lat} onChange={e => setLat(Number(e.target.value))} />
+              <Input id="lat" value={lat.toFixed(4)} onChange={e => setLat(Number(e.target.value))} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="lng">Longitude</Label>
-              <Input id="lng" value={lng} onChange={e => setLng(Number(e.target.value))} />
+              <Input id="lng" value={lng.toFixed(4)} onChange={e => setLng(Number(e.target.value))} />
             </div>
           </div>
           <div className="space-y-2">
@@ -89,7 +132,7 @@ function SatelliteView() {
             </Tabs>
           </div>
           
-          <Button className="w-full">
+          <Button className="w-full" onClick={fetchSatelliteData}>
             Fetch Satellite Data
           </Button>
 
@@ -119,6 +162,8 @@ function SatelliteView() {
             <StableMap
               center={center}
               zoom={zoom}
+              onMove={handleMapMove}
+              tileLayerUrl={tileUrl}
             />
           </CardContent>
         </Card>
@@ -126,28 +171,28 @@ function SatelliteView() {
           <Card>
             <CardHeader className="pb-2">
               <CardDescription className="flex items-center gap-2 text-sm"><Leaf className="w-4 h-4"/> NDVI Index</CardDescription>
-              <CardTitle className="text-2xl md:text-3xl text-green-600">0.571</CardTitle>
+              <CardTitle className="text-2xl md:text-3xl text-green-600">0.78</CardTitle>
             </CardHeader>
              <CardContent>
-                <p className="text-xs text-muted-foreground">Last updated: 12/9/2025</p>
+                <p className="text-xs text-muted-foreground">For selected area</p>
              </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
               <CardDescription className="flex items-center gap-2 text-sm"><Droplets className="w-4 h-4"/> Soil Moisture</CardDescription>
-              <CardTitle className="text-2xl md:text-3xl text-blue-500">54%</CardTitle>
+              <CardTitle className="text-2xl md:text-3xl text-blue-500">62%</CardTitle>
             </CardHeader>
              <CardContent>
-                <p className="text-xs text-muted-foreground">Based on last sensor reading</p>
+                <p className="text-xs text-muted-foreground">Aggregated from sensors</p>
              </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
               <CardDescription className="flex items-center gap-2 text-sm"><Info className="w-4 h-4"/> Status</CardDescription>
-              <CardTitle className="text-2xl md:text-3xl text-yellow-600">Needs Review</CardTitle>
+              <CardTitle className="text-2xl md:text-3xl text-green-600">Healthy</CardTitle>
             </CardHeader>
              <CardContent>
-                <p className="text-xs text-muted-foreground">Anomalies detected</p>
+                <p className="text-xs text-muted-foreground">Vegetation is healthy</p>
              </CardContent>
           </Card>
         </div>

@@ -38,7 +38,7 @@ const getStatusBadge = (status: string) => {
 export function GovDeviceTable() {
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
     const router = useRouter();
-    const { devices, isLoading } = useData();
+    const { devices, farmers, isLoading } = useData();
 
     const toggleRow = (id: string) => {
         setExpandedRow(expandedRow === id ? null : id);
@@ -49,21 +49,25 @@ export function GovDeviceTable() {
     };
 
     const devicesWithFarmer = useMemo(() => {
-        if (!devices) return [];
+        if (!devices || !farmers) return [];
         return devices.map(device => {
+            const farmer = farmers.find(f => f.id === device.farmerId);
             const lastUpdatedDate = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
             const timeAgo = formatDistanceToNow(lastUpdatedDate, { addSuffix: true });
             return {
                 ...device,
+                farmerName: farmer?.name ?? 'N/A',
+                village: farmer?.village ?? 'N/A',
+                district: farmer?.district ?? 'N/A',
                 lastUpdated: timeAgo,
             };
         }).sort((a, b) => {
-          const aNum = parseInt(a.id.split('-')[1]);
-          const bNum = parseInt(b.id.split('-')[1]);
+          const aNum = parseInt(a.id.split('-')[1] || '0');
+          const bNum = parseInt(b.id.split('-')[1] || '0');
           if(isNaN(aNum) || isNaN(bNum)) return 0;
           return aNum - bNum;
         });
-    }, [devices]);
+    }, [devices, farmers]);
 
     if(isLoading) {
         return (
@@ -97,7 +101,7 @@ export function GovDeviceTable() {
                     <TableHead className="w-[50px]"></TableHead>
                     <TableHead>Device ID</TableHead>
                     <TableHead>Farmer</TableHead>
-                    <TableHead>Region</TableHead>
+                    <TableHead>District</TableHead>
                     <TableHead>Last Update</TableHead>
                     <TableHead className="text-right">Status</TableHead>
                     <TableHead className="w-[120px] text-center">Actions</TableHead>
@@ -120,13 +124,13 @@ export function GovDeviceTable() {
                                         {device.id}
                                     </TableCell>
                                     <TableCell>{device.farmerName}</TableCell>
-                                    <TableCell>{device.region}</TableCell>
+                                    <TableCell>{device.district}</TableCell>
                                     <TableCell>{device.lastUpdated}</TableCell>
                                     <TableCell className="text-right">
                                         <Badge className={cn("text-white", getStatusBadge(device.status))}>{device.status}</Badge>
                                     </TableCell>
                                     <TableCell className="text-center">
-                                        <Button variant="outline" size="sm" onClick={() => handleViewOnMap(device.lat, device.lng)}>
+                                        <Button variant="outline" size="sm" onClick={() => handleViewOnMap(device.location.lat, device.location.lng)}>
                                             <MapPin className="mr-2 h-4 w-4"/>
                                             Map
                                         </Button>
@@ -145,7 +149,7 @@ export function GovDeviceTable() {
                                             >
                                                 <div className="p-4">
                                                     <div className="flex justify-between items-center mb-4">
-                                                        <h4 className="font-bold text-lg">Live Sensor Readings</h4>
+                                                        <h4 className="font-bold text-lg">Live Sensor Readings for {device.nickname}</h4>
                                                         <p className="text-sm text-muted-foreground">Last updated: {device.lastUpdated}</p>
                                                     </div>
                                                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -189,7 +193,7 @@ export function GovDeviceTable() {
                             </Fragment>
                         )
                     })}
-                     {(!devices || devices.length === 0) && (
+                     {(!devicesWithFarmer || devicesWithFarmer.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={7} className="text-center">No devices found.</TableCell>
                         </TableRow>
@@ -206,7 +210,7 @@ export function GovDeviceTable() {
                                  <div>
                                      <h3 className="font-bold">{device.id}</h3>
                                      <p className="text-sm text-muted-foreground">{device.farmerName}</p>
-                                     <p className="text-xs text-muted-foreground">{device.region}</p>
+                                     <p className="text-xs text-muted-foreground">{device.district}</p>
                                  </div>
                              </div>
                              <Badge className={cn("text-white", getStatusBadge(device.status))}>{device.status}</Badge>
@@ -228,14 +232,14 @@ export function GovDeviceTable() {
                             </div>
                         </div>
                          <div className="mt-4 flex justify-end">
-                            <Button variant="outline" size="sm" onClick={() => handleViewOnMap(device.lat, device.lng)}>
+                            <Button variant="outline" size="sm" onClick={() => handleViewOnMap(device.location.lat, device.location.lng)}>
                                 <MapPin className="mr-2 h-4 w-4"/>
                                 View on Map
                             </Button>
                         </div>
                     </Card>
                 ))}
-                 {(!devices || devices.length === 0) && (
+                 {(!devicesWithFarmer || devicesWithFarmer.length === 0) && (
                     <p className="text-muted-foreground text-center p-4">No devices found.</p>
                 )}
             </div>

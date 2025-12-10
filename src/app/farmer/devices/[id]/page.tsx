@@ -37,7 +37,7 @@ const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
 // This is now the Client Component part of the page
 function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   const { devices } = useData();
-  const device = useMemo(() => devices.find(d => d.id === deviceId), [devices, deviceId]);
+  const device = useMemo(() => devices?.find(d => d.id === deviceId), [devices, deviceId]);
 
   const [isMapOpen, setMapOpen] = useState(false);
 
@@ -65,9 +65,9 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   const markers = useMemo(
     () => [
       {
-        lat: device.lat,
-        lng: device.lng,
-        name: device.name,
+        lat: device.location.lat,
+        lng: device.location.lng,
+        name: device.nickname,
         id: device.id,
         isDevice: true,
       },
@@ -76,10 +76,18 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   );
 
   const lastUpdated =
-    typeof device.lastUpdated === 'string'
-      ? new Date(device.lastUpdated)
-      : new Date();
+    device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
+    
+  const getStatusBadgeClass = () => {
+    if (!device.status) return 'bg-gray-500';
+    switch (device.status.toLowerCase()) {
+        case 'online': return 'bg-green-600 text-white';
+        case 'offline': return 'bg-red-600 text-white';
+        default: return 'bg-yellow-500 text-black';
+    }
+  };
+
 
   return (
     <div className="flex flex-col gap-6 pb-20 md:pb-6">
@@ -90,7 +98,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
           </Link>
         </Button>
         <h1 className="flex-1 text-center font-headline text-xl font-bold">
-          {device.name}
+          {device.nickname}
         </h1>
         <div className="flex gap-2">
           <Button variant="ghost" size="icon">
@@ -110,11 +118,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground">Status</span>
             <Badge
-              className={
-                device.status === 'Online'
-                  ? 'bg-green-600 text-white'
-                  : 'bg-red-600 text-white'
-              }
+              className={getStatusBadgeClass()}
             >
               {device.status}
             </Badge>
@@ -126,7 +130,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
         </CardContent>
       </Card>
 
-      <WeatherCard lat={device.lat} lng={device.lng} />
+      <WeatherCard lat={device.location.lat} lng={device.location.lng} />
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <WaterTank level={device.waterLevel} />
@@ -164,13 +168,13 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
             </DialogTrigger>
             <DialogContent className="h-[70vh] max-w-[90vw] p-2 lg:max-w-[70vw]">
               <DialogHeader className="p-4">
-                <DialogTitle>Device Location: {device.name}</DialogTitle>
+                <DialogTitle>Device Location: {device.nickname}</DialogTitle>
               </DialogHeader>
               <div className="h-full w-full overflow-hidden rounded-lg">
                 {isMapOpen && (
                   <div key={device.id} className="h-full w-full">
                     <StableMap
-                      center={[device.lat, device.lng]}
+                      center={[device.location.lat, device.location.lng]}
                       zoom={14}
                       markers={markers}
                     />
@@ -182,7 +186,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
         </CardHeader>
         <CardContent>
           <div className="text-muted-foreground">
-            {device.location}, {device.region}
+             Survey No: {device.surveyNumber}, {device.areaAcres} acres
           </div>
         </CardContent>
       </Card>

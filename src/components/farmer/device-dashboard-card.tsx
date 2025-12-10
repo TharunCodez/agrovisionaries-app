@@ -37,7 +37,7 @@ const getStatusBadgeClass = (status: string) => {
 export default function DeviceDashboardCard({ device }: { device: Device }) {
   const [liveTemperature, setLiveTemperature] = useState<number | null>(null);
 
-  const lastUpdated = typeof device.lastUpdated === 'string' ? new Date(device.lastUpdated) : new Date();
+  const lastUpdated = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
   return (
@@ -46,9 +46,9 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
         <div>
             <div className='flex items-center gap-3'>
                 <HardDrive className='h-6 w-6 text-primary' />
-                <CardTitle>{device.name}</CardTitle>
+                <CardTitle>{device.nickname}</CardTitle>
             </div>
-            <p className='text-sm text-muted-foreground ml-9'>{device.location}</p>
+            <p className='text-sm text-muted-foreground ml-9'>Survey No: {device.surveyNumber}</p>
         </div>
          <div className='flex flex-col items-end gap-2'>
             <Badge className={cn("text-white", getStatusBadgeClass(device.status))}>{device.status}</Badge>
@@ -58,7 +58,7 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
       <CardContent>
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-1">
-            <WeatherCard lat={device.lat} lng={device.lng} onTemperatureUpdate={setLiveTemperature} />
+            <WeatherCard lat={device.location.lat} lng={device.location.lng} onTemperatureUpdate={setLiveTemperature} />
           </div>
           <div className="grid grid-cols-1 gap-6 lg:col-span-2">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
