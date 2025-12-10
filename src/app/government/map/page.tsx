@@ -27,7 +27,7 @@ function GovernmentMap() {
 
   const markers = useMemo(
     () =>
-      devices.map((d) => ({
+      (devices || []).map((d) => ({
         lat: d.lat,
         lng: d.lng,
         name: d.name,
