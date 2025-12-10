@@ -1,11 +1,19 @@
-
 'use server';
 
 import { smartAlertingSystem } from '@/ai/flows/smart-alerting-system';
 import type { SmartAlertingSystemOutput } from '@/ai/flows/smart-alerting-system';
-import { adminDb } from '@/lib/firebase-admin';
-import { FieldValue } from 'firebase-admin/firestore';
 import type { Farmer, Device } from '@/contexts/data-context';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { firebaseConfig } from '@/firebase/config';
+
+// Helper to initialize Firebase App on the server for actions
+const getDb = () => {
+    if (!getApps().length) {
+        initializeApp(firebaseConfig);
+    }
+    return getFirestore(getApp());
+};
 
 
 export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
@@ -33,42 +41,49 @@ type RegisterFarmerPayload = Omit<Farmer, 'id' | 'createdAt' | 'devices'>;
 
 
 export async function registerFarmerAction(farmerData: RegisterFarmerPayload): Promise<{ id: string }> {
-    const farmerWithDefaults = {
-        ...farmerData,
-        devices: [],
-        createdAt: FieldValue.serverTimestamp(),
-    };
+    const db = getDb();
     
     // Check if farmer with phone already exists
-    const farmerQuery = await adminDb.collection('farmers').where('phone', '==', farmerData.phone).get();
+    const farmersRef = collection(db, 'farmers');
+    const q = query(farmersRef, where('phone', '==', farmerData.phone));
+    const farmerQuery = await getDocs(q);
+
     if (!farmerQuery.empty) {
         throw new Error(`Farmer with phone number ${farmerData.phone} already exists.`);
     }
 
-    const docRef = await adminDb.collection('farmers').add(farmerWithDefaults);
-    await docRef.update({ id: docRef.id });
+    const farmerWithDefaults = {
+        ...farmerData,
+        devices: [],
+        createdAt: serverTimestamp(),
+    };
+
+    const docRef = await addDoc(collection(db, 'farmers'), farmerWithDefaults);
+    await updateDoc(docRef, { id: docRef.id });
     
     return { id: docRef.id };
 }
 
 
 export async function addDeviceAction(deviceData: Omit<Device, 'id' | 'createdAt' | 'status' | 'lastUpdated' | 'temperature' | 'humidity' | 'soilMoisture' | 'rssi' | 'health' | 'waterLevel'> & { deviceId: string; }) {
+    const db = getDb();
     const { deviceId, farmerId, ...restOfDeviceData } = deviceData;
 
-    const deviceRef = adminDb.collection('devices').doc(deviceId);
-    const farmerRef = adminDb.collection('farmers').doc(farmerId);
+    const deviceRef = doc(db, 'devices', deviceId);
+    const farmerRef = doc(db, 'farmers', farmerId);
 
-    const batch = adminDb.batch();
+    // Using client SDK means we can't use a batch write across different collections in a single server action like this easily without transactions.
+    // For simplicity, we'll perform the operations sequentially.
 
     // 1. Set the device data
-    batch.set(deviceRef, {
+    await setDoc(deviceRef, {
       ...restOfDeviceData,
-      id: deviceId, // Ensure the ID is part of the document data
+      id: deviceId,
       farmerId: farmerId,
-      createdAt: FieldValue.serverTimestamp(),
+      createdAt: serverTimestamp(),
       // Add mock sensor data on creation
       status: 'Online',
-      lastUpdated: FieldValue.serverTimestamp(),
+      lastUpdated: serverTimestamp(),
       temperature: 28 + Math.floor(Math.random() * 5),
       humidity: 60 + Math.floor(Math.random() * 10),
       soilMoisture: 55 + Math.floor(Math.random() * 10),
@@ -78,11 +93,9 @@ export async function addDeviceAction(deviceData: Omit<Device, 'id' | 'createdAt
     });
 
     // 2. Add deviceId to farmer's devices array
-    batch.update(farmerRef, {
-        devices: FieldValue.arrayUnion(deviceId)
+    await updateDoc(farmerRef, {
+        devices: arrayUnion(deviceId)
     });
-
-    await batch.commit();
 
     return { success: true, deviceId: deviceId };
 }
