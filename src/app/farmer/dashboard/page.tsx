@@ -40,7 +40,7 @@ export default function FarmerDashboardPage() {
              {farmer && (
                 <div className="flex items-center gap-3">
                     <span className="hidden sm:inline font-semibold">{farmer.name}</span>
-                    <Avatar className="h-10 w-10">
+                    <Avatar className="h-10 w-10 md:h-12 md:w-12 lg:h-14 lg:w-14">
                         <AvatarImage src={farmer.photoUrl} alt={farmer.name} />
                         <AvatarFallback>{farmer.name ? farmer.name.charAt(0) : 'F'}</AvatarFallback>
                     </Avatar>

@@ -85,41 +85,68 @@ interface DataContextType {
   farmers: Farmer[] | null;
   sensorData: SensorData[] | null;
   isLoading: boolean;
+  setFarmers: (farmers: Farmer[]) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
   const { firestore } = useFirebase();
-  const { user, isLoading: isAuthLoading } = useRole();
-  const { role } = useRole();
-  const [serverFetchedFarmer, setServerFetchedFarmer] = useState<Farmer[] | null>(null);
+  const { user, isLoading: isAuthLoading, role } = useRole();
+  
+  const [farmers, setFarmers] = useState<Farmer[] | null>(() => {
+    try {
+      const item = window.localStorage.getItem('farmers');
+      return item ? JSON.parse(item) : null;
+    } catch (error) {
+      return null;
+    }
+  });
+
   const [isFetching, setIsFetching] = useState(false);
 
   useEffect(() => {
-    // If the user is a farmer and we don't have their data yet, fetch it.
-    if (role === 'farmer' && user?.phoneNumber && !serverFetchedFarmer && !isFetching) {
+    try {
+      if (farmers) {
+        window.localStorage.setItem('farmers', JSON.stringify(farmers));
+      } else {
+        window.localStorage.removeItem('farmers');
+      }
+    } catch (error) {
+      console.error("Could not persist farmers to localStorage", error);
+    }
+  }, [farmers]);
+
+  useEffect(() => {
+    // If user is a farmer and we don't have their data, fetch it.
+    if (role === 'farmer' && user?.phoneNumber && !farmers && !isFetching) {
       setIsFetching(true);
       getFarmerProfile(user.phoneNumber)
         .then(profile => {
           if (profile) {
-            setServerFetchedFarmer([profile as Farmer]);
+            setFarmers([profile as Farmer]);
           }
         })
         .finally(() => setIsFetching(false));
     }
-  }, [user, role, serverFetchedFarmer, isFetching]);
+  }, [user, role, farmers, isFetching]);
 
   // Fetch all farmers - for government user
   const allFarmersQuery = useMemoFirebase(
     () => (firestore && role === 'government' ? collection(firestore, 'farmers') : null),
     [firestore, role]
   );
-  const { data: allFarmers, isLoading: farmersLoading } = useCollection<Farmer>(allFarmersQuery);
+  const { data: allFarmersData, isLoading: farmersLoading } = useCollection<Farmer>(allFarmersQuery);
 
-  const farmers = role === 'government' ? allFarmers : serverFetchedFarmer;
+  // Sync government data
+  useEffect(() => {
+      if (role === 'government' && allFarmersData) {
+          setFarmers(allFarmersData);
+      }
+  }, [role, allFarmersData]);
 
-  // Fetch all devices - for government user
+
+  // Fetch all devices
   const allDevicesQuery = useMemoFirebase(
     () => (firestore ? collection(firestore, 'devices') : null),
     [firestore]
@@ -134,7 +161,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
      return null;
   }, [role, user, allDevices]);
   
-  // For now, sensorData is mock. In a real app, you might fetch this per-device or as a stream.
+  // For now, sensorData is mock.
   const sensorData: SensorData[] | null = useMemo(() => {
     const devicesToUse = role === 'government' ? allDevices : farmerDevices;
     if (!devicesToUse) return null;
@@ -154,10 +181,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   const devices = role === 'government' ? allDevices : farmerDevices;
 
-  const isLoading = isAuthLoading || (role === 'government' && (farmersLoading || allDevicesLoading)) || (role === 'farmer' && isFetching);
+  const isLoading = isAuthLoading || farmersLoading || allDevicesLoading || isFetching;
 
   const value = useMemo(
-    () => ({ devices, farmers, sensorData, isLoading }),
+    () => ({ devices, farmers, sensorData, isLoading, setFarmers: (f: Farmer[]) => setFarmers(f) }),
     [devices, farmers, sensorData, isLoading]
   );
 

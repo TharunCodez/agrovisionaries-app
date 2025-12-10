@@ -125,7 +125,7 @@ export default function ChatAssistant() {
         </CardHeader>
         <div className="flex-1 min-h-0 flex flex-col">
             <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
-              <div className="space-y-4 p-4">
+              <div className="space-y-4 p-4 pb-24 md:pb-4">
                 {messages.map((message, index) => (
                   <div key={index} className={`flex items-start gap-2 ${message.role === 'user' ? 'justify-end' : ''}`}>
                     {message.role === 'assistant' && (
@@ -159,7 +159,7 @@ export default function ChatAssistant() {
                 )}
               </div>
             </ScrollArea>
-            <div className="w-full sticky bottom-0 bg-background border-t p-3 flex items-center gap-3 z-10 pointer-events-auto">
+            <div className="w-full sticky bottom-0 bg-background border-t p-3 flex items-center gap-3 z-50 pointer-events-auto">
                  <input
                     type="file"
                     ref={fileInputRef}

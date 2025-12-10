@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { getFarmerProfile } from '@/app/api/farmer-data';
 import { uploadProfilePhoto } from '@/app/api/upload-profile-photo';
 import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,7 +25,7 @@ function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, 
 }
 
 export default function FarmerProfilePage() {
-  const { farmers, isLoading: isDataLoading } = useData();
+  const { farmers, isLoading: isDataLoading, setFarmers } = useData();
   const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
@@ -56,7 +55,10 @@ export default function FarmerProfilePage() {
       if (error || !photoUrl) {
         throw new Error(error || 'Upload failed');
       }
-      setProfile((prev: any) => ({ ...prev, photoUrl }));
+      const updatedProfile = { ...profile, photoUrl };
+      setProfile(updatedProfile);
+      setFarmers([updatedProfile]);
+
       toast({
         title: 'Photo Uploaded!',
         description: 'Your new profile picture has been saved.',
