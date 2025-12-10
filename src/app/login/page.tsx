@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRole } from '@/contexts/role-context';
 import { Leaf, Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { signInWithEmailAndPassword, checkFarmerExists } from '@/lib/auth';
@@ -112,10 +113,16 @@ export default function LoginPage() {
                     {isSending && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Login
+                    Login with OTP
                   </Button>
                 </div>
               </form>
+               <div className="mt-4 text-center text-sm">
+                  Don&apos;t have an account?{' '}
+                  <Link href="/farmer/register" className="font-medium text-primary underline">
+                    Register here
+                  </Link>
+                </div>
             </TabsContent>
             <TabsContent value="government" className="pt-4">
               <form onSubmit={handleGovLogin}>

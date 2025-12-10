@@ -43,13 +43,20 @@ type RegisterFarmerPayload = Omit<Farmer, 'id' | 'createdAt' | 'devices'>;
 export async function registerFarmerAction(farmerData: RegisterFarmerPayload): Promise<{ id: string }> {
     const db = getDb();
     
-    // Check if farmer with phone already exists
     const farmersRef = collection(db, 'farmers');
-    const q = query(farmersRef, where('phone', '==', farmerData.phone));
-    const farmerQuery = await getDocs(q);
-
-    if (!farmerQuery.empty) {
-        throw new Error(`Farmer with phone number ${farmerData.phone} already exists.`);
+    
+    // Check if farmer with phone already exists
+    const phoneQuery = query(farmersRef, where('phone', '==', farmerData.phone));
+    const phoneSnapshot = await getDocs(phoneQuery);
+    if (!phoneSnapshot.empty) {
+        throw new Error(`A farmer with phone number ${farmerData.phone} is already registered.`);
+    }
+    
+    // Check if farmer with Aadhaar already exists
+    const aadhaarQuery = query(farmersRef, where('aadhaar', '==', farmerData.aadhaar));
+    const aadhaarSnapshot = await getDocs(aadhaarQuery);
+     if (!aadhaarSnapshot.empty) {
+        throw new Error(`A farmer with Aadhaar number ${farmerData.aadhaar} is already registered.`);
     }
 
     const farmerWithDefaults = {
