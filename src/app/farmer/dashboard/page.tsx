@@ -50,7 +50,9 @@ export default function FarmerDashboardPage() {
         <SmartAlert />
       </div>
       <div className="hidden lg:block lg:col-start-3">
-        <ChatAssistant />
+        <div className="sticky top-4">
+          <ChatAssistant />
+        </div>
       </div>
     </div>
   );

@@ -116,7 +116,7 @@ export default function ChatAssistant() {
   };
 
   return (
-    <Card className="flex h-full flex-col shadow-lg border-0 md:border md:shadow-sm lg:max-h-[calc(100vh-10rem)]">
+    <Card className="flex h-full flex-col shadow-lg border-0 md:border md:shadow-sm lg:h-auto lg:max-h-[calc(100vh-10rem)]">
         <CardHeader className='text-center hidden md:block'>
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <BrainCircuit className="h-8 w-8 text-primary" />
@@ -124,7 +124,7 @@ export default function ChatAssistant() {
             <CardTitle>AI Assistant</CardTitle>
             <CardDescription>Your personal farming support bot.</CardDescription>
         </CardHeader>
-      <CardContent className="flex-1 flex flex-col gap-4 p-4 overflow-hidden">
+      <CardContent className="flex flex-1 flex-col gap-4 p-4 min-h-0">
         <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
           <div className="space-y-4">
             {messages.map((message, index) => (
@@ -160,7 +160,7 @@ export default function ChatAssistant() {
             )}
           </div>
         </ScrollArea>
-        <form onSubmit={handleSendMessage} className="relative mt-auto border-t pt-4">
+        <form onSubmit={handleSendMessage} className="relative mt-auto border-t pt-4 z-10 pointer-events-auto">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
