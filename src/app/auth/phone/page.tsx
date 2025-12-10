@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Leaf, Loader2 } from 'lucide-react';
-import { sendOTP } from '@/lib/auth';
+import { checkFarmerExists } from '@/lib/auth';
 
 export default function PhoneLoginPage() {
   const router = useRouter();
@@ -15,26 +15,28 @@ export default function PhoneLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    // Basic validation for Indian/Nepalese numbers
     const cleanedNumber = phoneNumber.replace(/\s/g, '');
-    if (!/^\+?(91|977)\d{9,10}$/.test(cleanedNumber)) {
-        setError('Please enter a valid Indian (+91) or Nepalese (+977) number.');
+     if (!/^\+?(91|977)\d{9,10}$/.test(cleanedNumber)) {
+        setError('Please enter a valid Indian (+91) or Nepalese (+977) number with country code.');
+        setLoading(false);
         return;
     }
 
-    setLoading(true);
     try {
-      // In a real app, reCAPTCHA would be verified here.
-      // The verificationId would be stored to be used on the next page.
-      await sendOTP(cleanedNumber);
-      router.push(`/auth/verify-otp?phone=${encodeURIComponent(cleanedNumber)}`);
+      const { exists, farmerId } = await checkFarmerExists(cleanedNumber);
+      if (exists) {
+        router.push(`/auth/verify-otp?phone=${encodeURIComponent(cleanedNumber)}&farmerId=${farmerId}`);
+      } else {
+        setError('No farmer is registered with this phone number.');
+      }
     } catch (err) {
       const e = err as Error;
-      setError(e.message || 'Failed to send OTP. Please try again.');
+      setError(e.message || 'Failed to verify phone number. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -51,7 +53,7 @@ export default function PhoneLoginPage() {
           <CardDescription>Enter your phone number to receive a verification code.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSendOtp} className="space-y-4">
+          <form onSubmit={handlePhoneSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="phone">Phone Number</Label>
               <Input
@@ -64,15 +66,11 @@ export default function PhoneLoginPage() {
                 autoComplete="tel"
               />
             </div>
-            {/* Placeholder for reCAPTCHA */}
-            <div id="recaptcha-container" className="min-h-[80px]">
-                <p className="text-xs text-muted-foreground text-center">This site is protected by reCAPTCHA and the Google Privacy Policy and Terms of Service apply.</p>
-            </div>
-
+            
             {error && <p className="text-sm text-destructive">{error}</p>}
             
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Send OTP'}
+              {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Get OTP'}
             </Button>
           </form>
         </CardContent>

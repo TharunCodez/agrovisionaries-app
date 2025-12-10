@@ -3,7 +3,7 @@
 import { smartAlertingSystem } from '@/ai/flows/smart-alerting-system';
 import type { SmartAlertingSystemOutput } from '@/ai/flows/smart-alerting-system';
 import type { Farmer, Device } from '@/contexts/data-context';
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore';
 import { firebaseConfig } from '@/firebase/config';
 
@@ -11,6 +11,7 @@ import { firebaseConfig } from '@/firebase/config';
 // This creates a temporary app instance and should be used sparingly.
 const getDb = () => {
     const apps = getApps();
+    // Avoid re-initializing the app
     const app = apps.length > 0 ? apps[0] : initializeApp(firebaseConfig);
     return getFirestore(app);
 };
@@ -64,6 +65,7 @@ export async function registerFarmerAction(farmerData: RegisterFarmerPayload): P
     };
 
     const docRef = await addDoc(collection(db, 'farmers'), farmerWithDefaults);
+    // Set the ID field to the document ID
     await updateDoc(docRef, { id: docRef.id });
     
     return { id: docRef.id };
@@ -76,9 +78,6 @@ export async function addDeviceAction(deviceData: Omit<Device, 'id' | 'createdAt
 
     const deviceRef = doc(db, 'devices', deviceId);
     const farmerRef = doc(db, 'farmers', farmerId);
-
-    // Using client SDK means we can't use a batch write across different collections in a single server action like this easily without transactions.
-    // For simplicity, we'll perform the operations sequentially.
 
     // 1. Set the device data
     await setDoc(deviceRef, {

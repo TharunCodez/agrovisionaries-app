@@ -8,13 +8,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Leaf, Loader2 } from 'lucide-react';
 import { useRole } from '@/contexts/role-context';
-import { verifyOTP } from '@/lib/auth';
 import { useToast } from '@/hooks/use-toast';
+
+const MOCK_OTP = "123456";
 
 function VerifyOtpComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const phone = searchParams.get('phone') || '';
+  const farmerId = searchParams.get('farmerId') || '';
   const { setRole, setUser } = useRole();
   const { toast } = useToast();
 
@@ -59,23 +61,23 @@ function VerifyOtpComponent() {
     setError('');
     setLoading(true);
 
-    try {
-      const user = await verifyOTP(otpCode);
-      setUser(user);
-      setRole('farmer');
-      toast({
-        title: 'Login Successful!',
-        description: 'You are now logged in.',
-      });
-      router.replace('/farmer/dashboard');
-    } catch (err) {
-      const e = err as Error;
-      setError(e.message || 'OTP verification failed. Please try again.');
-      setOtp(new Array(6).fill('')); // Clear OTP fields
-      inputRefs.current[0]?.focus(); // Focus first input
-    } finally {
-      setLoading(false);
+    // Mock OTP verification
+    if (otpCode === MOCK_OTP) {
+        // Successful login
+        const user = { uid: farmerId, phoneNumber: phone, role: 'farmer' as const };
+        setUser(user);
+        setRole('farmer');
+        toast({
+            title: 'Login Successful!',
+            description: 'You are now logged in.',
+        });
+        router.replace('/farmer/dashboard');
+    } else {
+        setError('Invalid OTP. Please try again.');
+        setOtp(new Array(6).fill('')); // Clear OTP fields
+        inputRefs.current[0]?.focus(); // Focus first input
     }
+    setLoading(false);
   };
 
   return (
@@ -88,6 +90,7 @@ function VerifyOtpComponent() {
           <CardTitle>Verify Your Phone</CardTitle>
           <CardDescription>
             Enter the 6-digit code sent to <span className="font-semibold">{phone}</span>.
+            <br/> (Hint: it's 123456)
           </CardDescription>
         </CardHeader>
         <CardContent>

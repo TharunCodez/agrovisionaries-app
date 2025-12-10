@@ -15,7 +15,7 @@ import { useRole } from '@/contexts/role-context';
 import { Leaf, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { sendOTP, signInWithEmailAndPassword } from '@/lib/auth';
+import { signInWithEmailAndPassword, checkFarmerExists } from '@/lib/auth';
 
 export default function LoginPage() {
   const { setRole, setUser } = useRole();
@@ -47,22 +47,25 @@ export default function LoginPage() {
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    // Basic validation for Indian/Nepalese numbers
-    if (!/^\+?(91|977)\d{9,10}$/.test(phone.replace(/\s/g, ''))) {
-      setError(
-        'Please enter a valid Indian (+91) or Nepalese (+977) phone number.'
-      );
-      return;
+    setIsSending(true);
+    
+    const cleanedNumber = phone.replace(/\s/g, '');
+    if (!/^\+?(91|977)\d{9,10}$/.test(cleanedNumber)) {
+        setError('Please enter a valid Indian (+91) or Nepalese (+977) number with country code.');
+        setIsSending(false);
+        return;
     }
 
-    setIsSending(true);
     try {
-      await sendOTP(phone);
-      router.push(`/auth/verify-otp?phone=${encodeURIComponent(phone)}`);
+      const { exists, farmerId } = await checkFarmerExists(cleanedNumber);
+      if (exists) {
+        router.push(`/auth/verify-otp?phone=${encodeURIComponent(cleanedNumber)}&farmerId=${farmerId}`);
+      } else {
+        setError('No farmer is registered with this phone number.');
+      }
     } catch (err) {
       const e = err as Error;
-      setError(e.message || 'Failed to send OTP. Please try again.');
-      console.error(err);
+      setError(e.message || 'Failed to verify phone number. Please try again.');
     } finally {
       setIsSending(false);
     }
@@ -99,7 +102,6 @@ export default function LoginPage() {
                       onChange={(e) => setPhone(e.target.value)}
                       required
                     />
-                    <div id="recaptcha-container" className="my-2"></div>
                   </div>
                   {error && <p className="text-sm text-destructive">{error}</p>}
                   <Button
@@ -110,7 +112,7 @@ export default function LoginPage() {
                     {isSending && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Send OTP
+                    Login
                   </Button>
                 </div>
               </form>
