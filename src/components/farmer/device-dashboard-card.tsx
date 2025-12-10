@@ -54,11 +54,11 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
          </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <WaterTank level={device.waterLevel} />
             <PumpControlCard />
         </div>
-        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
           <SensorCard type="temperature" value={device.temperature} />
           <SensorCard type="soil" value={device.soilMoisture} />
           <SensorCard type="lora" value={device.rssi} />

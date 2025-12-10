@@ -2,7 +2,7 @@
 'use client';
 import ChatAssistantButton from '@/components/farmer/chat-assistant-button';
 import FarmerBottomNav from '@/components/farmer/farmer-bottom-nav';
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider } from '@/components/ui/sidebar';
 import { useUser } from '@/firebase';
 import { setupFCM } from '@/lib/notifications';
 import { useEffect } from 'react';

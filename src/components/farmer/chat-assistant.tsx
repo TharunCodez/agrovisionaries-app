@@ -7,7 +7,7 @@ import { Paperclip, Send, BrainCircuit, User, Bot, Loader2 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { Badge } from '../ui/badge';
-import type { DiagnosePlantOutput, DiagnosePlantInput } from '@/ai/flows/plant-diagnoser-flow';
+import type { DiagnosePlantOutput } from '@/ai/flows/plant-diagnoser-flow';
 import type { GeneralChatInput } from '@/ai/flows/general-chat-flow';
 import { runDiagnosePlant, runGeneralChat } from '@/app/api/ai-actions';
 
@@ -115,7 +115,7 @@ export default function ChatAssistant() {
   };
 
   return (
-    <Card className="flex h-full max-h-[100vh] flex-col md:max-h-[80vh] shadow-none border-0 md:border md:shadow-sm">
+    <Card className="flex h-full flex-col shadow-lg border-0 md:border md:shadow-sm lg:max-h-[calc(100vh-10rem)]">
         <CardHeader className='text-center hidden md:block'>
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <BrainCircuit className="h-8 w-8 text-primary" />
