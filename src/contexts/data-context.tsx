@@ -5,6 +5,8 @@ import React, {
   useContext,
   ReactNode,
   useMemo,
+  useState,
+  useEffect,
 } from 'react';
 import {
   useCollection,
@@ -19,6 +21,7 @@ import {
   doc,
 } from 'firebase/firestore';
 import { useRole } from './role-context';
+import { getFarmerProfile } from '@/app/api/farmer-data';
 
 export type Plot = {
   surveyNumber: string;
@@ -90,22 +93,31 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const { firestore } = useFirebase();
   const { user, isLoading: isAuthLoading } = useRole();
   const { role } = useRole();
+  const [serverFetchedFarmer, setServerFetchedFarmer] = useState<Farmer[] | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
 
-  // Fetch all farmers - for government user or any user to get farmer list
+  useEffect(() => {
+    // If the user is a farmer and we don't have their data yet, fetch it.
+    if (role === 'farmer' && user?.phoneNumber && !serverFetchedFarmer && !isFetching) {
+      setIsFetching(true);
+      getFarmerProfile(user.phoneNumber)
+        .then(profile => {
+          if (profile) {
+            setServerFetchedFarmer([profile as Farmer]);
+          }
+        })
+        .finally(() => setIsFetching(false));
+    }
+  }, [user, role, serverFetchedFarmer, isFetching]);
+
+  // Fetch all farmers - for government user
   const allFarmersQuery = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'farmers') : null),
-    [firestore]
+    () => (firestore && role === 'government' ? collection(firestore, 'farmers') : null),
+    [firestore, role]
   );
   const { data: allFarmers, isLoading: farmersLoading } = useCollection<Farmer>(allFarmersQuery);
 
-  // Memoize the current farmer's data from the allFarmers list
-  const currentFarmer = useMemo(() => {
-    if (role === 'farmer' && user && allFarmers) {
-      return allFarmers.filter(f => f.id === user.uid);
-    }
-    return null;
-  }, [role, user, allFarmers]);
-
+  const farmers = role === 'government' ? allFarmers : serverFetchedFarmer;
 
   // Fetch all devices - for government user
   const allDevicesQuery = useMemoFirebase(
@@ -113,7 +125,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     [firestore]
   );
   const { data: allDevices, isLoading: allDevicesLoading } = useCollection<Device>(allDevicesQuery);
-
+  
   // Memoize farmer's devices from the allDevices list
   const farmerDevices = useMemo(() => {
      if (role === 'farmer' && user && allDevices) {
@@ -140,10 +152,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   }, [allDevices, farmerDevices, role]);
 
-  const farmers = role === 'government' ? allFarmers : currentFarmer;
   const devices = role === 'government' ? allDevices : farmerDevices;
 
-  const isLoading = isAuthLoading || farmersLoading || allDevicesLoading;
+  const isLoading = isAuthLoading || (role === 'government' && (farmersLoading || allDevicesLoading)) || (role === 'farmer' && isFetching);
 
   const value = useMemo(
     () => ({ devices, farmers, sensorData, isLoading }),

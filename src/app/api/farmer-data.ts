@@ -15,6 +15,8 @@ const getDb = () => {
 export async function getFarmerProfile(phone: string) {
   const db = getDb();
 
+  if (!phone) return null;
+
   const farmerQuery = query(
     collection(db, 'farmers'),
     where('phone', '==', phone)

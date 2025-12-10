@@ -1,6 +1,6 @@
 
 'use client';
-import { useState, useRef, useEffect, use } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -9,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { Badge } from '../ui/badge';
 import type { DiagnosePlantOutput } from '@/ai/flows/plant-diagnoser-flow';
-import type { GeneralChatInput } from '@/ai/flows/general-chat-flow';
 import { runDiagnosePlant, runGeneralChat } from '@/app/api/ai-actions';
 
 
@@ -43,7 +42,7 @@ export default function ChatAssistant() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: 'user', content: input };
     const currentInput = input;
@@ -77,7 +76,7 @@ export default function ChatAssistant() {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || isLoading) return;
 
     setIsLoading(true);
 
@@ -124,75 +123,76 @@ export default function ChatAssistant() {
             <CardTitle>AI Assistant</CardTitle>
             <CardDescription>Your personal farming support bot.</CardDescription>
         </CardHeader>
-      <CardContent className="flex flex-1 flex-col gap-4 p-4 min-h-0">
-        <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
-          <div className="space-y-4">
-            {messages.map((message, index) => (
-              <div key={index} className={`flex items-start gap-2 ${message.role === 'user' ? 'justify-end' : ''}`}>
-                {message.role === 'assistant' && (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
-                    <Bot size={20} />
+        <div className="flex-1 min-h-0 flex flex-col">
+            <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
+              <div className="space-y-4 p-4">
+                {messages.map((message, index) => (
+                  <div key={index} className={`flex items-start gap-2 ${message.role === 'user' ? 'justify-end' : ''}`}>
+                    {message.role === 'assistant' && (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
+                        <Bot size={20} />
+                      </div>
+                    )}
+                    <div className={`rounded-lg px-4 py-2 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                      {typeof message.content === 'string' ? (
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                      ) : (
+                        message.content
+                      )}
+                    </div>
+                     {message.role === 'user' && (
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground flex-shrink-0">
+                        <User size={20} />
+                      </div>
+                    )}
                   </div>
-                )}
-                <div className={`rounded-lg px-4 py-2 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
-                  {typeof message.content === 'string' ? (
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                  ) : (
-                    message.content
-                  )}
-                </div>
-                 {message.role === 'user' && (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground flex-shrink-0">
-                    <User size={20} />
-                  </div>
+                ))}
+                {isLoading && (
+                    <div className="flex items-start gap-2">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
+                            <Bot size={20} />
+                        </div>
+                         <div className="rounded-lg px-4 py-2 bg-muted flex items-center">
+                            <Loader2 className="h-5 w-5 animate-spin"/>
+                         </div>
+                    </div>
                 )}
               </div>
-            ))}
-            {isLoading && (
-                <div className="flex items-start gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
-                        <Bot size={20} />
-                    </div>
-                     <div className="rounded-lg px-4 py-2 bg-muted flex items-center">
-                        <Loader2 className="h-5 w-5 animate-spin"/>
-                     </div>
-                </div>
-            )}
-          </div>
-        </ScrollArea>
-        <form onSubmit={handleSendMessage} className="relative mt-auto border-t pt-4 z-10 pointer-events-auto">
-          <Input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a question or upload a plant photo..."
-            className="pr-20"
-            disabled={isLoading}
-          />
-           <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-            accept="image/*"
-            disabled={isLoading}
-            />
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="absolute right-10 top-1/2 -translate-y-1/2"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isLoading}
-            >
-            <Paperclip className="h-5 w-5" />
-            <span className="sr-only">Attach image</span>
-          </Button>
-          <Button type="submit" size="icon" className="absolute right-1 top-1/2 -translate-y-1/2" disabled={isLoading || !input.trim()}>
-            <Send className="h-5 w-5" />
-            <span className="sr-only">Send</span>
-          </Button>
-        </form>
-      </CardContent>
+            </ScrollArea>
+            <div className="w-full sticky bottom-0 bg-background border-t p-3 flex items-center gap-3 z-10 pointer-events-auto">
+                 <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                    accept="image/*"
+                    disabled={isLoading}
+                 />
+                 <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isLoading}
+                    >
+                    <Paperclip className="h-5 w-5" />
+                    <span className="sr-only">Attach image</span>
+                </Button>
+                <form onSubmit={handleSendMessage} className="flex-1 flex items-center gap-2">
+                    <Input
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="Ask a question..."
+                        className="flex-1"
+                        disabled={isLoading}
+                    />
+                    <Button type="submit" size="icon" className="bg-primary rounded-full" disabled={isLoading || !input.trim()}>
+                        <Send className="h-5 w-5" />
+                        <span className="sr-only">Send</span>
+                    </Button>
+                </form>
+            </div>
+        </div>
     </Card>
   );
 }

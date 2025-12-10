@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { getFarmerProfile } from '@/app/api/farmer-data';
 import { uploadProfilePhoto } from '@/app/api/upload-profile-photo';
-import { useRole } from '@/contexts/role-context';
+import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, MapPin, Tractor, HardDrive, Edit, LogOut, Upload, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -26,40 +26,30 @@ function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, 
 }
 
 export default function FarmerProfilePage() {
-  const { user } = useRole();
+  const { farmers, isLoading: isDataLoading } = useData();
   const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const farmer = farmers?.[0];
 
   useEffect(() => {
-    if (!user?.phoneNumber) {
-      setLoading(false);
-      return;
-    };
-    (async () => {
-      try {
-        setLoading(true);
-        const p = await getFarmerProfile(user.phoneNumber);
-        setProfile(p);
-      } catch (error) {
-        console.error("Failed to fetch profile", error);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [user]);
+    if(farmer) {
+      setProfile(farmer);
+    }
+  }, [farmer]);
+
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !user) return;
+    if (!file || !farmer) return;
 
     setUploading(true);
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('farmerId', user.uid);
+    formData.append('farmerId', farmer.id);
 
     try {
       const { photoUrl, error } = await uploadProfilePhoto(formData);
@@ -82,7 +72,7 @@ export default function FarmerProfilePage() {
     }
   };
 
-  if (loading) {
+  if (isDataLoading) {
     return (
         <div className="flex flex-col gap-6 pb-20 md:pb-6">
             <div className="flex items-center justify-between">
@@ -91,7 +81,7 @@ export default function FarmerProfilePage() {
             </div>
             <Card>
                 <CardHeader className="text-center">
-                    <Skeleton className="mx-auto h-24 w-24 rounded-full" />
+                    <Skeleton className="mx-auto h-28 w-28 rounded-full" />
                     <Skeleton className="h-6 w-32 mx-auto mt-4" />
                     <Skeleton className="h-4 w-24 mx-auto mt-2" />
                 </CardHeader>

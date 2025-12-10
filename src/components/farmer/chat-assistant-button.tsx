@@ -1,15 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { MessageSquare } from "lucide-react";
-import { Drawer } from "@/components/ui/drawer";
-import ChatAssistant from "./chat-assistant";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import Link from 'next/link';
 
 export default function ChatAssistantButton() {
-    const isDesktop = useMediaQuery("(min-width: 768px)");
+    const isDesktop = useMediaQuery("(min-width: 1024px)");
 
     if (isDesktop) {
         return null; // Don't render on desktop, it's in the dashboard sidebar
