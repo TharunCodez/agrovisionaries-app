@@ -1,14 +1,22 @@
 import * as admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
+import { config } from 'dotenv';
+
+config();
 
 if (!admin.apps.length) {
   try {
-    // Initialize with application default credentials
-    admin.initializeApp();
+    const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT;
+    if (!serviceAccountString) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable not set.');
+    }
+    const serviceAccount = JSON.parse(serviceAccountString);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
   } catch (error) {
     console.error('Firebase admin initialization error', error);
-    // In a production app, you might want to handle this more gracefully
     throw error;
   }
 }
