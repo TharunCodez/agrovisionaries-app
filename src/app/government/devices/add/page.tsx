@@ -18,8 +18,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Label } from '@/components/ui/label';
 import { addDeviceAction } from '@/lib/actions';
 import { useData } from '@/contexts/data-context';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
@@ -141,43 +139,22 @@ export default function AddDevicePage() {
                 control={form.control}
                 name="farmerId"
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem>
                     <FormLabel>Select Farmer</FormLabel>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <FormControl>
-                                <Button
-                                variant="outline"
-                                role="combobox"
-                                className="w-full justify-between"
-                                >
-                                {field.value ? farmers?.find(f => f.id === field.value)?.name : "Select a farmer..."}
-                                <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                                </Button>
-                            </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                            <Command>
-                                <CommandInput placeholder="Search farmer..." />
-                                <CommandList>
-                                <CommandEmpty>No farmer found.</CommandEmpty>
-                                <CommandGroup>
-                                    {(farmers || []).map((farmer) => (
-                                    <CommandItem
-                                        value={farmer.name}
-                                        key={farmer.id}
-                                        onSelect={() => {
-                                            form.setValue("farmerId", farmer.id)
-                                        }}
-                                    >
-                                        {farmer.name} ({farmer.phone})
-                                    </CommandItem>
-                                    ))}
-                                </CommandGroup>
-                                </CommandList>
-                            </Command>
-                        </PopoverContent>
-                    </Popover>
+                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a farmer to assign the device" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {(farmers || []).map((farmer) => (
+                            <SelectItem key={farmer.id} value={farmer.id}>
+                                {farmer.name} ({farmer.phone})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     <FormMessage />
                   </FormItem>
                 )}
