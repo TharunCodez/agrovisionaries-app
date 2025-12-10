@@ -5,10 +5,12 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Paperclip, Send, BrainCircuit, User, Bot, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
-import { diagnosePlant, type DiagnosePlantOutput } from '@/ai/flows/plant-diagnoser-flow';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { Badge } from '../ui/badge';
-import { generalChat } from '@/ai/flows/general-chat-flow';
+import type { DiagnosePlantOutput, DiagnosePlantInput } from '@/ai/flows/plant-diagnoser-flow';
+import type { GeneralChatInput } from '@/ai/flows/general-chat-flow';
+import { runDiagnosePlant, runGeneralChat } from '@/app/api/ai-actions';
+
 
 type Message = {
   role: 'user' | 'assistant';
@@ -54,7 +56,7 @@ export default function ChatAssistant() {
         role: m.role,
         content: typeof m.content === 'string' ? m.content : 'Image diagnosis was displayed.'
       }));
-      const response = await generalChat({ query: currentInput, history });
+      const response = await runGeneralChat({ query: currentInput, history });
       const assistantResponse: Message = {
         role: 'assistant',
         content: response
@@ -92,7 +94,7 @@ export default function ChatAssistant() {
         setMessages(prev => [...prev, { role: 'user', content: imagePreview }]);
 
         try {
-            const diagnosis = await diagnosePlant({ photoDataUri: dataUri });
+            const diagnosis = await runDiagnosePlant({ photoDataUri: dataUri });
             const assistantResponse: Message = {
                 role: 'assistant',
                 content: <DiagnosisCard diagnosis={diagnosis} />

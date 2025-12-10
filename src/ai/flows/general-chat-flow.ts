@@ -1,4 +1,3 @@
-'use server';
 /**
  * @fileOverview A general purpose conversational chat AI flow.
  *

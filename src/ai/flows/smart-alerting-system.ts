@@ -1,4 +1,3 @@
-'use server';
 /**
  * @fileOverview Implements a smart alerting system that analyzes sensor data, weather forecasts, and historical data to proactively alert farmers about potential issues.
  *

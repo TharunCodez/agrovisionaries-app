@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Terminal, AlertTriangle, CheckCircle2, Loader, Siren } from 'lucide-react';
-import { checkForAlerts } from '@/lib/actions';
 import type { SmartAlertingSystemOutput } from '@/ai/flows/smart-alerting-system';
+import { runSmartAlerting } from '@/app/api/ai-actions';
 
 export default function SmartAlert() {
   const [alert, setAlert] = useState<SmartAlertingSystemOutput | null>(null);
@@ -15,8 +15,23 @@ export default function SmartAlert() {
   const handleCheckAlerts = async () => {
     setIsLoading(true);
     setAlert(null);
-    const result = await checkForAlerts();
-    setAlert(result);
+    try {
+        const mockInput = {
+            historicalData: "Past week average soil moisture: 45%. No significant rainfall. Reservoir levels have been steadily decreasing by 5% daily.",
+            weatherForecast: "Next 24 hours: Clear skies, 0% chance of rain. Temperature rising to 35°C. High winds expected in the afternoon.",
+            sensorReadings: "Current soil moisture: 25%. Water reservoir level: 30%.",
+            thresholds: "Soil moisture critical low: 30%. Water reservoir critical low: 25%.",
+        };
+        const result = await runSmartAlerting(mockInput);
+        setAlert(result);
+    } catch (error) {
+        console.error('Error in checkForAlerts:', error);
+        setAlert({
+            alertType: 'Error',
+            alertMessage: 'The smart alerting system is currently unavailable. Please try again later.',
+            urgencyLevel: 'low',
+        });
+    }
     setIsLoading(false);
   };
 
