@@ -1,33 +1,57 @@
 'use client';
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Button } from '@/components/ui/button';
-import { User, MapPin, Tractor, HardDrive, Edit, LogOut } from 'lucide-react';
-import LanguageSwitcher from '@/components/layout/language-switcher';
+import { useEffect, useState } from 'react';
+import { getFarmerProfile } from '@/app/api/farmer-data';
 import { useRole } from '@/contexts/role-context';
-import { useData } from '@/contexts/data-context';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { User, MapPin, Tractor, HardDrive, Edit, LogOut } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { Skeleton } from '@/components/ui/skeleton';
+
+function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, icon?: React.ElementType }) {
+    const IconComponent = Icon || User;
+    return (
+        <div className="flex items-start gap-3">
+            {Icon && <IconComponent className="h-5 w-5 mt-1 text-primary"/>}
+            <div>
+                <p className="font-semibold">{label}</p>
+                <p className="text-muted-foreground">{value ?? '—'}</p>
+            </div>
+        </div>
+    );
+}
+
 
 export default function FarmerProfilePage() {
+  const { user } = useRole();
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const avatarImage = PlaceHolderImages.find(
     (img) => img.id === 'farmer-avatar'
   );
-  const { user } = useRole();
-  const { farmers, devices, isLoading } = useData();
 
-  const farmer = farmers?.find(f => f.id === user?.uid);
-  const farmerDevices = devices?.filter(d => d.farmerId === user?.uid);
+  useEffect(() => {
+    if (!user?.phoneNumber) {
+      setLoading(false);
+      return;
+    };
+    (async () => {
+      try {
+        setLoading(true);
+        const p = await getFarmerProfile(user.phoneNumber);
+        setProfile(p);
+      } catch (error) {
+        console.error("Failed to fetch profile", error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [user]);
 
-  if (isLoading) {
+  if (loading) {
     return (
         <div className="flex flex-col gap-6 pb-20 md:pb-6">
             <div className="flex items-center justify-between">
@@ -49,25 +73,7 @@ export default function FarmerProfilePage() {
         </div>
     )
   }
-
-  if (!farmer) {
-    return (
-        <div className="flex flex-col gap-6 pb-20 md:pb-6">
-             <div className="flex items-center justify-between">
-              <h1 className="font-headline text-2xl md:text-3xl font-bold">Your Profile</h1>
-             </div>
-             <Card>
-                <CardHeader>
-                    <CardTitle>Profile not found</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <p className="text-muted-foreground">Your farmer profile could not be loaded. Please try logging in again or contact support.</p>
-                </CardContent>
-             </Card>
-        </div>
-    )
-  }
-
+  if (!profile) return <div className="p-6 text-center">No profile found. You may need to log in again.</div>;
 
   return (
     <div className="flex flex-col gap-8 pb-20 md:pb-6">
@@ -79,7 +85,6 @@ export default function FarmerProfilePage() {
         </Button>
       </div>
       
-      {/* Farmer Profile Card */}
       <Card>
         <CardHeader className="items-center text-center">
           <Avatar className="mx-auto h-24 w-24 border-4 border-primary">
@@ -90,34 +95,21 @@ export default function FarmerProfilePage() {
                 data-ai-hint={avatarImage.imageHint}
               />
             )}
-            <AvatarFallback>{farmer.name ? farmer.name.charAt(0) : 'F'}</AvatarFallback>
+            <AvatarFallback>{profile.name ? profile.name.charAt(0) : 'F'}</AvatarFallback>
           </Avatar>
           <div className="text-center">
-            <CardTitle className="mt-4">{farmer.name}</CardTitle>
-            <CardDescription>{farmer.phone}</CardDescription>
+            <CardTitle className="mt-4">{profile.name}</CardTitle>
+            <p className="text-sm text-muted-foreground">{profile.phone}</p>
           </div>
         </CardHeader>
         <CardContent>
              <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-                <div className="flex items-start gap-3">
-                    <User className="h-5 w-5 mt-1 text-primary"/>
-                    <div>
-                        <p className="font-semibold">Aadhaar</p>
-                        <p className="text-muted-foreground">{farmer.aadhaar}</p>
-                    </div>
-                </div>
-                <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 mt-1 text-primary"/>
-                    <div>
-                        <p className="font-semibold">Address</p>
-                        <p className="text-muted-foreground">{farmer.address}, {farmer.village}, {farmer.district}</p>
-                    </div>
-                </div>
+                <ProfileItem label="Aadhaar" value={profile.aadhaar} icon={User} />
+                <ProfileItem label="Address" value={`${profile.address}, ${profile.village}, ${profile.district}`} icon={MapPin} />
              </div>
         </CardContent>
       </Card>
       
-      {/* Plots Card */}
        <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -126,8 +118,8 @@ export default function FarmerProfilePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {farmer.plots && farmer.plots.length > 0 ? (
-            farmer.plots.map((plot, index) => (
+          {profile.plots?.length > 0 ? (
+            profile.plots.map((plot: any, index: number) => (
               <div key={index} className="rounded-lg border bg-muted/20 p-4">
                 <p className="font-bold">Survey No: {plot.surveyNumber}</p>
                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -143,7 +135,6 @@ export default function FarmerProfilePage() {
         </CardContent>
       </Card>
       
-      {/* Devices Card */}
        <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -152,8 +143,8 @@ export default function FarmerProfilePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {farmerDevices && farmerDevices.length > 0 ? (
-            farmerDevices.map((device) => (
+          {profile.devices && profile.devices.length > 0 ? (
+            profile.devices.map((device: any) => (
               <div key={device.id} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
                 <div>
                   <p className="font-bold">{device.nickname}</p>

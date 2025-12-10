@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, HardDrive, Bell, Settings, Map, User, BrainCircuit } from 'lucide-react';
+import { LayoutDashboard, HardDrive, Bell, User, BrainCircuit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import NotificationBell from '../notifications/NotificationBell';
 
