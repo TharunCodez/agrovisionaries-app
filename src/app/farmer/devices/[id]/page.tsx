@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ChevronLeft, Share2, Settings, MapPin } from 'lucide-react';
+import { ChevronLeft, Share2, Settings, MapPin, Battery, Rss } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +25,6 @@ import {
 } from '@/components/ui/dialog';
 import PumpControlCard from '@/components/farmer/pump-control-card';
 import WaterTank from '@/components/farmer/water-tank';
-import WeatherCard from '@/components/farmer/weather-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useData } from '@/contexts/data-context';
 
@@ -42,9 +41,6 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   const [isMapOpen, setMapOpen] = useState(false);
 
   if (!device) {
-      // Data might still be loading, or device not found.
-      // notFound() can't be used in a client component that renders after initial load.
-      // So we'll show a message.
        return (
          <div className="flex flex-col items-center justify-center h-full text-center">
             <Card>
@@ -130,8 +126,6 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
         </CardContent>
       </Card>
 
-      <WeatherCard lat={device.location.lat} lng={device.location.lng} />
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <WaterTank level={device.waterLevel} />
         <PumpControlCard />
@@ -145,12 +139,9 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <SensorCard type="temperature" value={device.temperature} />
             <SensorCard type="soil" value={device.soilMoisture} />
+            <SensorCard type="lora" value={device.rssi} />
             <SensorCard
-              type="wind"
-              value={device.rssi > -85 ? 15 : 5}
-            />
-            <SensorCard
-              type="solar"
+              type="battery"
               value={Math.round(device.rssi / -2 + 80)}
             />
           </div>

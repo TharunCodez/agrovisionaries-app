@@ -1,5 +1,6 @@
 
 'use client';
+import ChatAssistantButton from '@/components/farmer/chat-assistant-button';
 import FarmerBottomNav from '@/components/farmer/farmer-bottom-nav';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { useUser } from '@/firebase';
@@ -20,6 +21,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
       <div className="flex min-h-screen flex-col">
         <main className="flex-1 bg-background p-4 md:p-6 lg:p-8">{children}</main>
         <FarmerBottomNav />
+        <ChatAssistantButton />
       </div>
     </SidebarProvider>
   );

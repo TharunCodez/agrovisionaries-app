@@ -6,14 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ChevronRight, HardDrive } from 'lucide-react';
+import { ChevronRight, HardDrive, Battery, Rss } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import SensorCard from '@/components/farmer/sensor-card';
 import PumpControlCard from '@/components/farmer/pump-control-card';
 import WaterTank from '@/components/farmer/water-tank';
-import WeatherCard from '@/components/farmer/weather-card';
 import { type Device } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -35,7 +34,6 @@ const getStatusBadgeClass = (status: string) => {
 }
 
 export default function DeviceDashboardCard({ device }: { device: Device }) {
-  const [liveTemperature, setLiveTemperature] = useState<number | null>(null);
 
   const lastUpdated = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
@@ -56,28 +54,18 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
          </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-1">
-            <WeatherCard lat={device.location.lat} lng={device.location.lng} onTemperatureUpdate={setLiveTemperature} />
-          </div>
-          <div className="grid grid-cols-1 gap-6 lg:col-span-2">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-              <WaterTank level={device.waterLevel} />
-              <PumpControlCard />
-            </div>
-          </div>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            <WaterTank level={device.waterLevel} />
+            <PumpControlCard />
         </div>
         <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-          <SensorCard type="temperature" value={liveTemperature ?? device.temperature} />
+          <SensorCard type="temperature" value={device.temperature} />
           <SensorCard type="soil" value={device.soilMoisture} />
-           <SensorCard
-              type="wind"
-              value={device.rssi > -85 ? 15 : 5}
-            />
+          <SensorCard type="lora" value={device.rssi} />
           <SensorCard
-              type="solar"
-              value={Math.round(device.rssi / -2 + 80)}
-            />
+            type="battery"
+            value={Math.round(device.rssi / -2 + 80)}
+          />
         </div>
          <div className="mt-4 flex justify-end border-t pt-4">
             <Button asChild variant="outline">

@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Thermometer, Droplets, CloudRain, Sun, Battery, Waves, Wind } from "lucide-react";
+import { Thermometer, CloudRain, Sun, Battery, Waves, Wind, Rss } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type SensorType = 'temperature' | 'soil' | 'rain' | 'solar' | 'wind';
+type SensorType = 'temperature' | 'soil' | 'rain' | 'battery' | 'wind' | 'lora';
 
 interface SensorCardProps {
     type: SensorType;
@@ -13,8 +13,9 @@ const sensorDetails = {
     temperature: { icon: Thermometer, label: "Temp", unit: "°C" },
     soil: { icon: Waves, label: "Moisture", unit: "%" },
     rain: { icon: CloudRain, label: "Rain", unit: "" },
-    solar: { icon: Battery, label: "Solar", unit: "%" },
+    battery: { icon: Battery, label: "Battery", unit: "%" },
     wind: { icon: Wind, label: "Wind", unit: "km/h" },
+    lora: { icon: Rss, label: "Signal", unit: "dBm" }
 };
 
 const SoilIcon = ({ moisture }: { moisture: number }) => {
@@ -33,26 +34,6 @@ const SoilIcon = ({ moisture }: { moisture: number }) => {
     )
 }
 
-const RainIcon = ({ intensity }: { intensity: string }) => {
-    const intensityMap = { 'Low': 1, 'Medium': 3, 'High': 5 };
-    const count = intensityMap[intensity as keyof typeof intensityMap] || 0;
-
-    return (
-        <div className="relative h-16 w-16">
-            <CloudRain className="h-16 w-16 text-blue-400" />
-            {Array.from({ length: count }).map((_, i) => (
-                <Droplets key={i} className="absolute h-4 w-4 animate-pulse text-blue-500" style={{ 
-                    left: `${20 + (i * 15)}%`, 
-                    bottom: `${10 + Math.random() * 20}%`,
-                    animationDelay: `${i * 200}ms`,
-                    animationDuration: '1s'
-                }}/>
-            ))}
-        </div>
-    )
-}
-
-
 const TemperatureIcon = ({ temp }: { temp: number }) => {
     let colorClass = "text-yellow-500";
     if (temp > 30) colorClass = "text-red-500 animate-pulse";
@@ -65,7 +46,7 @@ const TemperatureIcon = ({ temp }: { temp: number }) => {
     )
 }
 
-const SolarIcon = ({ level }: { level: number }) => {
+const BatteryIcon = ({ level }: { level: number }) => {
     return (
         <div className="relative h-16 w-16">
             <Battery className="h-16 w-16 text-muted-foreground -rotate-90" />
@@ -80,13 +61,11 @@ const SolarIcon = ({ level }: { level: number }) => {
     )
 }
 
-const WindIcon = ({ speed }: { speed: number }) => {
-    return (
-         <div className="relative h-16 w-16">
-            <Wind className="h-16 w-16 text-slate-400" style={{ animation: `spin ${2 / Math.max(speed, 0.1)}s linear infinite` }} />
-        </div>
-    )
-}
+const LoraIcon = ({ rssi }: { rssi: number }) => {
+  const quality = rssi > -90 ? 'Good' : rssi > -110 ? 'Fair' : 'Poor';
+  const colorClass = quality === 'Good' ? 'text-green-500' : quality === 'Fair' ? 'text-yellow-500' : 'text-red-500';
+  return <Rss className={cn('h-16 w-16', colorClass)} />;
+};
 
 
 export default function SensorCard({ type, value }: SensorCardProps) {
@@ -97,14 +76,12 @@ export default function SensorCard({ type, value }: SensorCardProps) {
         switch (type) {
             case 'soil':
                 return <SoilIcon moisture={numericValue} />;
-            case 'rain':
-                return <RainIcon intensity={String(value)} />;
             case 'temperature':
                 return <TemperatureIcon temp={numericValue} />;
-             case 'solar':
-                return <SolarIcon level={numericValue} />;
-            case 'wind':
-                return <WindIcon speed={numericValue} />;
+             case 'battery':
+                return <BatteryIcon level={numericValue} />;
+             case 'lora':
+                return <LoraIcon rssi={numericValue} />;
             default:
                 const Icon = details.icon;
                 return <Icon className="h-12 w-12 text-muted-foreground" />;
