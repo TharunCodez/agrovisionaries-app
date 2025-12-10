@@ -1,13 +1,14 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, use } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Paperclip, Send, BrainCircuit, User, Bot, Loader2, Image as ImageIcon } from 'lucide-react';
+import { Paperclip, Send, BrainCircuit, User, Bot, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { diagnosePlant, type DiagnosePlantOutput } from '@/ai/flows/plant-diagnoser-flow';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { Badge } from '../ui/badge';
+import { generalChat } from '@/ai/flows/general-chat-flow';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -39,22 +40,36 @@ export default function ChatAssistant() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim() && messages.length === 0) return;
+    if (!input.trim()) return;
 
     const userMessage: Message = { role: 'user', content: input };
+    const currentInput = input;
+    
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
 
-    // Mock response for now.
-    setTimeout(() => {
+    try {
+      const history = messages.map(m => ({
+        role: m.role,
+        content: typeof m.content === 'string' ? m.content : 'Image diagnosis was displayed.'
+      }));
+      const response = await generalChat({ query: currentInput, history });
       const assistantResponse: Message = {
         role: 'assistant',
-        content: `You asked: "${input}". I am still learning how to answer general questions. For now, please try uploading a plant photo.`
+        content: response
       };
       setMessages(prev => [...prev, assistantResponse]);
-      setIsLoading(false);
-    }, 1000);
+    } catch(error) {
+        console.error("Chat failed:", error);
+        const errorResponse: Message = {
+            role: 'assistant',
+            content: "Sorry, I encountered an error. Please try again."
+        };
+        setMessages(prev => [...prev, errorResponse]);
+    } finally {
+        setIsLoading(false);
+    }
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +84,7 @@ export default function ChatAssistant() {
 
         const imagePreview = (
             <div className='flex flex-col items-center gap-2'>
-                <p>Here is the image you uploaded:</p>
+                <p>Plant photo for diagnosis:</p>
                 <img src={dataUri} alt="Uploaded plant" className="max-w-48 rounded-lg" />
             </div>
         );
@@ -98,8 +113,8 @@ export default function ChatAssistant() {
   };
 
   return (
-    <Card className="flex h-full max-h-[80vh] flex-col">
-        <CardHeader className='text-center'>
+    <Card className="flex h-full max-h-[100vh] flex-col md:max-h-[80vh] shadow-none border-0 md:border md:shadow-sm">
+        <CardHeader className='text-center hidden md:block'>
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <BrainCircuit className="h-8 w-8 text-primary" />
             </div>
@@ -110,39 +125,39 @@ export default function ChatAssistant() {
         <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
           <div className="space-y-4">
             {messages.map((message, index) => (
-              <div key={index} className={`flex items-end gap-2 ${message.role === 'user' ? 'justify-end' : ''}`}>
+              <div key={index} className={`flex items-start gap-2 ${message.role === 'user' ? 'justify-end' : ''}`}>
                 {message.role === 'assistant' && (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
                     <Bot size={20} />
                   </div>
                 )}
-                <div className={`max-w-xs rounded-lg px-4 py-2 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+                <div className={`rounded-lg px-4 py-2 ${message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
                   {typeof message.content === 'string' ? (
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                   ) : (
                     message.content
                   )}
                 </div>
                  {message.role === 'user' && (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground flex-shrink-0">
                     <User size={20} />
                   </div>
                 )}
               </div>
             ))}
             {isLoading && (
-                <div className="flex items-end gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                <div className="flex items-start gap-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground flex-shrink-0">
                         <Bot size={20} />
                     </div>
-                     <div className="max-w-xs rounded-lg px-4 py-2 bg-muted flex items-center">
+                     <div className="rounded-lg px-4 py-2 bg-muted flex items-center">
                         <Loader2 className="h-5 w-5 animate-spin"/>
                      </div>
                 </div>
             )}
           </div>
         </ScrollArea>
-        <form onSubmit={handleSendMessage} className="relative mt-4">
+        <form onSubmit={handleSendMessage} className="relative mt-auto border-t pt-4">
           <Input
             value={input}
             onChange={(e) => setInput(e.target.value)}
