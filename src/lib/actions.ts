@@ -4,15 +4,15 @@ import { smartAlertingSystem } from '@/ai/flows/smart-alerting-system';
 import type { SmartAlertingSystemOutput } from '@/ai/flows/smart-alerting-system';
 import type { Farmer, Device } from '@/contexts/data-context';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore';
 import { firebaseConfig } from '@/firebase/config';
 
 // Helper to initialize Firebase App on the server for actions
+// This creates a temporary app instance and should be used sparingly.
 const getDb = () => {
-    if (!getApps().length) {
-        initializeApp(firebaseConfig);
-    }
-    return getFirestore(getApp());
+    const apps = getApps();
+    const app = apps.length > 0 ? apps[0] : initializeApp(firebaseConfig);
+    return getFirestore(app);
 };
 
 
@@ -39,7 +39,6 @@ export async function checkForAlerts(): Promise<SmartAlertingSystemOutput> {
 
 type RegisterFarmerPayload = Omit<Farmer, 'id' | 'createdAt' | 'devices'>;
 
-
 export async function registerFarmerAction(farmerData: RegisterFarmerPayload): Promise<{ id: string }> {
     const db = getDb();
     
@@ -53,7 +52,13 @@ export async function registerFarmerAction(farmerData: RegisterFarmerPayload): P
     }
 
     const farmerWithDefaults = {
-        ...farmerData,
+        name: farmerData.name,
+        phone: farmerData.phone,
+        aadhaar: farmerData.aadhaar,
+        address: farmerData.address,
+        village: farmerData.village,
+        district: farmerData.district,
+        plots: farmerData.plots,
         devices: [],
         createdAt: serverTimestamp(),
     };

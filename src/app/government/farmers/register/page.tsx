@@ -17,11 +17,25 @@ import { Separator } from '@/components/ui/separator';
 import { registerFarmerAction } from '@/lib/actions';
 
 
+const soilTypes = [
+  "Alluvial",
+  "Black Soil",
+  "Red Soil",
+  "Laterite",
+  "Desert / Arid",
+  "Mountain / Forest Soil",
+  "Peaty / Marshy",
+  "Saline / Alkaline",
+  "Clay",
+  "Sandy Loam",
+  "Silty Loam",
+] as const;
+
 const plotSchema = z.object({
     surveyNumber: z.string().nonempty({ message: "Survey number is required." }),
     areaAcres: z.coerce.number().positive({ message: "Area must be a positive number." }),
     landType: z.enum(['Irrigated', 'Unirrigated'], { required_error: "Land type is required." }),
-    soilType: z.string().nonempty({ message: "Soil type is required." }),
+    soilType: z.enum(soilTypes, { required_error: "Soil type is required." }),
 });
 
 
@@ -49,7 +63,7 @@ export default function RegisterFarmerPage() {
       address: '',
       village: '',
       district: '',
-      plots: [{ surveyNumber: '', areaAcres: 0, landType: 'Irrigated', soilType: '' }],
+      plots: [{ surveyNumber: '', areaAcres: 0, landType: 'Irrigated', soilType: 'Alluvial' }],
     },
   });
 
@@ -124,7 +138,7 @@ export default function RegisterFarmerPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <h3 className="text-lg font-medium text-primary flex items-center gap-2"><Tractor /> Land Plot Information</h3>
-                    <Button type="button" variant="outline" size="sm" onClick={() => append({ surveyNumber: '', areaAcres: 0, landType: 'Irrigated', soilType: '' })}>
+                    <Button type="button" variant="outline" size="sm" onClick={() => append({ surveyNumber: '', areaAcres: 0, landType: 'Irrigated', soilType: 'Alluvial' })}>
                         <PlusCircle className="mr-2 h-4 w-4" /> Add Plot
                     </Button>
                 </div>
@@ -162,8 +176,16 @@ export default function RegisterFarmerPage() {
                                 <FormMessage />
                                 </FormItem>
                             )} />
-                             <FormField control={form.control} name={`plots.${index}.soilType`} render={({ field }) => (
-                                <FormItem><FormLabel>Soil Type</FormLabel><FormControl><Input placeholder="e.g., Alluvial" {...field} /></FormControl><FormMessage /></FormItem>
+                              <FormField control={form.control} name={`plots.${index}.soilType`} render={({ field }) => (
+                                <FormItem><FormLabel>Soil Type</FormLabel>
+                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                    <FormControl><SelectTrigger><SelectValue placeholder="Select soil type" /></SelectTrigger></FormControl>
+                                    <SelectContent>
+                                        {soilTypes.map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FormMessage />
+                                </FormItem>
                             )} />
                         </div>
                     </div>
