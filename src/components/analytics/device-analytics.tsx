@@ -39,6 +39,9 @@ export function DeviceAnalytics() {
     const { devices } = useData();
 
     const deviceStatusData = useMemo(() => {
+        if (!devices) {
+            return [];
+        }
         const statusCounts = devices.reduce((acc, device) => {
             acc[device.status] = (acc[device.status] || 0) + 1;
             return acc;
