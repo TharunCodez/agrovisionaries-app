@@ -1,3 +1,4 @@
+
 import * as admin from 'firebase-admin';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
@@ -7,17 +8,10 @@ config();
 
 if (!admin.apps.length) {
   try {
-    const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT;
-    if (!serviceAccountString) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT environment variable not set.');
-    }
-    const serviceAccount = JSON.parse(serviceAccountString);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
+    admin.initializeApp();
   } catch (error) {
     console.error('Firebase admin initialization error', error);
-    throw error;
+    throw new Error('Firebase Admin SDK initialization failed. See server logs for details.');
   }
 }
 
