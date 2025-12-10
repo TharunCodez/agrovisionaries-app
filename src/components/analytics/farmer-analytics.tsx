@@ -10,8 +10,12 @@ export function FarmerAnalytics() {
   const { farmers, devices } = useData();
 
   const farmerRiskData = useMemo(() => {
+    if (!farmers || !devices) {
+      return [];
+    }
+
     return farmers.slice(0, 5).map(farmer => {
-        const deviceCount = devices.filter(d => d.farmerPhone === farmer.phone).length;
+        const deviceCount = devices.filter(d => d.farmerId === farmer.id).length;
         const alertsCount = Math.floor(Math.random() * 15); // Mock data
         const status = alertsCount > 10 ? 'High Risk' : alertsCount > 5 ? 'Medium Risk' : 'Low Risk';
         return {
