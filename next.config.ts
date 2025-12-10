@@ -2,13 +2,6 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
-  experimental: {
-    // This is to allow the Next.js dev server to accept requests from the
-    // Firebase Studio environment.
-    allowedDevOrigins: [
-      '6000-firebase-studio-1765213199757.cluster-sumfw3zmzzhzkx4mpvz3ogth4y.cloudworkstations.dev',
-    ],
-  },
   typescript: {
     ignoreBuildErrors: true,
   },
