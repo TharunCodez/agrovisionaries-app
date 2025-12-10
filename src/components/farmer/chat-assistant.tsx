@@ -29,14 +29,11 @@ export default function ChatAssistant() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollAreaRef.current) {
-        scrollAreaRef.current.scrollTo({
-            top: scrollAreaRef.current.scrollHeight,
-            behavior: 'smooth'
-        });
+    if (scrollRef.current) {
+        scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages])
 
@@ -115,7 +112,7 @@ export default function ChatAssistant() {
   };
 
   return (
-    <Card className="flex h-full flex-col shadow-lg border-0 md:border md:shadow-sm lg:h-auto lg:max-h-[calc(100vh-10rem)]">
+    <Card className="flex flex-col h-full max-h-[calc(100vh-12rem)] md:shadow-lg border-0 md:border md:shadow-sm">
         <CardHeader className='text-center hidden md:block'>
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <BrainCircuit className="h-8 w-8 text-primary" />
@@ -123,9 +120,9 @@ export default function ChatAssistant() {
             <CardTitle>AI Assistant</CardTitle>
             <CardDescription>Your personal farming support bot.</CardDescription>
         </CardHeader>
-        <div className="flex-1 min-h-0 flex flex-col">
-            <ScrollArea className="flex-1 pr-4" ref={scrollAreaRef}>
-              <div className="space-y-4 p-4 pb-24 md:pb-4">
+        <div className="flex-1 flex flex-col min-h-0">
+            <div className="flex-1 overflow-y-auto p-4 pb-24" ref={scrollRef}>
+              <div className="space-y-4">
                 {messages.map((message, index) => (
                   <div key={index} className={`flex items-start gap-2 ${message.role === 'user' ? 'justify-end' : ''}`}>
                     {message.role === 'assistant' && (
@@ -158,7 +155,7 @@ export default function ChatAssistant() {
                     </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
             <div className="w-full sticky bottom-0 bg-background border-t p-3 flex items-center gap-3 z-50 pointer-events-auto">
                  <input
                     type="file"

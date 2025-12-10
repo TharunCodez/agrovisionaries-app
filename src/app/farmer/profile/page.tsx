@@ -27,18 +27,10 @@ function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, 
 export default function FarmerProfilePage() {
   const { farmers, isLoading: isDataLoading, setFarmers } = useData();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<any>(null);
-  const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
   
   const farmer = farmers?.[0];
-
-  useEffect(() => {
-    if(farmer) {
-      setProfile(farmer);
-    }
-  }, [farmer]);
-
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -55,8 +47,7 @@ export default function FarmerProfilePage() {
       if (error || !photoUrl) {
         throw new Error(error || 'Upload failed');
       }
-      const updatedProfile = { ...profile, photoUrl };
-      setProfile(updatedProfile);
+      const updatedProfile = { ...farmer, photoUrl };
       setFarmers([updatedProfile]);
 
       toast({
@@ -96,7 +87,7 @@ export default function FarmerProfilePage() {
         </div>
     )
   }
-  if (!profile) return <div className="p-6 text-center">No profile found. You may need to log in again.</div>;
+  if (!farmer) return <div className="p-6 text-center">No profile found. You may need to log in again.</div>;
 
   return (
     <div className="flex flex-col gap-8 pb-20 md:pb-6">
@@ -113,10 +104,10 @@ export default function FarmerProfilePage() {
           <div className="relative">
             <Avatar className="mx-auto h-28 w-28 border-4 border-primary">
                 <AvatarImage
-                    src={profile.photoUrl}
-                    alt={profile.name}
+                    src={farmer.photoUrl ?? ''}
+                    alt={farmer.name}
                 />
-                <AvatarFallback>{profile.name ? profile.name.charAt(0) : 'F'}</AvatarFallback>
+                <AvatarFallback>{farmer.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
             </Avatar>
             <input 
                 type="file" 
@@ -135,14 +126,14 @@ export default function FarmerProfilePage() {
             </Button>
           </div>
           <div className="text-center mt-4">
-            <CardTitle>{profile.name}</CardTitle>
-            <p className="text-sm text-muted-foreground">{profile.phone}</p>
+            <CardTitle>{farmer.name}</CardTitle>
+            <p className="text-sm text-muted-foreground">{farmer.phone}</p>
           </div>
         </CardHeader>
         <CardContent>
              <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-                <ProfileItem label="Aadhaar" value={profile.aadhaar} icon={User} />
-                <ProfileItem label="Address" value={`${profile.address}, ${profile.village}, ${profile.district}`} icon={MapPin} />
+                <ProfileItem label="Aadhaar" value={farmer.aadhaar} icon={User} />
+                <ProfileItem label="Address" value={`${farmer.address}, ${farmer.village}, ${farmer.district}`} icon={MapPin} />
              </div>
         </CardContent>
       </Card>
@@ -155,8 +146,8 @@ export default function FarmerProfilePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {profile.plots?.length > 0 ? (
-            profile.plots.map((plot: any, index: number) => (
+          {farmer.plots?.length > 0 ? (
+            farmer.plots.map((plot: any, index: number) => (
               <div key={index} className="rounded-lg border bg-muted/20 p-4">
                 <p className="font-bold">Survey No: {plot.surveyNumber}</p>
                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -180,8 +171,8 @@ export default function FarmerProfilePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {profile.devices && profile.devices.length > 0 ? (
-            profile.devices.map((device: any) => (
+          {farmer.devices && farmer.devices.length > 0 ? (
+            farmer.devices.map((device: any) => (
               <div key={device.id} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
                 <div>
                   <p className="font-bold">{device.nickname}</p>

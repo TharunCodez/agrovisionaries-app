@@ -20,8 +20,8 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
         <main className="w-full max-w-screen-2xl mx-auto p-4 md:p-6 lg:p-8">
             {children}
         </main>
-        <FarmerBottomNav />
         <ChatAssistantButton />
+        <FarmerBottomNav />
     </div>
   );
 }
