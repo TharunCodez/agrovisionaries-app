@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -39,7 +40,7 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
   return (
-    <Card>
+    <Card className="w-full">
       <CardHeader className='flex-row items-center justify-between'>
         <div>
             <div className='flex items-center gap-3'>
