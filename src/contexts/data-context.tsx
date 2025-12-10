@@ -37,6 +37,7 @@ export type Farmer = {
   district: string;
   plots: Plot[];
   devices: string[]; // array of device IDs
+  photoUrl: string | null;
   createdAt: Timestamp;
 };
 

@@ -14,7 +14,7 @@ const getDb = () => {
     return getFirestore(app);
 };
 
-type RegisterFarmerPayload = Omit<Farmer, 'id' | 'createdAt' | 'devices'>;
+type RegisterFarmerPayload = Omit<Farmer, 'id' | 'createdAt' | 'devices' | 'photoUrl'>;
 
 export async function registerFarmerAction(farmerData: RegisterFarmerPayload): Promise<{ id: string }> {
     const db = getDb();
@@ -44,6 +44,7 @@ export async function registerFarmerAction(farmerData: RegisterFarmerPayload): P
         district: farmerData.district,
         plots: farmerData.plots,
         devices: [],
+        photoUrl: null,
         createdAt: serverTimestamp(),
     };
 

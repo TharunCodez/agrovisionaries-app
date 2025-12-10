@@ -1,15 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { getFarmerProfile } from '@/app/api/farmer-data';
+import { uploadProfilePhoto } from '@/app/api/upload-profile-photo';
 import { useRole } from '@/contexts/role-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, MapPin, Tractor, HardDrive, Edit, LogOut } from 'lucide-react';
+import { User, MapPin, Tractor, HardDrive, Edit, LogOut, Upload, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, icon?: React.ElementType }) {
     const IconComponent = Icon || User;
@@ -24,14 +25,13 @@ function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, 
     );
 }
 
-
 export default function FarmerProfilePage() {
   const { user } = useRole();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const avatarImage = PlaceHolderImages.find(
-    (img) => img.id === 'farmer-avatar'
-  );
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!user?.phoneNumber) {
@@ -50,6 +50,37 @@ export default function FarmerProfilePage() {
       }
     })();
   }, [user]);
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploading(true);
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('farmerId', user.uid);
+
+    try {
+      const { photoUrl, error } = await uploadProfilePhoto(formData);
+      if (error || !photoUrl) {
+        throw new Error(error || 'Upload failed');
+      }
+      setProfile((prev: any) => ({ ...prev, photoUrl }));
+      toast({
+        title: 'Photo Uploaded!',
+        description: 'Your new profile picture has been saved.',
+      });
+    } catch (err: any) {
+       toast({
+        variant: "destructive",
+        title: 'Upload Failed',
+        description: err.message || 'Could not upload your photo.',
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -79,7 +110,7 @@ export default function FarmerProfilePage() {
     <div className="flex flex-col gap-8 pb-20 md:pb-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <h1 className="font-headline text-2xl md:text-3xl font-bold">Your Profile</h1>
-        <Button>
+        <Button disabled>
           <Edit className="mr-2 h-4 w-4" />
           Edit Profile
         </Button>
@@ -87,18 +118,32 @@ export default function FarmerProfilePage() {
       
       <Card>
         <CardHeader className="items-center text-center">
-          <Avatar className="mx-auto h-24 w-24 border-4 border-primary">
-            {avatarImage && (
-              <AvatarImage
-                src={avatarImage.imageUrl}
-                alt="User Avatar"
-                data-ai-hint={avatarImage.imageHint}
-              />
-            )}
-            <AvatarFallback>{profile.name ? profile.name.charAt(0) : 'F'}</AvatarFallback>
-          </Avatar>
-          <div className="text-center">
-            <CardTitle className="mt-4">{profile.name}</CardTitle>
+          <div className="relative">
+            <Avatar className="mx-auto h-28 w-28 border-4 border-primary">
+                <AvatarImage
+                    src={profile.photoUrl}
+                    alt={profile.name}
+                />
+                <AvatarFallback>{profile.name ? profile.name.charAt(0) : 'F'}</AvatarFallback>
+            </Avatar>
+            <input 
+                type="file" 
+                accept="image/*" 
+                ref={fileInputRef} 
+                onChange={handlePhotoUpload} 
+                className="hidden" 
+            />
+             <Button 
+                size="icon" 
+                className="absolute bottom-0 right-0 rounded-full"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+               {uploading ? <Loader2 className="h-4 w-4 animate-spin"/> : <Upload className="h-4 w-4"/>}
+            </Button>
+          </div>
+          <div className="text-center mt-4">
+            <CardTitle>{profile.name}</CardTitle>
             <p className="text-sm text-muted-foreground">{profile.phone}</p>
           </div>
         </CardHeader>
