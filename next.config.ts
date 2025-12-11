@@ -40,6 +40,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+   async rewrites() {
+    return [
+      { source: '/locales/:lng/:ns.json', destination: '/public/locales/:lng/:ns.json' },
+      { source: '/public/locales/:lng/:ns.json', destination: '/locales/:lng/:ns.json' },
+    ];
+  },
 };
 
 export default nextConfig;

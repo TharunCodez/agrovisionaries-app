@@ -23,7 +23,6 @@ import { useLogout } from '@/hooks/use-logout';
 import { Leaf } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import '@/lib/i18n/client';
 
 export default function Header() {
   const isMobile = useMediaQuery('(max-width: 767px)');

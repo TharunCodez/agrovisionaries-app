@@ -12,7 +12,6 @@ import { Leaf, Droplets, Eye, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { getSentinelHubToken } from '@/lib/actions';
 import { useTranslation } from 'react-i18next';
-import '@/lib/i18n/client';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,

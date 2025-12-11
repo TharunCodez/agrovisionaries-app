@@ -19,7 +19,8 @@ export const i18nOptions = {
     lookupLocalStorage: "agrovisionaries-locale",
   },
   backend: {
-    loadPath: "/public/locales/{{lng}}/{{ns}}.json"
+    loadPath: "/locales/{{lng}}/{{ns}}.json"
   },
   react: { useSuspense: false }
 };
+

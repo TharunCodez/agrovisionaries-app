@@ -4,7 +4,6 @@ import { Users, HardDrive, Siren } from "lucide-react";
 import { useData } from "@/contexts/data-context";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
-import '@/lib/i18n/client';
 
 export default function StatsCards() {
     const { farmers, devices } = useData();

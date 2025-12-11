@@ -33,5 +33,219 @@
   "welcome_message": "नमस्ते! मैं आपका एआई सहायक हूं। मैं आज आपकी कैसे मदद कर सकता हूं? आप मुझसे ऐप के बारे में प्रश्न पूछ सकते हैं या स्वास्थ्य निदान के लिए पौधे की तस्वीर अपलोड कर सकते हैं।",
   "ask_question": "एक प्रश्न पूछें...",
   "attach_image": "छवि संलग्न करें",
-  "send": "भेजें"
+  "send": "भेजें",
+  "liveStatus": "लाइव स्थिति",
+  "farmerPortal": "किसान पोर्टल",
+  "myAccount": "मेरा खाता",
+  "settings": "सेटिंग्स",
+  "areaAcres": "क्षेत्र (एकड़ में)",
+  "irrigated": "सिंचित",
+  "unirrigated": "असिंचित",
+  "humidity": "आर्द्रता",
+  "map": "नक्शा",
+  "good": "अच्छा",
+  "info": "जानकारी",
+  "status": "स्थिति",
+  "healthy": "स्वस्थ",
+  "actions": "कार्रवाई",
+  "latitude": "अक्षांश",
+  "longitude": "देशांतर",
+  "acres": "एकड़",
+  "gov": {
+    "portalName": "सरकारी पोर्टल",
+    "sidebar": {
+      "title": "एग्रो विजनरीज",
+      "dashboard": "डैशबोर्ड",
+      "devices": "उपकरण",
+      "map": "नक्शा दृश्य",
+      "satellite": "सैटेलाइट",
+      "notifications": "सूचनाएं",
+      "farmers": "किसान",
+      "registerFarmer": "किसान पंजीकृत करें",
+      "analytics": "एनालिटिक्स",
+      "settings": "सेटिंग्स"
+    },
+    "dashboard": {
+      "title": "दक्षिण सिक्किम कृषि अवलोकन",
+      "stats": {
+        "totalFarmers": "कुल किसान",
+        "totalFarmersDesc": "+2 इस महीने",
+        "devicesOnline": "ऑनलाइन उपकरण",
+        "uptime": "अपटाइम",
+        "criticalAlerts": "गंभीर अलर्ट",
+        "last24h": "पिछले 24 घंटे"
+      },
+      "regionalWaterUsageTitle": "क्षेत्रीय जल उपयोग (दक्षिण सिक्किम)",
+      "regionalWaterUsageDesc": "क्षेत्रों में पानी की खपत की तुलना।"
+    },
+    "devices": {
+      "title": "उपकरण प्रबंधन",
+      "addDeviceButton": "उपकरण जोड़ें",
+      "add": {
+        "title": "नया उपकरण पंजीकृत करें",
+        "formTitle": "उपकरण पंजीकरण फॉर्म",
+        "selectFarmer": "किसान चुनें",
+        "selectFarmerPlaceholder": "उपकरण सौंपने के लिए एक किसान चुनें",
+        "deviceId": "उपकरण आईडी",
+        "deviceNickname": "उपकरण उपनाम",
+        "deviceNicknamePlaceholder": "जैसे, उत्तरी खेत पंप",
+        "selectPlot": "प्लॉट चुनें",
+        "selectPlotPlaceholder": "उपकरण को लिंक करने के लिए एक प्लॉट चुनें",
+        "surveyNo": "सर्वेक्षण संख्या",
+        "jalkundLabel": "जलकुंड अधिकतम मात्रा (लीटर)",
+        "location": "उपकरण का स्थान",
+        "pickOnMap": "नक्शे पर चुनें",
+        "mapDialogTitle": "स्थान सेट करने के लिए नक्शे पर क्लिक करें",
+        "submitButton": "उपकरण जोड़ें"
+      },
+      "list": {
+        "title": "सभी पंजीकृत उपकरण"
+      },
+      "table": {
+        "deviceId": "उपकरण आईडी",
+        "farmer": "किसान",
+        "district": "जिला",
+        "liveReadingsTitle": "{{nickname}} के लिए लाइव सेंसर रीडिंग",
+        "viewOnMap": "नक्शे पर देखें"
+      },
+      "toast": {
+        "addSuccessTitle": "उपकरण सफलतापूर्वक पंजीकृत हुआ!",
+        "addSuccessDesc": "{{deviceId}} को {{farmerName}} के लिए पंजीकृत किया गया है।",
+        "addErrorTitle": "पंजीकरण विफल",
+        "addErrorDesc": "एक अप्रत्याशित त्रुटि हुई।"
+      }
+    },
+    "farmers": {
+      "title": "किसान डेटाबेस",
+      "registerFarmerButton": "किसान पंजीकृत करें",
+      "noFarmersFound": "कोई किसान नहीं मिला।",
+      "list": {
+        "title": "किसान डेटाबेस",
+        "description": "क्षेत्र के किसानों का अवलोकन।"
+      },
+      "table": {
+        "name": "नाम",
+        "phone": "फोन",
+        "village": "गांव",
+        "district": "जिला",
+        "farmer": "किसान"
+      },
+      "register": {
+        "title": "नया किसान पंजीकृत करें",
+        "formTitle": "किसान पंजीकरण फॉर्म",
+        "formDescription": "नए किसान और उनके भूमि भूखंडों का विवरण दर्ज करें।",
+        "personalInfo": "व्यक्तिगत जानकारी",
+        "fullName": "पूरा नाम",
+        "mobileNumber": "मोबाइल नंबर",
+        "addressPlaceholder": "मकान नंबर, गली, लैंडमार्क...",
+        "village": "गांव",
+        "district": "जिला",
+        "addPlot": "प्लॉट जोड़ें",
+        "selectLandType": "भूमि का प्रकार चुनें",
+        "selectSoilType": "मिट्टी का प्रकार चुनें"
+      },
+      "toast": {
+        "addSuccessTitle": "किसान सफलतापूर्वक पंजीकृत हुआ!",
+        "addSuccessDesc": "{{farmerName}} को डेटाबेस में जोड़ा गया है।",
+        "addErrorTitle": "पंजीकरण विफल",
+        "addErrorDesc": "एक अप्रत्याशित त्रुटि हुई।"
+      }
+    },
+    "analytics": {
+      "title": "एनालिटिक्स डैशबोर्ड",
+      "totalFarmers": "कुल किसान",
+      "inSouthSikkim": "दक्षिण सिक्किम में",
+      "totalDevices": "कुल उपकरण",
+      "vsLastMonth": "पिछले महीने की तुलना में",
+      "onlineDevices": "ऑनलाइन उपकरण",
+      "uptime": "अपटाइम",
+      "criticalAlerts": "गंभीर अलर्ट",
+      "inLast24h": "पिछले 24 घंटों में",
+      "riskAnalysisTitle": "जोखिम विश्लेषण",
+      "riskAnalysisDesc": "उच्च जोखिम वाले क्षेत्र और जोखिम वाले किसानों का डेटा यहां प्रदर्शित किया जाएगा।",
+      "alertPatternsTitle": "अलर्ट पैटर्न",
+      "alertPatternsDesc": "पिछले 7 दिनों में ट्रिगर हुए अलर्ट।",
+      "devicePerformanceTitle": "उपकरण प्रदर्शन",
+      "devicePerformanceDesc": "सभी पंजीकृत उपकरणों की लाइव स्थिति।",
+      "atRiskFarmersTitle": "शीर्ष जोखिम वाले किसान",
+      "atRiskFarmersDesc": "सबसे अधिक गंभीर अलर्ट वाले किसान।",
+      "regionalInsightsTitle": "दक्षिण सिक्किम कृषि अंतर्दृष्टि",
+      "regionalInsightsDesc": "प्रमुख क्षेत्रों में पानी का उपयोग और मिट्टी की नमी।",
+      "warning": "चेतावनी",
+      "critical": "गंभीर",
+      "risk": {
+        "high": "उच्च जोखिम",
+        "medium": "मध्यम जोखिम",
+        "low": "कम जोखिम"
+      },
+      "charts": {
+        "rain": "वर्षा",
+        "water": "जल स्तर",
+        "soil": "मिट्टी",
+        "pump": "पंप",
+        "waterUsage": "जल उपयोग (L)"
+      }
+    },
+    "map": {
+      "title": "उपकरण नक्शा दृश्य"
+    },
+    "satellite": {
+      "title": "सैटेलाइट एनालिटिक्स",
+      "settings": {
+        "title": "स्थान सेटिंग्स",
+        "description": "दक्षिण सिक्किम पर केंद्रित"
+      },
+      "dataLayer": "डेटा परत",
+      "fetchButton": "सैटेलाइट डेटा प्राप्त करें",
+      "map": {
+        "title": "सैटेलाइट नक्शा दृश्य"
+      },
+      "stats": {
+        "ndviIndex": "NDVI सूचकांक",
+        "forSelectedArea": "चयनित क्षेत्र के लिए",
+        "aggregated": "सेंसर से एकत्रित",
+        "vegetationHealthy": "वनस्पति स्वस्थ है"
+      },
+      "layers": {
+        "trueColor": {
+          "label": "वास्तविक रंग",
+          "description": "अंतरिक्ष से देखे गए प्राकृतिक रंगों को दिखाने वाला वास्तविक रंग समग्र। भूमि उपयोग, जल निकायों और शहरी क्षेत्रों की पहचान के लिए उपयोगी।"
+        },
+        "ndvi": {
+          "label": "NDVI",
+          "description": "सामान्यीकृत अंतर वनस्पति सूचकांक जीवित हरी वनस्पति को उजागर करता है। उच्च मान स्वस्थ वनस्पति का संकेत देते हैं।"
+        },
+        "moisture": {
+          "label": "नमी",
+          "description": "नमी सूचकांक फसलों में पानी के तनाव की पहचान करने में मदद करता है। यह पत्ते में संग्रहीत पानी की कुल मात्रा के प्रति संवेदनशील है।"
+        }
+      }
+    },
+    "notifications": {
+      "title": "सूचनाएं",
+      "systemAlerts": "सिस्टम-व्यापी अलर्ट",
+      "items": {
+        "1": {
+          "title": "उच्च जल उपयोग अलर्ट",
+          "description": "पंजाब क्षेत्र में पानी का उपयोग पिछले 24 घंटों में 15% बढ़ गया है। संभावित लीक या अक्षम सिंचाई की जांच करें।",
+          "time": "1 घंटा पहले"
+        },
+        "2": {
+          "title": "उपकरण ऑफ़लाइन: LIV-003",
+          "description": "अमित सिंह के खेत (उत्तर प्रदेश) में डिवाइस LIV-003 6 घंटे से अधिक समय से ऑफ़लाइन है। कृपया डिवाइस की स्थिति जांचें।",
+          "time": "3 घंटे पहले"
+        },
+        "3": {
+          "title": "सिस्टम रखरखाव निर्धारित",
+          "description": "आज रात 2:00 बजे एक सिस्टम-व्यापी अपडेट निर्धारित है। 15 मिनट तक की एक संक्षिप्त डाउनटाइम की उम्मीद है।",
+          "time": "1 दिन पहले"
+        }
+      }
+    },
+    "settings": {
+      "title": "सेटिंग्स",
+      "portalSettings": "पोर्टल सेटिंग्स",
+      "portalSettingsDesc": "यहां अपनी प्रोफ़ाइल और पोर्टल प्राथमिकताएं प्रबंधित करें।"
+    }
+  }
 }

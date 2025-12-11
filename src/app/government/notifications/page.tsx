@@ -3,7 +3,6 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bell, Siren, HardDrive } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import '@/lib/i18n/client';
 
 const notifications = [
     {

@@ -33,5 +33,219 @@
   "welcome_message": "Hello! I'm your AI assistant. How can I help you today? You can ask me questions about the app or upload a photo of a plant for a health diagnosis.",
   "ask_question": "Ask a question...",
   "attach_image": "Attach image",
-  "send": "Send"
+  "send": "Send",
+  "liveStatus": "Live Status",
+  "farmerPortal": "Farmer Portal",
+  "myAccount": "My Account",
+  "settings": "Settings",
+  "areaAcres": "Area (in acres)",
+  "irrigated": "Irrigated",
+  "unirrigated": "Unirrigated",
+  "humidity": "Humidity",
+  "map": "Map",
+  "good": "Good",
+  "info": "Info",
+  "status": "Status",
+  "healthy": "Healthy",
+  "actions": "Actions",
+  "latitude": "Latitude",
+  "longitude": "Longitude",
+  "acres": "acres",
+  "gov": {
+    "portalName": "Government Portal",
+    "sidebar": {
+      "title": "Agro Visionaries",
+      "dashboard": "Dashboard",
+      "devices": "Devices",
+      "map": "Map View",
+      "satellite": "Satellite",
+      "notifications": "Notifications",
+      "farmers": "Farmers",
+      "registerFarmer": "Register Farmer",
+      "analytics": "Analytics",
+      "settings": "Settings"
+    },
+    "dashboard": {
+      "title": "South Sikkim Agriculture Overview",
+      "stats": {
+        "totalFarmers": "Total Farmers",
+        "totalFarmersDesc": "+2 this month",
+        "devicesOnline": "Devices Online",
+        "uptime": "uptime",
+        "criticalAlerts": "Critical Alerts",
+        "last24h": "Last 24 hours"
+      },
+      "regionalWaterUsageTitle": "Regional Water Usage (South Sikkim)",
+      "regionalWaterUsageDesc": "Comparison of water consumption across regions."
+    },
+    "devices": {
+      "title": "Device Management",
+      "addDeviceButton": "Add Device",
+      "add": {
+        "title": "Register New Device",
+        "formTitle": "Device Registration Form",
+        "selectFarmer": "Select Farmer",
+        "selectFarmerPlaceholder": "Select a farmer to assign the device",
+        "deviceId": "Device ID",
+        "deviceNickname": "Device Nickname",
+        "deviceNicknamePlaceholder": "e.g., North Field Pump",
+        "selectPlot": "Select Plot",
+        "selectPlotPlaceholder": "Select a plot to link the device",
+        "surveyNo": "Survey No",
+        "jalkundLabel": "Jalkund Maximum Quantity (Liters)",
+        "location": "Device Location",
+        "pickOnMap": "Pick on Map",
+        "mapDialogTitle": "Click on the map to set location",
+        "submitButton": "Add Device"
+      },
+      "list": {
+        "title": "All Registered Devices"
+      },
+      "table": {
+        "deviceId": "Device ID",
+        "farmer": "Farmer",
+        "district": "District",
+        "liveReadingsTitle": "Live Sensor Readings for {{nickname}}",
+        "viewOnMap": "View on Map"
+      },
+      "toast": {
+        "addSuccessTitle": "Device Registered Successfully!",
+        "addSuccessDesc": "{{deviceId}} has been registered for {{farmerName}}.",
+        "addErrorTitle": "Registration Failed",
+        "addErrorDesc": "An unexpected error occurred."
+      }
+    },
+    "farmers": {
+      "title": "Farmer Database",
+      "registerFarmerButton": "Register Farmer",
+      "noFarmersFound": "No farmers found.",
+      "list": {
+        "title": "Farmer Database",
+        "description": "Overview of all registered farmers."
+      },
+      "table": {
+        "name": "Name",
+        "phone": "Phone",
+        "village": "Village",
+        "district": "District",
+        "farmer": "Farmer"
+      },
+      "register": {
+        "title": "Register New Farmer",
+        "formTitle": "Farmer Registration Form",
+        "formDescription": "Enter the details of the new farmer and their land plots.",
+        "personalInfo": "Personal Information",
+        "fullName": "Full Name",
+        "mobileNumber": "Mobile Number",
+        "addressPlaceholder": "House No, Street, Landmark...",
+        "village": "Village",
+        "district": "District",
+        "addPlot": "Add Plot",
+        "selectLandType": "Select land type",
+        "selectSoilType": "Select soil type"
+      },
+      "toast": {
+        "addSuccessTitle": "Farmer Registered Successfully!",
+        "addSuccessDesc": "{{farmerName}} has been added to the database.",
+        "addErrorTitle": "Registration Failed",
+        "addErrorDesc": "An unexpected error occurred."
+      }
+    },
+    "analytics": {
+      "title": "Analytics Dashboard",
+      "totalFarmers": "Total Farmers",
+      "inSouthSikkim": "in South Sikkim",
+      "totalDevices": "Total Devices",
+      "vsLastMonth": "vs last month",
+      "onlineDevices": "Online Devices",
+      "uptime": "uptime",
+      "criticalAlerts": "Critical Alerts",
+      "inLast24h": "in last 24h",
+      "riskAnalysisTitle": "Risk Analysis",
+      "riskAnalysisDesc": "High-risk zones and at-risk farmer data will be displayed here.",
+      "alertPatternsTitle": "Alert Patterns",
+      "alertPatternsDesc": "Alerts triggered over the last 7 days.",
+      "devicePerformanceTitle": "Device Performance",
+      "devicePerformanceDesc": "Live status of all registered devices.",
+      "atRiskFarmersTitle": "Top At-Risk Farmers",
+      "atRiskFarmersDesc": "Farmers with the highest number of critical alerts.",
+      "regionalInsightsTitle": "South Sikkim Agriculture Insights",
+      "regionalInsightsDesc": "Water usage and soil moisture across key regions.",
+      "warning": "Warning",
+      "critical": "Critical",
+      "risk": {
+        "high": "High Risk",
+        "medium": "Medium Risk",
+        "low": "Low Risk"
+      },
+      "charts": {
+        "rain": "Rain",
+        "water": "Water Level",
+        "soil": "Soil",
+        "pump": "Pump",
+        "waterUsage": "Water Usage (L)"
+      }
+    },
+    "map": {
+      "title": "Device Map View"
+    },
+    "satellite": {
+      "title": "Satellite Analytics",
+      "settings": {
+        "title": "Location Settings",
+        "description": "Centered on South Sikkim"
+      },
+      "dataLayer": "Data Layer",
+      "fetchButton": "Fetch Satellite Data",
+      "map": {
+        "title": "Satellite Map View"
+      },
+      "stats": {
+        "ndviIndex": "NDVI Index",
+        "forSelectedArea": "For selected area",
+        "aggregated": "Aggregated from sensors",
+        "vegetationHealthy": "Vegetation is healthy"
+      },
+      "layers": {
+        "trueColor": {
+          "label": "True Color",
+          "description": "True color composite showing natural colors as seen from space. Useful for identifying land use, water bodies, and urban areas."
+        },
+        "ndvi": {
+          "label": "NDVI",
+          "description": "Normalized Difference Vegetation Index highlights live green vegetation. Higher values indicate healthier vegetation."
+        },
+        "moisture": {
+          "label": "Moisture",
+          "description": "Moisture index helps in identifying water stress in crops. It is sensitive to the total amount of water stored in the foliage."
+        }
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "systemAlerts": "System-wide Alerts",
+      "items": {
+        "1": {
+          "title": "High Water Usage Alert",
+          "description": "Water usage in the Punjab region has increased by 15% in the last 24 hours. Investigate for potential leaks or inefficient irrigation.",
+          "time": "1 hour ago"
+        },
+        "2": {
+          "title": "Device Offline: LIV-003",
+          "description": "Device LIV-003 in Amit Singh's farm (Uttar Pradesh) has been offline for over 6 hours. Please check the device status.",
+          "time": "3 hours ago"
+        },
+        "3": {
+          "title": "System Maintenance Scheduled",
+          "description": "A system-wide update is scheduled for tonight at 2:00 AM. A brief downtime of up to 15 minutes is expected.",
+          "time": "1 day ago"
+        }
+      }
+    },
+    "settings": {
+      "title": "Settings",
+      "portalSettings": "Portal Settings",
+      "portalSettingsDesc": "Manage your profile and portal preferences here."
+    }
+  }
 }

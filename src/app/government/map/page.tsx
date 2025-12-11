@@ -7,7 +7,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import dynamic from 'next/dynamic';
 import { useData } from '@/contexts/data-context';
 import { useTranslation } from 'react-i18next';
-import '@/lib/i18n/client';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
