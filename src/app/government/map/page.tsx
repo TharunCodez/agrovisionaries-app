@@ -6,6 +6,7 @@ import { ChevronLeft } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import dynamic from 'next/dynamic';
 import { useData } from '@/contexts/data-context';
+import { useTranslation } from 'react-i18next';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -17,6 +18,7 @@ function GovernmentMap() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { devices } = useData();
+  const { t } = useTranslation();
 
   const lat = searchParams.get('lat');
   const lng = searchParams.get('lng');
@@ -43,7 +45,7 @@ function GovernmentMap() {
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ChevronLeft />
         </Button>
-        <h1 className="font-headline text-xl font-bold">Device Map View</h1>
+        <h1 className="font-headline text-xl font-bold">{t('gov.map.title')}</h1>
         <div className="w-10"></div>
       </div>
       <div className="flex-1 overflow-hidden rounded-lg border">

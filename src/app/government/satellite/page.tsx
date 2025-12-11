@@ -7,38 +7,40 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Leaf, Droplets, Eye, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { getSentinelHubToken } from '@/lib/actions';
+import { useTranslation } from 'react-i18next';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full rounded-lg" />,
 });
 
-const dataLayers = {
-  trueColor: {
-    label: "True Color",
-    description: "True color composite showing natural colors as seen from space. Useful for identifying land use, water bodies, and urban areas.",
-    icon: Eye
-  },
-  ndvi: {
-    label: "NDVI",
-    description: "Normalized Difference Vegetation Index highlights live green vegetation. Higher values indicate healthier vegetation.",
-    icon: Leaf
-  },
-  moisture: {
-    label: "Moisture",
-    description: "Moisture index helps in identifying water stress in crops. It is sensitive to the total amount of water stored in the foliage.",
-    icon: Droplets
-  }
-};
-
-type DataLayer = keyof typeof dataLayers;
+type DataLayer = 'trueColor' | 'ndvi' | 'moisture';
 
 function SatelliteView() {
+  const { t } = useTranslation();
+
+  const dataLayers: Record<DataLayer, { label: string; description: string; icon: React.ElementType }> = {
+    trueColor: {
+      label: t('gov.satellite.layers.trueColor.label'),
+      description: t('gov.satellite.layers.trueColor.description'),
+      icon: Eye
+    },
+    ndvi: {
+      label: t('gov.satellite.layers.ndvi.label'),
+      description: t('gov.satellite.layers.ndvi.description'),
+      icon: Leaf
+    },
+    moisture: {
+      label: t('gov.satellite.layers.moisture.label'),
+      description: t('gov.satellite.layers.moisture.description'),
+      icon: Droplets
+    }
+  };
+
   const [lat, setLat] = useState(27.1067);
   const [lng, setLng] = useState(88.3233);
   const [zoom, setZoom] = useState(13);
@@ -95,7 +97,6 @@ function SatelliteView() {
         }
     `;
     
-    // For now, we will just log this. In a real app we'd fetch an image and overlay it.
     console.log("Sentinel Hub request would be:", url.toString());
 
     setTileUrl(`https://services.sentinel-hub.com/ogc/wms/${access_token}?REQUEST=GetMap&SERVICE=WMS&VERSION=1.1.1&LAYERS=TRUE-COLOR-S2-L1C&BBOX=${bbox}&WIDTH=512&HEIGHT=512&FORMAT=image/png&SRS=EPSG:4326`);
@@ -107,40 +108,40 @@ function SatelliteView() {
       {/* Left Panel: Settings */}
       <Card className="lg:col-span-1 h-fit">
         <CardHeader>
-          <CardTitle>Location Settings</CardTitle>
-          <CardDescription>Centered on South Sikkim</CardDescription>
+          <CardTitle>{t('gov.satellite.settings.title')}</CardTitle>
+          <CardDescription>{t('gov.satellite.settings.description')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="lat">Latitude</Label>
+              <Label htmlFor="lat">{t('latitude')}</Label>
               <Input id="lat" value={lat.toFixed(4)} onChange={e => setLat(Number(e.target.value))} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lng">Longitude</Label>
+              <Label htmlFor="lng">{t('longitude')}</Label>
               <Input id="lng" value={lng.toFixed(4)} onChange={e => setLng(Number(e.target.value))} />
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Data Layer</Label>
+            <Label>{t('gov.satellite.dataLayer')}</Label>
             <Tabs value={dataLayer} onValueChange={(value) => setDataLayer(value as DataLayer)} className="w-full">
                 <TabsList className="grid w-full grid-cols-3 h-auto flex-wrap sm:flex-nowrap">
-                    <TabsTrigger value="ndvi" className="flex-col sm:flex-row gap-2"><Leaf className="w-4 h-4"/>NDVI</TabsTrigger>
-                    <TabsTrigger value="moisture" className="flex-col sm:flex-row gap-2"><Droplets className="w-4 h-4"/>Moisture</TabsTrigger>
-                    <TabsTrigger value="trueColor" className="flex-col sm:flex-row gap-2"><Eye className="w-4 h-4"/>True Color</TabsTrigger>
+                    <TabsTrigger value="ndvi" className="flex-col sm:flex-row gap-2"><Leaf className="w-4 h-4"/>{t('gov.satellite.layers.ndvi.label')}</TabsTrigger>
+                    <TabsTrigger value="moisture" className="flex-col sm:flex-row gap-2"><Droplets className="w-4 h-4"/>{t('gov.satellite.layers.moisture.label')}</TabsTrigger>
+                    <TabsTrigger value="trueColor" className="flex-col sm:flex-row gap-2"><Eye className="w-4 h-4"/>{t('gov.satellite.layers.trueColor.label')}</TabsTrigger>
                 </TabsList>
             </Tabs>
           </div>
           
           <Button className="w-full" onClick={fetchSatelliteData}>
-            Fetch Satellite Data
+            {t('gov.satellite.fetchButton')}
           </Button>
 
           {CurrentDataLayer && (
             <Card className="bg-muted/50">
               <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
                  <CurrentDataLayer.icon className="w-6 h-6 text-primary"/>
-                 <CardTitle className="text-base">{CurrentDataLayer.label} Info</CardTitle>
+                 <CardTitle className="text-base">{CurrentDataLayer.label} {t('info')}</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">{CurrentDataLayer.description}</p>
@@ -155,8 +156,8 @@ function SatelliteView() {
       <div className="lg:col-span-2 flex flex-col gap-6">
         <Card className="flex-1">
           <CardHeader className="flex-row items-center justify-between">
-            <CardTitle>Satellite Map View</CardTitle>
-            <Badge variant="outline" className="text-green-600 border-green-600">Good</Badge>
+            <CardTitle>{t('gov.satellite.map.title')}</CardTitle>
+            <Badge variant="outline" className="text-green-600 border-green-600">{t('good')}</Badge>
           </CardHeader>
           <CardContent className="h-[50vh] lg:h-[calc(100%-8rem)] p-0 rounded-b-lg overflow-hidden">
             <StableMap
@@ -170,29 +171,29 @@ function SatelliteView() {
          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card>
             <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2 text-sm"><Leaf className="w-4 h-4"/> NDVI Index</CardDescription>
+              <CardDescription className="flex items-center gap-2 text-sm"><Leaf className="w-4 h-4"/>{t('gov.satellite.stats.ndviIndex')}</CardDescription>
               <CardTitle className="text-2xl md:text-3xl text-green-600">0.78</CardTitle>
             </CardHeader>
              <CardContent>
-                <p className="text-xs text-muted-foreground">For selected area</p>
+                <p className="text-xs text-muted-foreground">{t('gov.satellite.stats.forSelectedArea')}</p>
              </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2 text-sm"><Droplets className="w-4 h-4"/> Soil Moisture</CardDescription>
+              <CardDescription className="flex items-center gap-2 text-sm"><Droplets className="w-4 h-4"/> {t('soil_moisture')}</CardDescription>
               <CardTitle className="text-2xl md:text-3xl text-blue-500">62%</CardTitle>
             </CardHeader>
              <CardContent>
-                <p className="text-xs text-muted-foreground">Aggregated from sensors</p>
+                <p className="text-xs text-muted-foreground">{t('gov.satellite.stats.aggregated')}</p>
              </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardDescription className="flex items-center gap-2 text-sm"><Info className="w-4 h-4"/> Status</CardDescription>
-              <CardTitle className="text-2xl md:text-3xl text-green-600">Healthy</CardTitle>
+              <CardDescription className="flex items-center gap-2 text-sm"><Info className="w-4 h-4"/> {t('status')}</CardDescription>
+              <CardTitle className="text-2xl md:text-3xl text-green-600">{t('healthy')}</CardTitle>
             </CardHeader>
              <CardContent>
-                <p className="text-xs text-muted-foreground">Vegetation is healthy</p>
+                <p className="text-xs text-muted-foreground">{t('gov.satellite.stats.vegetationHealthy')}</p>
              </CardContent>
           </Card>
         </div>
@@ -203,9 +204,10 @@ function SatelliteView() {
 }
 
 export default function SatellitePage() {
+    const { t } = useTranslation();
     return (
         <div className="flex flex-col gap-6 h-full">
-             <h1 className="font-headline text-2xl md:text-3xl font-bold">Satellite Analytics</h1>
+             <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('gov.satellite.title')}</h1>
             <Suspense fallback={<Skeleton className="h-[70vh] w-full" />}>
                 <SatelliteView />
             </Suspense>

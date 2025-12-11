@@ -4,13 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { useMemo } from "react";
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
-
-const chartConfig = {
-    rain: { label: "Rain", color: "hsl(var(--chart-1))" },
-    water: { label: "Water Level", color: "hsl(var(--chart-2))" },
-    soil: { label: "Soil", color: "hsl(var(--chart-3))" },
-    pump: { label: "Pump", color: "hsl(var(--chart-4))" },
-};
+import { useTranslation } from "react-i18next";
 
 const mockAlertsData = [
   { date: "Mon", rain: 2, water: 5, soil: 8, pump: 1 },
@@ -24,11 +18,20 @@ const mockAlertsData = [
 
 
 export function AlertAnalytics() {
+    const { t } = useTranslation();
+
+    const chartConfig = {
+        rain: { label: t('gov.analytics.charts.rain'), color: "hsl(var(--chart-1))" },
+        water: { label: t('gov.analytics.charts.water'), color: "hsl(var(--chart-2))" },
+        soil: { label: t('gov.analytics.charts.soil'), color: "hsl(var(--chart-3))" },
+        pump: { label: t('gov.analytics.charts.pump'), color: "hsl(var(--chart-4))" },
+    };
+
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Alert Patterns</CardTitle>
-                <CardDescription>Alerts triggered over the last 7 days.</CardDescription>
+                <CardTitle>{t('gov.analytics.alertPatternsTitle')}</CardTitle>
+                <CardDescription>{t('gov.analytics.alertPatternsDesc')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={chartConfig} className="h-72 w-full">

@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { addDeviceAction } from '@/app/actions/add-device';
 import { useData } from '@/contexts/data-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useTranslation } from 'react-i18next';
 
 
 const AddDeviceMap = dynamic(() => import('@/components/government/add-device-map'), {
@@ -43,6 +44,7 @@ export default function AddDevicePage() {
   const [isLoading, setIsLoading] = useState(false);
   const { farmers } = useData();
   const [selectedFarmerId, setSelectedFarmerId] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -106,8 +108,8 @@ export default function AddDevicePage() {
       });
 
       toast({
-        title: 'Device Registered Successfully!',
-        description: `${values.deviceId} has been registered for ${farmer.name}.`,
+        title: t('gov.devices.toast.addSuccessTitle'),
+        description: t('gov.devices.toast.addSuccessDesc', { deviceId: values.deviceId, farmerName: farmer.name }),
       });
 
       router.push('/government/devices');
@@ -115,8 +117,8 @@ export default function AddDevicePage() {
       console.error("Failed to add device: ", error);
       toast({
         variant: "destructive",
-        title: 'Registration Failed',
-        description: (error as Error).message || 'An unexpected error occurred.',
+        title: t('gov.devices.toast.addErrorTitle'),
+        description: (error as Error).message || t('gov.devices.toast.addErrorDesc'),
       });
     } finally {
       setIsLoading(false);
@@ -125,10 +127,10 @@ export default function AddDevicePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-headline text-2xl md:text-3xl font-bold">Register New Device</h1>
+      <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('gov.devices.add.title')}</h1>
       <Card>
         <CardHeader>
-          <CardTitle>Device Registration Form</CardTitle>
+          <CardTitle>{t('gov.devices.add.formTitle')}</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -140,11 +142,11 @@ export default function AddDevicePage() {
                 name="farmerId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Select Farmer</FormLabel>
+                    <FormLabel>{t('gov.devices.add.selectFarmer')}</FormLabel>
                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a farmer to assign the device" />
+                            <SelectValue placeholder={t('gov.devices.add.selectFarmerPlaceholder')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -167,7 +169,7 @@ export default function AddDevicePage() {
                     name="deviceId"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Device ID</FormLabel>
+                        <FormLabel>{t('gov.devices.add.deviceId')}</FormLabel>
                         <FormControl>
                         <Input placeholder="e.g., AGRO-001" {...field} />
                         </FormControl>
@@ -180,9 +182,9 @@ export default function AddDevicePage() {
                     name="nickname"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Device Nickname</FormLabel>
+                        <FormLabel>{t('gov.devices.add.deviceNickname')}</FormLabel>
                         <FormControl>
-                        <Input placeholder="e.g., North Field Pump" {...field} />
+                        <Input placeholder={t('gov.devices.add.deviceNicknamePlaceholder')} {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -196,17 +198,17 @@ export default function AddDevicePage() {
                   name="surveyNumber"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Select Plot</FormLabel>
+                      <FormLabel>{t('gov.devices.add.selectPlot')}</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value} disabled={!selectedFarmer}>
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a plot to link the device" />
+                            <SelectValue placeholder={t('gov.devices.add.selectPlotPlaceholder')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
                           {selectedFarmer?.plots.map((plot) => (
                             <SelectItem key={plot.surveyNumber} value={plot.surveyNumber}>
-                              Survey No: {plot.surveyNumber} ({plot.areaAcres} acres)
+                              {t('gov.devices.add.surveyNo')}: {plot.surveyNumber} ({plot.areaAcres} {t('acres')})
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -223,7 +225,7 @@ export default function AddDevicePage() {
                     name="jalkundMaxQuantity"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Jalkund Maximum Quantity (Liters)</FormLabel>
+                        <FormLabel>{t('gov.devices.add.jalkundLabel')}</FormLabel>
                         <FormControl>
                         <Input type="number" placeholder="e.g., 5000" {...field} />
                         </FormControl>
@@ -234,7 +236,7 @@ export default function AddDevicePage() {
               
               {/* Location Picker */}
               <div className="space-y-2">
-                <FormLabel>Device Location</FormLabel>
+                <FormLabel>{t('gov.devices.add.location')}</FormLabel>
                 <div className='flex items-end gap-2'>
                     <div className='grid grid-cols-2 gap-2 flex-1'>
                          <FormField
@@ -242,7 +244,7 @@ export default function AddDevicePage() {
                             name="lat"
                             render={({ field }) => (
                             <FormItem>
-                                <Label className="text-xs text-muted-foreground">Latitude</Label>
+                                <Label className="text-xs text-muted-foreground">{t('latitude')}</Label>
                                 <FormControl>
                                 <Input type="number" step="any" placeholder="e.g., 27.1067" {...field} />
                                 </FormControl>
@@ -255,7 +257,7 @@ export default function AddDevicePage() {
                             name="lng"
                             render={({ field }) => (
                             <FormItem>
-                                <Label className="text-xs text-muted-foreground">Longitude</Label>
+                                <Label className="text-xs text-muted-foreground">{t('longitude')}</Label>
                                 <FormControl>
                                 <Input type="number" step="any" placeholder="e.g., 88.3233" {...field} />
                                 </FormControl>
@@ -267,12 +269,12 @@ export default function AddDevicePage() {
                      <Dialog open={isMapOpen} onOpenChange={setMapOpen}>
                         <DialogTrigger asChild>
                             <Button type="button" variant="outline">
-                                <MapPin className="mr-2 h-4 w-4" /> Pick on Map
+                                <MapPin className="mr-2 h-4 w-4" /> {t('gov.devices.add.pickOnMap')}
                             </Button>
                         </DialogTrigger>
                         <DialogContent className="h-[70vh] max-w-[90vw] p-2 flex flex-col lg:max-w-[70vw]">
                             <DialogHeader className="p-4 flex-shrink-0">
-                                <DialogTitle>Click on the map to set location</DialogTitle>
+                                <DialogTitle>{t('gov.devices.add.mapDialogTitle')}</DialogTitle>
                             </DialogHeader>
                             <div className="flex-grow w-full overflow-hidden rounded-lg">
                                 {isMapOpen && <AddDeviceMap onLocationSelect={handleLocationSelect} />}
@@ -285,7 +287,7 @@ export default function AddDevicePage() {
 
               <Button type="submit" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Add Device
+                {t('gov.devices.add.submitButton')}
               </Button>
             </form>
           </Form>

@@ -4,24 +4,26 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { regionalAnalyticsData } from "@/lib/data";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts";
-
-const chartConfig = {
-  waterUsage: {
-    label: "Water Usage (L)",
-    color: "hsl(var(--chart-1))",
-  },
-  soilMoisture: {
-    label: "Soil Moisture (%)",
-    color: "hsl(var(--chart-2))"
-  }
-};
+import { useTranslation } from "react-i18next";
 
 export function RegionalAnalytics() {
+  const { t } = useTranslation();
+  const chartConfig = {
+    waterUsage: {
+      label: t('gov.analytics.charts.waterUsage'),
+      color: "hsl(var(--chart-1))",
+    },
+    soilMoisture: {
+      label: t('soil_moisture'),
+      color: "hsl(var(--chart-2))"
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>South Sikkim Agriculture Insights</CardTitle>
-        <CardDescription>Water usage and soil moisture across key regions.</CardDescription>
+        <CardTitle>{t('gov.analytics.regionalInsightsTitle')}</CardTitle>
+        <CardDescription>{t('gov.analytics.regionalInsightsDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-80 w-full">

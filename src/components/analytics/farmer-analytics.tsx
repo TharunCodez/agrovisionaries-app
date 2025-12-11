@@ -5,9 +5,11 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { useData } from "@/contexts/data-context";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 
 export function FarmerAnalytics() {
   const { farmers, devices } = useData();
+  const { t } = useTranslation();
 
   const farmerRiskData = useMemo(() => {
     if (!farmers || !devices) {
@@ -17,7 +19,7 @@ export function FarmerAnalytics() {
     return farmers.slice(0, 5).map(farmer => {
         const deviceCount = devices.filter(d => d.farmerId === farmer.id).length;
         const alertsCount = Math.floor(Math.random() * 15); // Mock data
-        const status = alertsCount > 10 ? 'High Risk' : alertsCount > 5 ? 'Medium Risk' : 'Low Risk';
+        const status = alertsCount > 10 ? t('gov.analytics.risk.high') : alertsCount > 5 ? t('gov.analytics.risk.medium') : t('gov.analytics.risk.low');
         return {
             ...farmer,
             devices: deviceCount,
@@ -25,27 +27,27 @@ export function FarmerAnalytics() {
             status: status
         }
     }).sort((a,b) => b.alerts - a.alerts);
-  }, [farmers, devices]);
+  }, [farmers, devices, t]);
 
   const getBadgeClass = (status: string) => {
-    if (status === 'High Risk') return 'bg-destructive';
-    if (status === 'Medium Risk') return 'bg-yellow-500 text-black';
+    if (status === t('gov.analytics.risk.high')) return 'bg-destructive';
+    if (status === t('gov.analytics.risk.medium')) return 'bg-yellow-500 text-black';
     return 'bg-green-600';
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Top At-Risk Farmers</CardTitle>
-        <CardDescription>Farmers with the highest number of critical alerts.</CardDescription>
+        <CardTitle>{t('gov.analytics.atRiskFarmersTitle')}</CardTitle>
+        <CardDescription>{t('gov.analytics.atRiskFarmersDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Farmer</TableHead>
-              <TableHead className="text-right">Alerts</TableHead>
-              <TableHead className="text-right">Status</TableHead>
+              <TableHead>{t('gov.farmers.table.farmer')}</TableHead>
+              <TableHead className="text-right">{t('alerts')}</TableHead>
+              <TableHead className="text-right">{t('status')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

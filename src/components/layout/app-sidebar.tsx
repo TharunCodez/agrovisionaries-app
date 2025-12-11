@@ -24,21 +24,25 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-
-const governmentMenuItems = [
-  { href: '/government/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/government/devices', label: 'Devices', icon: HardDrive },
-  { href: '/government/map', label: 'Map View', icon: Map },
-  { href: '/government/satellite', label: 'Satellite', icon: Satellite },
-  { href: '/government/notifications', label: 'Notifications', icon: Bell },
-  { href: '/government/farmers', label: 'Farmers', icon: Users },
-  { href: '/government/farmers/register', label: 'Register Farmer', icon: UserPlus },
-  { href: '/government/analytics', label: 'Analytics', icon: BarChart },
-  { href: '/government/settings', label: 'Settings', icon: Settings },
-];
+import { useTranslation } from 'react-i18next';
+import { useLogout } from '@/hooks/use-logout';
 
 export default function AppSidebar() {
   const pathname = usePathname();
+  const { t } = useTranslation();
+  const logout = useLogout();
+
+  const governmentMenuItems = [
+    { href: '/government/dashboard', label: t('gov.sidebar.dashboard'), icon: LayoutDashboard },
+    { href: '/government/devices', label: t('gov.sidebar.devices'), icon: HardDrive },
+    { href: '/government/map', label: t('gov.sidebar.map'), icon: Map },
+    { href: '/government/satellite', label: t('gov.sidebar.satellite'), icon: Satellite },
+    { href: '/government/notifications', label: t('gov.sidebar.notifications'), icon: Bell },
+    { href: '/government/farmers', label: t('gov.sidebar.farmers'), icon: Users },
+    { href: '/government/farmers/register', label: t('gov.sidebar.registerFarmer'), icon: UserPlus },
+    { href: '/government/analytics', label: t('gov.sidebar.analytics'), icon: BarChart },
+    { href: '/government/settings', label: t('gov.sidebar.settings'), icon: Settings },
+  ];
 
   return (
     <Sidebar>
@@ -47,7 +51,7 @@ export default function AppSidebar() {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
             <Leaf className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="font-headline text-lg font-bold">Agro Visionaries</span>
+          <span className="font-headline text-lg font-bold">{t('gov.sidebar.title')}</span>
         </div>
       </SidebarHeader>
       <SidebarContent className="p-2">
@@ -71,10 +75,10 @@ export default function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
            <SidebarMenuItem>
-              <SidebarMenuButton asChild variant="outline">
-                <Link href="/">
+              <SidebarMenuButton asChild variant="outline" onClick={logout}>
+                <Link href="#">
                   <LogOut />
-                  <span>Logout</span>
+                  <span>{t('logout')}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

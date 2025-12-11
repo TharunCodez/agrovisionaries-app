@@ -40,14 +40,17 @@ export default function Header() {
     t: (key: string) => string
   ): string => {
     if (role === 'government') {
-      if (pathname.includes('/dashboard')) return 'Regional Agriculture Overview';
-      if (pathname.includes('/devices')) return 'Device Management';
-      if (pathname.includes('/map')) return 'Device Map';
-      if (pathname.includes('/notifications')) return 'Notifications';
-      if (pathname.includes('/farmers')) return 'Farmer Database';
-      if (pathname.includes('/analytics')) return 'Analytics';
-      if (pathname.includes('/settings')) return 'Settings';
-      return 'Government Portal';
+      if (pathname.includes('/dashboard')) return t('gov.sidebar.dashboard');
+      if (pathname.includes('/devices/add')) return t('gov.devices.add.title');
+      if (pathname.includes('/devices')) return t('gov.sidebar.devices');
+      if (pathname.includes('/map')) return t('gov.sidebar.map');
+      if (pathname.includes('/satellite')) return t('gov.sidebar.satellite');
+      if (pathname.includes('/notifications')) return t('gov.sidebar.notifications');
+      if (pathname.includes('/farmers/register')) return t('gov.sidebar.registerFarmer');
+      if (pathname.includes('/farmers')) return t('gov.sidebar.farmers');
+      if (pathname.includes('/analytics')) return t('gov.sidebar.analytics');
+      if (pathname.includes('/settings')) return t('gov.sidebar.settings');
+      return t('gov.portalName');
     }
     return t('dashboard');
   };
@@ -66,7 +69,7 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-card/80 px-4 backdrop-blur-sm md:px-6">
             <div className="flex items-center gap-2">
-                {isMobile && <SidebarTrigger />}
+                <SidebarTrigger className="md:hidden" />
                 <h1 className="font-headline text-lg font-semibold">{pageTitle}</h1>
             </div>
             <div className="flex items-center gap-2 md:gap-4">
@@ -83,12 +86,12 @@ export default function Header() {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                        <DropdownMenuLabel>{t('myAccount')}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>Profile</DropdownMenuItem>
-                        <DropdownMenuItem>Settings</DropdownMenuItem>
+                        <DropdownMenuItem>{t('profile')}</DropdownMenuItem>
+                        <DropdownMenuItem>{t('settings')}</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                        <DropdownMenuItem onClick={logout}>{t('logout')}</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
@@ -102,7 +105,7 @@ export default function Header() {
         <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-card/80 px-4 backdrop-blur-sm md:px-6">
             <Link href="/farmer/dashboard" className="flex items-center gap-2">
                 <Leaf className="h-6 w-6 text-primary" />
-                <span className="text-lg font-bold">Farmer Portal</span>
+                <span className="text-lg font-bold">{t('farmerPortal')}</span>
             </Link>
             <div className='flex items-center'>
               <LanguageSwitcher />
@@ -116,7 +119,7 @@ export default function Header() {
     <header className="hidden md:flex w-full sticky top-0 z-50 bg-background/95 backdrop-blur-sm px-6 lg:px-12 py-3 justify-between items-center border-b">
         <Link href="/farmer/dashboard" className="flex items-center gap-2">
             <Leaf className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">Farmer Portal</span>
+            <span className="text-xl font-bold">{t('farmerPortal')}</span>
         </Link>
 
         <nav className="flex items-center gap-6 text-sm font-medium">
@@ -149,13 +152,13 @@ export default function Header() {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>{farmer?.name ?? "My Account"}</DropdownMenuLabel>
+                    <DropdownMenuLabel>{farmer?.name ?? t('myAccount')}</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
                         <Link href="/farmer/profile">{t('profile')}</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                        <Link href="/farmer/settings">Settings</Link>
+                        <Link href="/farmer/settings">{t('settings')}</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={logout}>{t('logout')}</DropdownMenuItem>

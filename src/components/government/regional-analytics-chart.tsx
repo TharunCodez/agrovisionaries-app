@@ -4,20 +4,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { regionalAnalyticsData } from "@/lib/data";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
-
-const chartConfig = {
-  waterUsage: {
-    label: "Water Usage (L)",
-    color: "hsl(var(--chart-1))",
-  },
-};
+import { useTranslation } from "react-i18next";
 
 export default function RegionalAnalyticsChart() {
+  const { t } = useTranslation();
+
+  const chartConfig = {
+    waterUsage: {
+      label: t('gov.analytics.charts.waterUsage'),
+      color: "hsl(var(--chart-1))",
+    },
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Regional Water Usage (South Sikkim)</CardTitle>
-        <CardDescription>Comparison of water consumption across regions.</CardDescription>
+        <CardTitle>{t('gov.dashboard.regionalWaterUsageTitle')}</CardTitle>
+        <CardDescription>{t('gov.dashboard.regionalWaterUsageDesc')}</CardDescription>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-80 w-full">

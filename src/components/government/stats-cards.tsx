@@ -2,18 +2,20 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, HardDrive, Siren } from "lucide-react";
 import { useData } from "@/contexts/data-context";
+import { useTranslation } from "react-i18next";
 
 export default function StatsCards() {
     const { farmers, devices } = useData();
+    const { t } = useTranslation();
 
     const totalFarmers = farmers ? farmers.length : 0;
     const onlineDevices = devices ? devices.filter(d => d.status === 'Online').length : 0;
     const totalDevices = devices ? devices.length : 0;
 
     const stats = [
-        { title: "Total Farmers", value: totalFarmers, icon: Users, description: "+2 this month" },
-        { title: "Devices Online", value: `${onlineDevices} / ${totalDevices}`, icon: HardDrive, description: `${totalDevices > 0 ? Math.round(onlineDevices/totalDevices * 100) : 0}% uptime` },
-        { title: "Critical Alerts", value: "2", icon: Siren, description: "Last 24 hours" },
+        { title: t('gov.dashboard.stats.totalFarmers'), value: totalFarmers, icon: Users, description: t('gov.dashboard.stats.totalFarmersDesc') },
+        { title: t('gov.dashboard.stats.devicesOnline'), value: `${onlineDevices} / ${totalDevices}`, icon: HardDrive, description: `${totalDevices > 0 ? Math.round(onlineDevices/totalDevices * 100) : 0}% ${t('gov.dashboard.stats.uptime')}` },
+        { title: t('gov.dashboard.stats.criticalAlerts'), value: "2", icon: Siren, description: t('gov.dashboard.stats.last24h') },
     ];
 
     return (

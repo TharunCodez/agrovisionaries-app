@@ -4,16 +4,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useData } from "@/contexts/data-context";
 import { Skeleton } from "../ui/skeleton";
+import { useTranslation } from "react-i18next";
 
 export default function FarmerList() {
   const { farmers, isLoading } = useData();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>Farmer Database</CardTitle>
-                <CardDescription>Overview of farmers in the region.</CardDescription>
+                <CardTitle>{t('gov.farmers.list.title')}</CardTitle>
+                <CardDescription>{t('gov.farmers.list.description')}</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="space-y-2">
@@ -29,18 +31,18 @@ export default function FarmerList() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Farmer Database</CardTitle>
-        <CardDescription>Overview of all registered farmers.</CardDescription>
+        <CardTitle>{t('gov.farmers.list.title')}</CardTitle>
+        <CardDescription>{t('gov.farmers.list.description')}</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Phone</TableHead>
-              <TableHead>Village</TableHead>
-              <TableHead>District</TableHead>
-              <TableHead className="text-right">Devices</TableHead>
+              <TableHead>{t('gov.farmers.table.name')}</TableHead>
+              <TableHead>{t('gov.farmers.table.phone')}</TableHead>
+              <TableHead>{t('gov.farmers.table.village')}</TableHead>
+              <TableHead>{t('gov.farmers.table.district')}</TableHead>
+              <TableHead className="text-right">{t('devices')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -55,7 +57,7 @@ export default function FarmerList() {
             ))}
              {(!farmers || farmers.length === 0) && (
                 <TableRow>
-                    <TableCell colSpan={5} className="text-center">No farmers found.</TableCell>
+                    <TableCell colSpan={5} className="text-center">{t('gov.farmers.noFarmersFound')}</TableCell>
                 </TableRow>
             )}
           </TableBody>

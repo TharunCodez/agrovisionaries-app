@@ -15,6 +15,7 @@ import { Loader2, PlusCircle, Trash2, Tractor } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { registerFarmerAction } from '@/app/actions/register-farmer';
+import { useTranslation } from 'react-i18next';
 
 
 const soilTypes = [
@@ -53,6 +54,7 @@ export default function RegisterFarmerPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { t } = useTranslation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,16 +79,16 @@ export default function RegisterFarmerPage() {
     try {
       await registerFarmerAction(values);
       toast({
-        title: 'Farmer Registered Successfully!',
-        description: `${values.name} has been added to the database.`,
+        title: t('gov.farmers.toast.addSuccessTitle'),
+        description: t('gov.farmers.toast.addSuccessDesc', { farmerName: values.name }),
       });
       router.push('/government/farmers');
     } catch (error) {
       console.error("Failed to register farmer: ", error);
       toast({
         variant: "destructive",
-        title: 'Registration Failed',
-        description: (error as Error).message || 'An unexpected error occurred.',
+        title: t('gov.farmers.toast.addErrorTitle'),
+        description: (error as Error).message || t('gov.farmers.toast.addErrorDesc'),
       });
     } finally {
       setIsLoading(false);
@@ -95,11 +97,11 @@ export default function RegisterFarmerPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="font-headline text-2xl md:text-3xl font-bold">Register New Farmer</h1>
+      <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('gov.farmers.register.title')}</h1>
       <Card>
         <CardHeader>
-          <CardTitle>Farmer Registration Form</CardTitle>
-          <CardDescription>Enter the details of the new farmer and their land plots.</CardDescription>
+          <CardTitle>{t('gov.farmers.register.formTitle')}</CardTitle>
+          <CardDescription>{t('gov.farmers.register.formDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -107,27 +109,27 @@ export default function RegisterFarmerPage() {
               
               {/* Personal Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium text-primary">Personal Information</h3>
+                <h3 className="text-lg font-medium text-primary">{t('gov.farmers.register.personalInfo')}</h3>
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <FormField control={form.control} name="name" render={({ field }) => (
-                        <FormItem><FormLabel>Full Name</FormLabel><FormControl><Input placeholder="e.g., Alex Doe" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>{t('gov.farmers.register.fullName')}</FormLabel><FormControl><Input placeholder="e.g., Alex Doe" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="phone" render={({ field }) => (
-                        <FormItem><FormLabel>Mobile Number</FormLabel><FormControl><Input placeholder="+91 98765 43210" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>{t('gov.farmers.register.mobileNumber')}</FormLabel><FormControl><Input placeholder="+91 98765 43210" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                 </div>
                  <FormField control={form.control} name="aadhaar" render={({ field }) => (
-                    <FormItem><FormLabel>Aadhaar Number</FormLabel><FormControl><Input placeholder="xxxxxxxxxxxx" {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('aadhaar')}</FormLabel><FormControl><Input placeholder="xxxxxxxxxxxx" {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                 <FormField control={form.control} name="address" render={({ field }) => (
-                    <FormItem><FormLabel>Full Address</FormLabel><FormControl><Textarea placeholder="House No, Street, Landmark..." {...field} /></FormControl><FormMessage /></FormItem>
+                    <FormItem><FormLabel>{t('address')}</FormLabel><FormControl><Textarea placeholder={t('gov.farmers.register.addressPlaceholder')} {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <FormField control={form.control} name="village" render={({ field }) => (
-                        <FormItem><FormLabel>Village</FormLabel><FormControl><Input placeholder="e.g., Rampur" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>{t('gov.farmers.register.village')}</FormLabel><FormControl><Input placeholder="e.g., Rampur" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                     <FormField control={form.control} name="district" render={({ field }) => (
-                        <FormItem><FormLabel>District</FormLabel><FormControl><Input placeholder="e.g., Jaipur" {...field} /></FormControl><FormMessage /></FormItem>
+                        <FormItem><FormLabel>{t('gov.farmers.register.district')}</FormLabel><FormControl><Input placeholder="e.g., Jaipur" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                 </div>
               </div>
@@ -137,9 +139,9 @@ export default function RegisterFarmerPage() {
               {/* Land Plots Section */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-medium text-primary flex items-center gap-2"><Tractor /> Land Plot Information</h3>
+                    <h3 className="text-lg font-medium text-primary flex items-center gap-2"><Tractor /> {t('landPlots')}</h3>
                     <Button type="button" variant="outline" size="sm" onClick={() => append({ surveyNumber: '', areaAcres: 0, landType: 'Irrigated', soilType: 'Alluvial' })}>
-                        <PlusCircle className="mr-2 h-4 w-4" /> Add Plot
+                        <PlusCircle className="mr-2 h-4 w-4" /> {t('gov.farmers.register.addPlot')}
                     </Button>
                 </div>
 
@@ -159,27 +161,27 @@ export default function RegisterFarmerPage() {
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                              <FormField control={form.control} name={`plots.${index}.surveyNumber`} render={({ field }) => (
-                                <FormItem><FormLabel>Survey Number</FormLabel><FormControl><Input placeholder="e.g., 123/4A" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>{t('surveyNumber')}</FormLabel><FormControl><Input placeholder="e.g., 123/4A" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name={`plots.${index}.areaAcres`} render={({ field }) => (
-                                <FormItem><FormLabel>Area (in acres)</FormLabel><FormControl><Input type="number" step="0.1" placeholder="e.g., 5.5" {...field} /></FormControl><FormMessage /></FormItem>
+                                <FormItem><FormLabel>{t('areaAcres')}</FormLabel><FormControl><Input type="number" step="0.1" placeholder="e.g., 5.5" {...field} /></FormControl><FormMessage /></FormItem>
                             )} />
                              <FormField control={form.control} name={`plots.${index}.landType`} render={({ field }) => (
-                                <FormItem><FormLabel>Type of Land</FormLabel>
+                                <FormItem><FormLabel>{t('landType')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Select land type" /></SelectTrigger></FormControl>
+                                    <FormControl><SelectTrigger><SelectValue placeholder={t('gov.farmers.register.selectLandType')} /></SelectTrigger></FormControl>
                                     <SelectContent>
-                                        <SelectItem value="Irrigated">Irrigated</SelectItem>
-                                        <SelectItem value="Unirrigated">Unirrigated</SelectItem>
+                                        <SelectItem value="Irrigated">{t('irrigated')}</SelectItem>
+                                        <SelectItem value="Unirrigated">{t('unirrigated')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <FormMessage />
                                 </FormItem>
                             )} />
                               <FormField control={form.control} name={`plots.${index}.soilType`} render={({ field }) => (
-                                <FormItem><FormLabel>Soil Type</FormLabel>
+                                <FormItem><FormLabel>{t('soilType')}</FormLabel>
                                 <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <FormControl><SelectTrigger><SelectValue placeholder="Select soil type" /></SelectTrigger></FormControl>
+                                    <FormControl><SelectTrigger><SelectValue placeholder={t('gov.farmers.register.selectSoilType')} /></SelectTrigger></FormControl>
                                     <SelectContent>
                                         {soilTypes.map(type => <SelectItem key={type} value={type}>{type}</SelectItem>)}
                                     </SelectContent>
@@ -194,7 +196,7 @@ export default function RegisterFarmerPage() {
               
               <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Register Farmer
+                {t('gov.farmers.registerFarmerButton')}
               </Button>
             </form>
           </Form>

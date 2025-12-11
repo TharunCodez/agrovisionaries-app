@@ -5,6 +5,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { useData } from "@/contexts/data-context";
 import { useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import { useTranslation } from "react-i18next";
 
 const COLORS = {
     Online: 'hsl(var(--chart-1))',
@@ -13,30 +14,31 @@ const COLORS = {
     Critical: 'hsl(var(--chart-5))',
 };
 
-const chartConfig = {
-    devices: {
-        label: "Devices",
-    },
-    Online: {
-        label: "Online",
-        color: COLORS.Online,
-    },
-    Offline: {
-        label: "Offline",
-        color: COLORS.Offline,
-    },
-    Warning: {
-        label: "Warning",
-        color: COLORS.Warning,
-    },
-     Critical: {
-        label: "Critical",
-        color: COLORS.Critical,
-    }
-}
-
 export function DeviceAnalytics() {
     const { devices } = useData();
+    const { t } = useTranslation();
+
+    const chartConfig = {
+        devices: {
+            label: t('devices'),
+        },
+        Online: {
+            label: t('online'),
+            color: COLORS.Online,
+        },
+        Offline: {
+            label: t('offline'),
+            color: COLORS.Offline,
+        },
+        Warning: {
+            label: t('gov.analytics.warning'),
+            color: COLORS.Warning,
+        },
+        Critical: {
+            label: t('gov.analytics.critical'),
+            color: COLORS.Critical,
+        }
+    }
 
     const deviceStatusData = useMemo(() => {
         if (!devices) {
@@ -53,8 +55,8 @@ export function DeviceAnalytics() {
     return (
         <Card className="flex flex-col">
             <CardHeader>
-                <CardTitle>Device Performance</CardTitle>
-                <CardDescription>Live status of all registered devices.</CardDescription>
+                <CardTitle>{t('gov.analytics.devicePerformanceTitle')}</CardTitle>
+                <CardDescription>{t('gov.analytics.devicePerformanceDesc')}</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col items-center justify-center">
                  <ChartContainer
