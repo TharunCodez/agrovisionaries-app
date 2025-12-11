@@ -5,14 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Power } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from "react-i18next";
 
 export default function PumpControlCard() {
+  const { t } = useTranslation();
   const [isPumpOn, setIsPumpOn] = useState(false);
 
   return (
     <Card className='overflow-hidden'>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-medium">Irrigation Pump</CardTitle>
+        <CardTitle className="text-lg font-medium">{t('irrigation_pump')}</CardTitle>
         <Power className={cn('h-6 w-6 text-muted-foreground transition-colors', isPumpOn && 'text-green-500')}/>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center gap-4 pt-4">

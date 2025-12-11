@@ -3,12 +3,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Waves } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface WaterTankProps {
   level: number; // Percentage full
 }
 
 export default function WaterTank({ level }: WaterTankProps) {
+  const { t } = useTranslation();
   const waterHeight = Math.max(0, Math.min(100, level));
 
   const getWaterColor = () => {
@@ -26,7 +28,7 @@ export default function WaterTank({ level }: WaterTankProps) {
   return (
     <Card className="overflow-hidden">
       <CardHeader>
-        <CardTitle className="text-lg">Reservoir Level</CardTitle>
+        <CardTitle className="text-lg">{t('reservoir_level')}</CardTitle>
         <CardDescription>Live water level status</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col items-center justify-center gap-4 pt-4">

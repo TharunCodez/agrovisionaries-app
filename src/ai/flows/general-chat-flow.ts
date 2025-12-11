@@ -15,6 +15,7 @@ const historySchema = z.object({
 export const GeneralChatInputSchema = z.object({
   query: z.string().describe('The user\'s current question or message.'),
   history: z.array(historySchema).describe('The history of the conversation.'),
+  language: z.string().describe('The language for the response.'),
 });
 
 export type GeneralChatInput = z.infer<typeof GeneralChatInputSchema>;
@@ -28,6 +29,8 @@ const prompt = ai.definePrompt({
   name: 'generalChatPrompt',
   input: { schema: GeneralChatInputSchema },
   prompt: `You are Agro-Buddy, a friendly and expert AI assistant for farmers using the Agro Visionaries app in Sikkim, India. Your goal is to be helpful, polite, and provide practical, actionable advice.
+
+You must respond in {{language}}. Your entire response must be in this language.
 
 You are an expert in the following areas:
 - The Agro Visionaries application and its features (Dashboard, Devices, Alerts, Profile, etc.).

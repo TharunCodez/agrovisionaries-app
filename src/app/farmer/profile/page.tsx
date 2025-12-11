@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 import { uploadProfilePhoto } from '@/app/api/upload-profile-photo';
 import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 
 function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, icon?: React.ElementType }) {
     const IconComponent = Icon || User;
@@ -26,6 +27,7 @@ function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, 
 
 export default function FarmerProfilePage() {
   const { farmers, isLoading: isDataLoading, setFarmers } = useData();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -69,7 +71,7 @@ export default function FarmerProfilePage() {
     return (
         <div className="flex flex-col gap-6 pb-20 md:pb-6">
             <div className="flex items-center justify-between">
-              <h1 className="font-headline text-2xl md:text-3xl font-bold">Your Profile</h1>
+              <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('profile_title')}</h1>
               <Skeleton className="h-10 w-24" />
             </div>
             <Card>
@@ -92,10 +94,10 @@ export default function FarmerProfilePage() {
   return (
     <div className="flex flex-col gap-8 pb-20 md:pb-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="font-headline text-2xl md:text-3xl font-bold">Your Profile</h1>
+        <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('profile_title')}</h1>
         <Button disabled>
           <Edit className="mr-2 h-4 w-4" />
-          Edit Profile
+          {t('edit_profile')}
         </Button>
       </div>
       
@@ -132,8 +134,8 @@ export default function FarmerProfilePage() {
         </CardHeader>
         <CardContent>
              <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-                <ProfileItem label="Aadhaar" value={farmer.aadhaar} icon={User} />
-                <ProfileItem label="Address" value={`${farmer.address}, ${farmer.village}, ${farmer.district}`} icon={MapPin} />
+                <ProfileItem label={t('aadhaar')} value={farmer.aadhaar} icon={User} />
+                <ProfileItem label={t('address')} value={`${farmer.address}, ${farmer.village}, ${farmer.district}`} icon={MapPin} />
              </div>
         </CardContent>
       </Card>
@@ -142,18 +144,18 @@ export default function FarmerProfilePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Tractor className="h-6 w-6"/>
-            <span>My Land Plots</span>
+            <span>{t('land_plots')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {farmer.plots?.length > 0 ? (
             farmer.plots.map((plot: any, index: number) => (
               <div key={index} className="rounded-lg border bg-muted/20 p-4">
-                <p className="font-bold">Survey No: {plot.surveyNumber}</p>
+                <p className="font-bold">{t('survey_number')}: {plot.surveyNumber}</p>
                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                  <p><span className="font-semibold">Area:</span> {plot.areaAcres} acres</p>
-                  <p><span className="font-semibold">Land Type:</span> {plot.landType}</p>
-                  <p><span className="font-semibold">Soil Type:</span> {plot.soilType}</p>
+                  <p><span className="font-semibold">{t('area')}:</span> {plot.areaAcres} acres</p>
+                  <p><span className="font-semibold">{t('land_type')}:</span> {plot.landType}</p>
+                  <p><span className="font-semibold">{t('soil_type')}:</span> {plot.soilType}</p>
                 </div>
               </div>
             ))
@@ -167,7 +169,7 @@ export default function FarmerProfilePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <HardDrive className="h-6 w-6"/>
-            <span>My Devices</span>
+            <span>{t('my_devices')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -180,7 +182,7 @@ export default function FarmerProfilePage() {
                    <p className="text-sm text-muted-foreground">Jalkund Capacity: {device.jalkundMaxQuantity}L</p>
                 </div>
                 <Badge variant={device.status === 'Online' ? 'default' : 'destructive'} className={device.status === 'Online' ? 'bg-green-600' : ''}>
-                  {device.status}
+                  {t(device.status.toLowerCase())}
                 </Badge>
               </div>
             ))
@@ -192,7 +194,7 @@ export default function FarmerProfilePage() {
 
       <Button variant="destructive">
         <LogOut className="mr-2 h-4 w-4" />
-        Logout
+        {t('logout')}
       </Button>
     </div>
   );

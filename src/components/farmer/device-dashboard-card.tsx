@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -17,7 +16,7 @@ import WaterTank from '@/components/farmer/water-tank';
 import { type Device } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
-import { useState } from 'react';
+import { useTranslation } from "react-i18next";
 
 const getStatusBadgeClass = (status: string) => {
     switch (status.toLowerCase()) {
@@ -35,7 +34,7 @@ const getStatusBadgeClass = (status: string) => {
 }
 
 export default function DeviceDashboardCard({ device }: { device: Device }) {
-
+  const { t } = useTranslation();
   const lastUpdated = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
@@ -47,11 +46,11 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
                 <HardDrive className='h-6 w-6 text-primary' />
                 <CardTitle>{device.nickname}</CardTitle>
             </div>
-            <p className='text-sm text-muted-foreground ml-9'>Survey No: {device.surveyNumber}</p>
+            <p className='text-sm text-muted-foreground ml-9'>{t('survey_number')}: {device.surveyNumber}</p>
         </div>
          <div className='flex flex-col items-end gap-2'>
-            <Badge className={cn("text-white", getStatusBadgeClass(device.status))}>{device.status}</Badge>
-            <p className='text-xs text-muted-foreground'>{timeAgo}</p>
+            <Badge className={cn("text-white", getStatusBadgeClass(device.status))}>{t(device.status.toLowerCase())}</Badge>
+            <p className='text-xs text-muted-foreground'>{t('last_updated')} {timeAgo}</p>
          </div>
       </CardHeader>
       <CardContent>
@@ -71,7 +70,7 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
          <div className="mt-4 flex justify-end border-t pt-4">
             <Button asChild variant="outline">
                 <Link href={`/farmer/devices/${device.id}`}>
-                    View Details <ChevronRight className='ml-2 h-4 w-4' />
+                    {t('view_details')} <ChevronRight className='ml-2 h-4 w-4' />
                 </Link>
             </Button>
         </div>

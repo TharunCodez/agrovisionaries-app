@@ -7,8 +7,10 @@ import { cn } from "@/lib/utils";
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from "../ui/button";
 import { type Device } from '@/contexts/data-context';
+import { useTranslation } from "react-i18next";
 
 export default function DeviceCard({ device }: { device: Device }) {
+    const { t } = useTranslation();
     const isOnline = device.status === 'Online';
     
     const lastUpdated = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
@@ -70,11 +72,11 @@ export default function DeviceCard({ device }: { device: Device }) {
                 <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
                      <div className="flex gap-2">
                         <Badge variant={'default'} className={cn('text-white', getStatusBadgeClass())}>
-                            {device.status}
+                            {t(device.status.toLowerCase())}
                         </Badge>
                          <Badge className={cn(getHealthBadgeClass(), 'text-white')}>{device.health}</Badge>
                      </div>
-                     <p className="text-xs text-muted-foreground mt-2">{timeAgo}</p>
+                     <p className="text-xs text-muted-foreground mt-2">{t('last_updated')} {timeAgo}</p>
                 </div>
             </div>
              <div className="flex justify-end items-center mt-4 border-t border-border pt-3">

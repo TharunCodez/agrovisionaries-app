@@ -1,14 +1,13 @@
 'use client';
 
 import { use } from 'react';
-import { notFound } from 'next/navigation';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ChevronLeft, Share2, Settings, MapPin, Battery, Rss } from 'lucide-react';
+import { ChevronLeft, Share2, Settings, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -27,6 +26,7 @@ import PumpControlCard from '@/components/farmer/pump-control-card';
 import WaterTank from '@/components/farmer/water-tank';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useData } from '@/contexts/data-context';
+import { useTranslation } from 'react-i18next';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -36,6 +36,7 @@ const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
 // This is now the Client Component part of the page
 function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   const { devices } = useData();
+  const { t } = useTranslation();
   const device = useMemo(() => devices?.find(d => d.id === deviceId), [devices, deviceId]);
 
   const [isMapOpen, setMapOpen] = useState(false);
@@ -116,11 +117,11 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
             <Badge
               className={getStatusBadgeClass()}
             >
-              {device.status}
+              {t(device.status.toLowerCase())}
             </Badge>
           </div>
           <div className="mt-2 flex items-center justify-between">
-            <span className="text-muted-foreground">Last updated</span>
+            <span className="text-muted-foreground">{t('last_updated')}</span>
             <span>{timeAgo}</span>
           </div>
         </CardContent>
@@ -177,7 +178,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
         </CardHeader>
         <CardContent>
           <div className="text-muted-foreground">
-             Survey No: {device.surveyNumber}, {device.areaAcres} acres
+             {t('survey_number')}: {device.surveyNumber}, {device.areaAcres} acres
           </div>
         </CardContent>
       </Card>

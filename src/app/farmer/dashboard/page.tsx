@@ -1,4 +1,3 @@
-
 'use client';
 
 import SmartAlert from "@/components/dashboard/smart-alert";
@@ -10,13 +9,14 @@ import Link from 'next/link';
 import { Skeleton } from "@/components/ui/skeleton";
 import ChatAssistant from "@/components/farmer/chat-assistant";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useTranslation } from "react-i18next";
 
 export default function FarmerDashboardPage() {
   const { devices, farmers, isLoading: isDataLoading } = useData();
+  const { t } = useTranslation();
 
   const isLoading = isDataLoading;
   const farmer = farmers?.[0];
-
 
   if (isLoading) {
     return (
@@ -36,7 +36,7 @@ export default function FarmerDashboardPage() {
   return (
     <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
-            <h1 className="font-headline text-2xl md:text-3xl font-bold">Dashboard</h1>
+            <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('dashboard')}</h1>
              {farmer && (
                 <div className="flex items-center gap-3">
                     <span className="font-semibold">{farmer.name}</span>
@@ -58,12 +58,12 @@ export default function FarmerDashboardPage() {
                 ) : (
                 <Card>
                     <CardHeader>
-                    <CardTitle>No Devices Found</CardTitle>
+                    <CardTitle>{t('no_devices')}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                    <p className="text-muted-foreground">No devices have been registered for your account yet. Please contact your local government office to get started.</p>
+                    <p className="text-muted-foreground">{t('no_devices_desc')}</p>
                     <Button asChild className="mt-4">
-                        <Link href="/farmer/devices">View Devices Page</Link>
+                        <Link href="/farmer/devices">{t('view_devices')}</Link>
                         </Button>
                     </CardContent>
                 </Card>

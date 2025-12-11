@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Thermometer, CloudRain, Sun, Battery, Waves, Wind, Rss } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 type SensorType = 'temperature' | 'soil' | 'rain' | 'battery' | 'wind' | 'lora';
 
@@ -8,15 +9,6 @@ interface SensorCardProps {
     type: SensorType;
     value: string | number;
 }
-
-const sensorDetails = {
-    temperature: { icon: Thermometer, label: "Temp", unit: "°C" },
-    soil: { icon: Waves, label: "Moisture", unit: "%" },
-    rain: { icon: CloudRain, label: "Rain", unit: "" },
-    battery: { icon: Battery, label: "Battery", unit: "%" },
-    wind: { icon: Wind, label: "Wind", unit: "km/h" },
-    lora: { icon: Rss, label: "Signal", unit: "dBm" }
-};
 
 const SoilIcon = ({ moisture }: { moisture: number }) => {
     let colorClass = "text-yellow-700"; // Dry
@@ -50,6 +42,16 @@ const LoraIcon = ({ rssi }: { rssi: number }) => {
 
 
 export default function SensorCard({ type, value }: SensorCardProps) {
+    const { t } = useTranslation();
+    const sensorDetails = {
+        temperature: { icon: Thermometer, label: t("temperature"), unit: "°C" },
+        soil: { icon: Waves, label: t("soil_moisture"), unit: "%" },
+        rain: { icon: CloudRain, label: "Rain", unit: "" },
+        battery: { icon: Battery, label: t("battery"), unit: "%" },
+        wind: { icon: Wind, label: "Wind", unit: "km/h" },
+        lora: { icon: Rss, label: t("signal_strength"), unit: "dBm" }
+    };
+
     const details = sensorDetails[type];
     const numericValue = typeof value === 'string' ? parseFloat(value) : value;
 

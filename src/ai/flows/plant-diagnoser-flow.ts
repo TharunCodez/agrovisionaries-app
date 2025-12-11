@@ -15,6 +15,7 @@ const DiagnosePlantInputSchema = z.object({
     .describe(
       "A photo of a plant, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
     ),
+  language: z.string().describe('The language for the response.'),
 });
 export type DiagnosePlantInput = z.infer<typeof DiagnosePlantInputSchema>;
 
@@ -23,7 +24,7 @@ const DiagnosePlantOutputSchema = z.object({
   disease: z.string().describe("The name of the identified plant disease or pest. 'None' if healthy."),
   severity: z.enum(['Low', 'Medium', 'High', 'None']).describe("The severity of the issue."),
   treatment: z.string().describe('The recommended treatment or care instructions.'),
-  nextSteps: z.array(z.string()).describe('A list of recommended next steps for the farmer.'),
+  nextSteps: z.array(z.string()).describe('A list of recommended next steps for the farmer to take.'),
 });
 export type DiagnosePlantOutput = z.infer<typeof DiagnosePlantOutputSchema>;
 
@@ -36,6 +37,8 @@ const prompt = ai.definePrompt({
   input: {schema: DiagnosePlantInputSchema},
   output: {schema: DiagnosePlantOutputSchema},
   prompt: `You are an expert agricultural botanist specializing in diagnosing plant illnesses and pests for farmers in Sikkim, India.
+
+Your full response must be in {{language}}.
 
 Analyze the provided photo of a plant.
 

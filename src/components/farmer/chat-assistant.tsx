@@ -1,31 +1,28 @@
-
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Paperclip, Send, BrainCircuit, User, Bot, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 import { Badge } from '../ui/badge';
 import type { DiagnosePlantOutput } from '@/ai/flows/plant-diagnoser-flow';
 import { runDiagnosePlant, runGeneralChat } from '@/app/api/ai-actions';
-
+import { useTranslation } from 'react-i18next';
 
 type Message = {
   role: 'user' | 'assistant';
   content: string | React.ReactNode;
 };
 
-const initialMessages: Message[] = [
+export default function ChatAssistant() {
+  const { t, i18n } = useTranslation();
+  const [messages, setMessages] = useState<Message[]>([
     {
         role: 'assistant',
-        content: "Hello! I'm your AI assistant. How can I help you today? You can ask me questions about the app or upload a photo of a plant for a health diagnosis."
+        content: t('welcome_message')
     }
-]
-
-export default function ChatAssistant() {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -53,7 +50,7 @@ export default function ChatAssistant() {
         role: m.role,
         content: typeof m.content === 'string' ? m.content : 'Image diagnosis was displayed.'
       }));
-      const response = await runGeneralChat({ query: currentInput, history });
+      const response = await runGeneralChat({ query: currentInput, history, language: i18n.language });
       const assistantResponse: Message = {
         role: 'assistant',
         content: response
@@ -91,7 +88,7 @@ export default function ChatAssistant() {
         setMessages(prev => [...prev, { role: 'user', content: imagePreview }]);
 
         try {
-            const diagnosis = await runDiagnosePlant({ photoDataUri: dataUri });
+            const diagnosis = await runDiagnosePlant({ photoDataUri: dataUri, language: i18n.language });
             const assistantResponse: Message = {
                 role: 'assistant',
                 content: <DiagnosisCard diagnosis={diagnosis} />
@@ -117,8 +114,8 @@ export default function ChatAssistant() {
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <BrainCircuit className="h-8 w-8 text-primary" />
             </div>
-            <CardTitle>AI Assistant</CardTitle>
-            <CardDescription>Your personal farming support bot.</CardDescription>
+            <CardTitle>{t('ai_assistant')}</CardTitle>
+            <CardDescription>{t('ai_assistant_subtitle')}</CardDescription>
         </CardHeader>
         <div className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 overflow-y-auto p-4 pb-24" ref={scrollRef}>
@@ -171,21 +168,22 @@ export default function ChatAssistant() {
                     variant="ghost"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isLoading}
+                    aria-label={t('attach_image')}
                     >
                     <Paperclip className="h-5 w-5" />
-                    <span className="sr-only">Attach image</span>
+                    <span className="sr-only">{t('attach_image')}</span>
                 </Button>
                 <form onSubmit={handleSendMessage} className="flex-1 flex items-center gap-2">
                     <Input
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
-                        placeholder="Ask a question..."
+                        placeholder={t('ask_question')}
                         className="flex-1"
                         disabled={isLoading}
                     />
-                    <Button type="submit" size="icon" className="bg-primary rounded-full" disabled={isLoading || !input.trim()}>
+                    <Button type="submit" size="icon" className="bg-primary rounded-full" disabled={isLoading || !input.trim()} aria-label={t('send')}>
                         <Send className="h-5 w-5" />
-                        <span className="sr-only">Send</span>
+                        <span className="sr-only">{t('send')}</span>
                     </Button>
                 </form>
             </div>

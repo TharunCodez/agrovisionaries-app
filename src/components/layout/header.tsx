@@ -23,22 +23,21 @@ function getPageTitle(
   role: 'farmer' | 'government' | null
 ): string {
   if (role === 'government') {
-    if (pathname.startsWith('/government/dashboard'))
-      return 'Regional Agriculture Overview';
-    if (pathname.startsWith('/government/devices')) return 'Device Management';
-    if (pathname.startsWith('/government/map')) return 'Device Map';
-    if (pathname.startsWith('/government/notifications')) return 'Notifications';
-    if (pathname.startsWith('/government/farmers')) return 'Farmer Database';
-    if (pathname.startsWith('/government/analytics')) return 'Analytics';
-    if (pathname.startsWith('/government/settings')) return 'Settings';
+    if (pathname.includes('/dashboard')) return 'Regional Agriculture Overview';
+    if (pathname.includes('/devices')) return 'Device Management';
+    if (pathname.includes('/map')) return 'Device Map';
+    if (pathname.includes('/notifications')) return 'Notifications';
+    if (pathname.includes('/farmers')) return 'Farmer Database';
+    if (pathname.includes('/analytics')) return 'Analytics';
+    if (pathname.includes('/settings')) return 'Settings';
     return 'Government Portal';
   }
   if (role === 'farmer') {
-    if (pathname.startsWith('/farmer/dashboard')) return 'Dashboard';
-    if (pathname.startsWith('/farmer/devices')) return 'My Devices';
-    if (pathname.startsWith('/farmer/map')) return 'Farm Map';
-    if (pathname.startsWith('/farmer/notifications')) return 'Alerts';
-    if (pathname.startsWith('/farmer/settings')) return 'Settings';
+    if (pathname.includes('/dashboard')) return 'Dashboard';
+    if (pathname.includes('/devices')) return 'My Devices';
+    if (pathname.includes('/map')) return 'Farm Map';
+    if (pathname.includes('/notifications')) return 'Alerts';
+    if (pathname.includes('/settings')) return 'Settings';
     return 'Farmer Portal';
   }
   return 'Agro Visionaries';
@@ -62,7 +61,7 @@ export default function Header() {
         <h1 className="font-headline text-lg font-semibold">{pageTitle}</h1>
       </div>
       <div className="flex items-center gap-2 md:gap-4">
-        {role === 'farmer' && <LanguageSwitcher />}
+        <LanguageSwitcher />
         <ThemeToggle />
         <NotificationBell />
         <DropdownMenu>

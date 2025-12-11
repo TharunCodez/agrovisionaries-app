@@ -5,23 +5,25 @@ import { usePathname } from 'next/navigation';
 import { LayoutDashboard, HardDrive, Bell, User, BrainCircuit } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import NotificationBell from '../notifications/NotificationBell';
-
-const navItems = [
-  { href: '/farmer/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { href: '/farmer/devices', icon: HardDrive, label: 'Devices' },
-  { href: '/farmer/assistant', icon: BrainCircuit, label: 'Assistant' },
-  { href: '/farmer/notifications', icon: Bell, label: 'Alerts' },
-  { href: '/farmer/profile', icon: User, label: 'Profile' },
-];
+import { useTranslation } from "react-i18next";
 
 export default function FarmerBottomNav() {
   const pathname = usePathname();
+  const { t } = useTranslation();
+
+  const navItems = [
+    { href: '/farmer/dashboard', icon: LayoutDashboard, label: t('dashboard') },
+    { href: '/farmer/devices', icon: HardDrive, label: t('devices') },
+    { href: '/farmer/assistant', icon: BrainCircuit, label: t('assistant') },
+    { href: '/farmer/notifications', icon: Bell, label: t('alerts') },
+    { href: '/farmer/profile', icon: User, label: t('profile') },
+  ];
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t bg-background/95 backdrop-blur-sm md:hidden">
       <nav className="grid h-16 grid-cols-5 items-center justify-around">
         {navItems.map((item) => {
-          if (item.label === 'Alerts') {
+          if (item.label === t('alerts')) {
             const isActive = pathname.startsWith(item.href);
             return (
               <Link

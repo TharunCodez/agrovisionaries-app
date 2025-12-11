@@ -43,20 +43,23 @@
     "dotenv": "16.4.5",
     "embla-carousel-react": "8.1.6",
     "firebase": "11.9.1",
-    "framer-motion": "11.5.7",
-    "genkit": "1.20.0",
+    "framer-motion": "11.2.12",
+    "i18next": "^23.12.2",
+    "i18next-browser-languagedetector": "^7.2.1",
+    "i18next-http-backend": "^2.5.2",
     "leaflet": "1.9.4",
     "lucide-react": "0.417.0",
-    "next": "15.0.0-rc.0",
+    "next": "15.0.5",
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "react-day-picker": "9.11.3",
     "react-hook-form": "7.54.2",
+    "react-i18next": "^15.0.0",
     "react-leaflet": "4.2.1",
     "recharts": "2.15.1",
     "tailwind-merge": "2.4.0",
     "tailwindcss-animate": "1.0.7",
-    "vaul": "0.9.11",
+    "vaul": "0.9.1",
     "zod": "3.24.2"
   },
   "devDependencies": {
@@ -71,6 +74,21 @@
   },
   "overrides": {
     "react-leaflet": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    },
+    "cmdk": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    },
+    "embla-carousel-react": {
+      "react": "$react"
+    },
+    "framer-motion": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    },
+    "vaul": {
       "react": "$react",
       "react-dom": "$react-dom"
     }

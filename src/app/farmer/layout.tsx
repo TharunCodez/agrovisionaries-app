@@ -1,4 +1,3 @@
-
 'use client';
 import ChatAssistantButton from '@/components/farmer/chat-assistant-button';
 import FarmerBottomNav from '@/components/farmer/farmer-bottom-nav';
@@ -17,11 +16,11 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="min-h-screen">
-        <main className="w-full max-w-screen-2xl mx-auto p-4 md:p-6 lg:p-8">
-            {children}
-        </main>
-        <ChatAssistantButton />
-        <FarmerBottomNav />
+      <main className="w-full max-w-screen-2xl mx-auto p-4 md:p-6 lg:p-8">
+          {children}
+      </main>
+      <ChatAssistantButton />
+      <FarmerBottomNav />
     </div>
   );
 }

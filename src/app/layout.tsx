@@ -6,13 +6,14 @@ import { RoleProvider } from '@/contexts/role-context';
 import { ThemeProvider } from '@/contexts/theme-provider';
 import { DataProvider } from '@/contexts/data-context';
 import { FirebaseClientProvider } from '@/firebase';
+import { I18nProvider } from '@/components/i18n-provider';
 
 export const metadata: Metadata = {
   title: 'Agro Visionaries',
   description: 'A smart farming solution for modern agriculture.',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -32,14 +33,16 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <FirebaseClientProvider>
-          <ThemeProvider>
-            <RoleProvider>
-              <DataProvider>{children}</DataProvider>
-            </RoleProvider>
-          </ThemeProvider>
-          <Toaster />
-        </FirebaseClientProvider>
+        <I18nProvider>
+          <FirebaseClientProvider>
+            <ThemeProvider>
+              <RoleProvider>
+                <DataProvider>{children}</DataProvider>
+              </RoleProvider>
+            </ThemeProvider>
+            <Toaster />
+          </FirebaseClientProvider>
+        </I18nProvider>
       </body>
     </html>
   );
