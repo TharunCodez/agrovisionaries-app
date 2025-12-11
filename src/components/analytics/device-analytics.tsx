@@ -44,8 +44,9 @@ export function DeviceAnalytics() {
         if (!devices) {
             return [];
         }
-        const statusCounts = devices.reduce((acc, device) => {
-            const statusLabel = t(device.status?.toLowerCase() ?? 'offline');
+        const statusCounts: Record<string, number> = devices.reduce((acc, device) => {
+            const statusKey = device.status || 'Offline';
+            const statusLabel = chartConfig[statusKey as keyof typeof chartConfig]?.label || statusKey;
             acc[statusLabel] = (acc[statusLabel] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
@@ -55,7 +56,7 @@ export function DeviceAnalytics() {
             value, 
             fill: COLORS[Object.keys(chartConfig).find(key => chartConfig[key as keyof typeof chartConfig].label === name) as keyof typeof COLORS] 
         }));
-    }, [devices, t, chartConfig]);
+    }, [devices, chartConfig]);
 
     return (
         <Card className="flex flex-col">
