@@ -55,22 +55,6 @@ function ProfileLoading() {
     )
 }
 
-// Client-only utility function for uploading photo
-async function uploadProfilePhoto(userId: string, file: File) {
-  if (!userId || !file) {
-    throw new Error('Missing user ID or file.');
-  }
-  
-  const imgRef = ref(storage, `profilePhotos/${userId}/${file.name}`);
-
-  await uploadBytes(imgRef, file);
-  const url = await getDownloadURL(imgRef);
-
-  await updateDoc(doc(db, "farmers", userId), { photoUrl: url });
-
-  return url;
-}
-
 function useLogout() {
   const router = useRouter();
   const auth = useAuth();
@@ -84,7 +68,9 @@ function useLogout() {
       // Clear local state
       setUser(null);
       setRole(null);
-      setFarmers([]); // Clear data context
+      if (setFarmers) {
+        setFarmers([]); // Clear data context
+      }
       localStorage.removeItem('userRole');
       localStorage.removeItem('user');
       localStorage.removeItem('agrovisionaries-locale');
@@ -114,10 +100,19 @@ export default function FarmerProfilePage() {
     setUploading(true);
 
     try {
-      const photoUrl = await uploadProfilePhoto(user.uid, file);
-      
-      // Optimistically update the local state to show the new photo immediately
-      setFarmers(prev => prev ? [{ ...prev[0], photoUrl }] : [{...farmer, photoUrl}]);
+      const storageRef = ref(storage, `profilePhotos/${user.uid}/farmer_img.jpg`);
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+      await updateDoc(doc(db, "farmers", user.uid), { photoUrl: url });
+
+      if (setFarmers) {
+          setFarmers(prev => {
+              if (!prev) return null;
+              const newFarmers = [...prev];
+              newFarmers[0] = { ...newFarmers[0], photoUrl: url };
+              return newFarmers;
+          });
+      }
 
       toast({
         title: 'Photo Uploaded!',
@@ -196,8 +191,8 @@ export default function FarmerProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {farmer?.plots?.length > 0 ? (
-            farmer.plots.map((plot, index) => (
-              <div key={plot.surveyNumber ?? index} className="rounded-lg border bg-muted/20 p-4">
+            farmer.plots.map((plot) => (
+              <div key={plot.surveyNumber} className="rounded-lg border bg-muted/20 p-4">
                 <p className="font-bold">{t('surveyNumber')}: {plot.surveyNumber}</p>
                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                   <p><span className="font-semibold">{t('area')}:</span> {plot.areaAcres} acres</p>
@@ -221,12 +216,8 @@ export default function FarmerProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {farmer?.devices && farmer.devices.length > 0 ? (
-            farmer.devices.map((deviceId: string, index: number) => (
-              // This part assumes device details are not embedded in farmer.devices
-              // It's just an array of IDs as per schema.
-              // A proper implementation would fetch device details separately if needed.
-              // For now, we just list the IDs.
-              <div key={deviceId ?? index} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
+            farmer.devices.map((deviceId: string) => (
+              <div key={deviceId} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
                   <p className="font-bold">{`Device ID: ${deviceId}`}</p>
               </div>
             ))

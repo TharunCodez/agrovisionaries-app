@@ -87,7 +87,7 @@ interface DataContextType {
   farmers: Farmer[] | null;
   sensorData: SensorData[] | null;
   isLoading: boolean;
-  setFarmers: (farmers: ((prevState: Farmer[] | null) => Farmer[] | null) | Farmer[] | null) => void;
+  setFarmers: React.Dispatch<React.SetStateAction<Farmer[] | null>> | null;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -113,7 +113,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   // Data fetching logic
   useEffect(() => {
     // Wait for firestore and user role to be available
-    if (!firestore || !role || !user) {
+    if (!firestore || !user || !role) {
       if (!isFirebaseLoading) {
         setIsDataLoading(false);
       }
@@ -171,7 +171,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
     fetchData();
 
-  }, [firestore, user, role]);
+  }, [firestore, user, role, isFirebaseLoading]);
 
 
   // For now, sensorData is mock.
@@ -194,13 +194,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   const isLoading = isFirebaseLoading || isDataLoading;
 
-  const handleSetFarmers = useCallback((newFarmers: any) => {
-    setFarmers(newFarmers);
-  }, []);
-
   const value = useMemo(
-    () => ({ devices, farmers, sensorData, isLoading, setFarmers: handleSetFarmers }),
-    [devices, farmers, sensorData, isLoading, handleSetFarmers]
+    () => ({ devices, farmers, sensorData, isLoading, setFarmers }),
+    [devices, farmers, sensorData, isLoading]
   );
 
   return (
