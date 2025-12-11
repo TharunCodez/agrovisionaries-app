@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useRole } from '@/contexts/role-context';
-import { Leaf, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -78,7 +78,7 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <div className="mb-4 flex justify-center">
             <div className="rounded-full bg-primary p-3">
-              <Leaf className="h-8 w-8 text-primary-foreground" />
+              <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-8 w-8 object-contain" />
             </div>
           </div>
           <CardTitle className="text-3xl font-bold">Agro Visionaries</CardTitle>

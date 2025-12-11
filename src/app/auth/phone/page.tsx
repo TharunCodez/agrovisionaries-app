@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Leaf, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { checkFarmerExists } from '@/lib/auth';
 
 export default function PhoneLoginPage() {
@@ -47,7 +47,7 @@ export default function PhoneLoginPage() {
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary">
-                <Leaf className="h-10 w-10 text-primary-foreground" />
+                <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-10 w-10 object-contain" />
             </div>
           <CardTitle>Farmer Login</CardTitle>
           <CardDescription>Enter your phone number to receive a verification code.</CardDescription>

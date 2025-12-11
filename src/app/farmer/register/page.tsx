@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, PlusCircle, Trash2, Tractor, Leaf } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Tractor } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { registerFarmerAction } from '@/app/actions/register-farmer';
@@ -106,7 +106,7 @@ export default function FarmerSelfRegisterPage() {
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary">
-                <Leaf className="h-10 w-10 text-primary-foreground" />
+                <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-10 w-10 object-contain" />
             </div>
             <CardTitle className="text-3xl">Farmer Registration</CardTitle>
             <CardDescription>Create your account to get started with Agro Visionaries.</CardDescription>

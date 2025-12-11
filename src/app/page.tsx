@@ -4,7 +4,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { Leaf } from 'lucide-react';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
@@ -32,7 +31,7 @@ export default function Home() {
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center p-4 text-center">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8 flex items-center justify-center gap-3">
-            <Leaf className="h-10 w-10 md:h-12 md:w-12 text-primary" />
+            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-12 w-12 md:h-16 md:w-16 object-contain" />
             <h1 className="font-headline text-4xl md:text-7xl font-bold tracking-tight text-foreground">
               Agro Visionaries
             </h1>
