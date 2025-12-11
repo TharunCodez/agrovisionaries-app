@@ -14,9 +14,11 @@ i18n
   .init({
     fallbackLng: 'en',
     supportedLngs: ["en", "hi", "sk"],
-    debug: process.env.NODE_ENV === 'development',
+    debug: false,
     ns: ['common'],
     defaultNS: 'common',
+    keySeparator: '.', // IMPORTANT
+    nsSeparator: ':',   // IMPORTANT
     
     detection: {
       // order and from where user language should be detected
@@ -26,7 +28,7 @@ i18n
     },
 
     backend: {
-      loadPath: '/locales/{{lng}}/common.json',
+      loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
 
     interpolation: {
