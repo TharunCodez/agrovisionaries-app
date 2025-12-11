@@ -10,7 +10,6 @@ const nextConfig: NextConfig = {
   },
   experimental: {
   },
-  allowedDevOrigins: ["https://6000-firebase-studio-1765213199757.cluster-sumfw3zmzzhzkx4mpvz3ogth4y.cloudworkstations.dev"],
   images: {
     remotePatterns: [
       {
