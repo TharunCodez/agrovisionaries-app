@@ -1,3 +1,5 @@
+'use client';
+
 import type { Metadata } from 'next';
 import './globals.css';
 import 'leaflet/dist/leaflet.css';
@@ -6,12 +8,8 @@ import { RoleProvider } from '@/contexts/role-context';
 import { ThemeProvider } from '@/contexts/theme-provider';
 import { DataProvider } from '@/contexts/data-context';
 import { FirebaseClientProvider } from '@/firebase';
-import { I18nProvider } from '@/components/i18n-provider';
-
-export const metadata: Metadata = {
-  title: 'Agro Visionaries',
-  description: 'A smart farming solution for modern agriculture.',
-};
+import { I18nextProvider } from 'react-i18next';
+import i18n from '@/lib/i18n/client';
 
 export default function RootLayout({
   children,
@@ -34,14 +32,14 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <ThemeProvider>
-            <I18nProvider>
-              <FirebaseClientProvider>
-                <RoleProvider>
-                  <DataProvider>{children}</DataProvider>
-                </RoleProvider>
-              </FirebaseClientProvider>
-              <Toaster />
-            </I18nProvider>
+          <I18nextProvider i18n={i18n}>
+            <FirebaseClientProvider>
+              <RoleProvider>
+                <DataProvider>{children}</DataProvider>
+              </RoleProvider>
+            </FirebaseClientProvider>
+            <Toaster />
+          </I18nextProvider>
         </ThemeProvider>
       </body>
     </html>

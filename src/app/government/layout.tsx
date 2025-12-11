@@ -2,13 +2,16 @@
 import AppSidebar from '@/components/layout/app-sidebar';
 import Header from '@/components/layout/header';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
-import { I18nProvider } from '@/components/i18n-provider';
+import { useTranslation } from "react-i18next";
 
 export default function GovernmentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // This forces the namespace to be loaded on mount for client components
+  useTranslation("common");
+
   return (
     <SidebarProvider>
       <AppSidebar />

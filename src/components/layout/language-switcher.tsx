@@ -7,14 +7,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { availableLanguages } from "@/lib/i18n/config";
 import { Globe } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
-const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'hi', name: 'हिन्दी' },
-  { code: 'sk', name: 'Sikkimese' },
-];
 
 export default function LanguageSwitcher() {
   const { i18n } = useTranslation();
@@ -26,7 +21,7 @@ export default function LanguageSwitcher() {
   const selectedLanguageCode = i18n.language || 'en';
   // Handle cases like 'en-US' by taking the first part
   const baseLanguageCode = selectedLanguageCode.split('-')[0];
-  const selectedLanguage = languages.find(lang => lang.code === baseLanguageCode) || languages[0];
+  const selectedLanguage = availableLanguages.find(lang => lang.code === baseLanguageCode) || availableLanguages[0];
 
   return (
     <DropdownMenu>
@@ -37,7 +32,7 @@ export default function LanguageSwitcher() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {languages.map((lang) => (
+        {availableLanguages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
             onSelect={() => handleLocaleChange(lang.code)}
