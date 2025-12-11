@@ -6,6 +6,8 @@ import { LayoutDashboard, HardDrive, Bell, User, BrainCircuit } from 'lucide-rea
 import { cn } from '@/lib/utils';
 import NotificationBell from '../notifications/NotificationBell';
 import { useTranslation } from "react-i18next";
+import LanguageSwitcher from '../layout/language-switcher';
+import ThemeToggle from '../layout/theme-toggle';
 
 export default function FarmerBottomNav() {
   const pathname = usePathname();
