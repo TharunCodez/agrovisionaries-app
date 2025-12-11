@@ -12,10 +12,9 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/role-context';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "@/firebase";
+import { db, storage, auth } from "@/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { signOut } from 'firebase/auth';
-import { useAuth } from '@/firebase';
 
 function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, icon?: React.ElementType }) {
     const IconComponent = Icon || User;
@@ -56,12 +55,10 @@ function ProfileLoading() {
 
 function useLogout() {
   const router = useRouter();
-  const auth = useAuth();
   const { setUser, setRole } = useRole();
   const { setFarmers } = useData();
 
   return async () => {
-    if (!auth) return;
     try {
       await signOut(auth);
       // Clear local state
@@ -106,7 +103,7 @@ export default function FarmerProfilePage() {
 
       if (setFarmers) {
           setFarmers(prev => {
-              if (!prev) return null;
+              if (!prev || prev.length === 0) return [];
               const newFarmers = [...prev];
               newFarmers[0] = { ...newFarmers[0], photoUrl: url };
               return newFarmers;
