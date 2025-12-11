@@ -3,7 +3,7 @@
 import type { Farmer } from '@/contexts/data-context';
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
-import { firebaseConfig } from '@/firebase';
+import { firebaseConfig } from '@/firebase/config';
 
 // Helper to initialize Firebase App on the server for actions
 // This creates a temporary app instance and should be used sparingly.
