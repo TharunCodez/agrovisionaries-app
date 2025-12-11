@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
-import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/role-context';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "@/firebase";
@@ -33,7 +32,7 @@ function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, 
 function ProfileLoading() {
     const { t } = useTranslation();
      return (
-        <div className="flex flex-col gap-6 pb-20 md:pb-6">
+        <div className="space-y-8 pb-20 md:pb-6">
             <div className="flex items-center justify-between">
               <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('your_profile')}</h1>
               <Skeleton className="h-10 w-24" />
@@ -106,8 +105,8 @@ export default function FarmerProfilePage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 pb-20 md:pb-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="space-y-8 pb-20 md:pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('your_profile')}</h1>
         <Button disabled>
           <Edit className="mr-2 h-4 w-4" />
@@ -116,7 +115,7 @@ export default function FarmerProfilePage() {
       </div>
       
       <Card>
-        <CardHeader className="items-center text-center">
+        <CardHeader className="items-center text-center p-6">
           <div className="relative">
             <Avatar className="mx-auto h-28 w-28 border-4 border-primary">
                 <AvatarImage

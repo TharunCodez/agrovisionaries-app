@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import Link from 'next/link';
 import { Skeleton } from "@/components/ui/skeleton";
 import ChatAssistant from "@/components/farmer/chat-assistant";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useTranslation } from "react-i18next";
 
 export default function FarmerDashboardPage() {
@@ -20,41 +19,36 @@ export default function FarmerDashboardPage() {
 
   if (isLoading) {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_2fr_3fr] gap-6">
-            <div className="lg:col-span-2 flex flex-col gap-6">
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-96 w-full" />
-                <Skeleton className="h-48 w-full" />
-            </div>
-            <div className="hidden lg:block">
-                <Skeleton className="h-[calc(100vh-10rem)] w-full" />
-            </div>
+        <div className="space-y-8">
+          <Skeleton className="h-10 w-1/3" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 flex flex-col gap-6">
+                  <Skeleton className="h-96 w-full" />
+                  <Skeleton className="h-48 w-full" />
+              </div>
+              <div className="hidden lg:block">
+                  <Skeleton className="h-[calc(100vh-10rem)] w-full" />
+              </div>
+          </div>
         </div>
     )
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="space-y-6 sm:space-y-8 lg:space-y-10 pb-20 md:pb-6">
         <div className="flex items-center justify-between">
             <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('dashboard')}</h1>
-             {farmer && (
-                <div className="flex items-center gap-3">
-                    <span className="font-semibold">{farmer.name}</span>
-                    <Avatar className="h-10 w-10 md:h-12 md:w-12">
-                        <AvatarImage src={farmer.photoUrl ?? ''} alt={farmer.name} />
-                        <AvatarFallback>{farmer.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
-                    </Avatar>
-                </div>
-            )}
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_2fr_3fr] gap-6 pb-20 md:pb-6">
-            <div className="lg:col-span-2 flex flex-col gap-6">
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8">
+            {/* Main content */}
+            <div className="lg:col-span-2 flex flex-col gap-6 xl:gap-8">
                 {devices && devices.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {devices.map(device => (
-                    <DeviceDashboardCard key={device.id} device={device} />
-                  ))}
-                </div>
+                    <div className="grid grid-cols-1 gap-6">
+                      {devices.map(device => (
+                        <DeviceDashboardCard key={device.id} device={device} />
+                      ))}
+                    </div>
                 ) : (
                 <Card>
                     <CardHeader>
@@ -70,11 +64,13 @@ export default function FarmerDashboardPage() {
                 )}
                 <SmartAlert />
             </div>
-            <div className="hidden lg:block lg:col-start-3">
-                <div className="sticky top-4">
+
+            {/* Sticky Sidebar */}
+            <aside className="hidden lg:block lg:col-span-1">
+                <div className="sticky top-24">
                     <ChatAssistant />
                 </div>
-            </div>
+            </aside>
         </div>
     </div>
   );

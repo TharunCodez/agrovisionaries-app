@@ -109,7 +109,7 @@ export default function ChatAssistant() {
   };
 
   return (
-    <Card className="flex flex-col h-full max-h-[calc(100vh-12rem)] md:shadow-lg border-0 md:border md:shadow-sm">
+    <Card className="flex flex-col h-full max-h-[calc(100vh-12rem)] md:shadow-lg border-0 md:border md:shadow-sm rounded-xl overflow-hidden">
         <CardHeader className='text-center hidden md:block'>
             <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                 <BrainCircuit className="h-8 w-8 text-primary" />
@@ -118,7 +118,7 @@ export default function ChatAssistant() {
             <CardDescription>{t('ai_assistant_subtitle')}</CardDescription>
         </CardHeader>
         <div className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 overflow-y-auto p-4 pb-24" ref={scrollRef}>
+            <div className="flex-1 overflow-y-auto p-4 pb-28 md:pb-24" ref={scrollRef}>
               <div className="space-y-4">
                 {messages.map((message, index) => (
                   <div key={index} className={`flex items-start gap-2 ${message.role === 'user' ? 'justify-end' : ''}`}>
@@ -153,7 +153,7 @@ export default function ChatAssistant() {
                 )}
               </div>
             </div>
-            <div className="w-full sticky bottom-0 bg-background border-t p-3 flex items-center gap-3 z-50 pointer-events-auto">
+            <div className="w-full absolute bottom-0 bg-background/80 backdrop-blur-sm border-t p-3 flex items-center gap-3 z-50 pointer-events-auto">
                  <input
                     type="file"
                     ref={fileInputRef}

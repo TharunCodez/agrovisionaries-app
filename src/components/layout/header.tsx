@@ -22,11 +22,12 @@ import { useData } from '@/contexts/data-context';
 import { useLogout } from '@/hooks/use-logout';
 import { Leaf } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 export default function Header() {
-  const { isMobile } = useSidebar();
+  const isMobile = useMediaQuery('(max-width: 767px)');
   const pathname = usePathname();
-  const { role, user } = useRole();
+  const { role } = useRole();
   const { farmers } = useData();
   const { t } = useTranslation();
   const logout = useLogout();
@@ -53,7 +54,7 @@ export default function Header() {
 
   const pageTitle = getPageTitle(pathname, role, t);
 
-  const navItems = [
+  const farmerNavItems = [
     { href: '/farmer/dashboard', label: t('dashboard') },
     { href: '/farmer/devices', label: t('devices') },
     { href: '/farmer/assistant', label: t('assistant') },
@@ -96,57 +97,70 @@ export default function Header() {
   }
 
   // Farmer Header
-  return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 px-6 py-3 backdrop-blur-sm md:px-8 lg:px-12">
-        <div className="flex items-center justify-between">
+  if (isMobile) {
+      return (
+        <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-card/80 px-4 backdrop-blur-sm md:px-6">
             <Link href="/farmer/dashboard" className="flex items-center gap-2">
                 <Leaf className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">Farmer Portal</span>
+                <span className="text-lg font-bold">Farmer Portal</span>
             </Link>
-
-            <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
-                {navItems.map((item) => (
-                    <Link
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                            'transition-colors hover:text-primary',
-                            pathname.startsWith(item.href) ? 'text-primary' : 'text-muted-foreground'
-                        )}
-                    >
-                        {item.label}
-                    </Link>
-                ))}
-            </nav>
-
-            <div className="flex items-center gap-2 md:gap-4">
-                <LanguageSwitcher />
-                <ThemeToggle />
-                <NotificationBell />
-
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                            <Avatar className="h-10 w-10">
-                                <AvatarImage src={farmer?.photoUrl ?? ''} alt={farmer?.name} />
-                                <AvatarFallback>{farmer?.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
-                            </Avatar>
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56">
-                        <DropdownMenuLabel>{farmer?.name ?? "My Account"}</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem asChild>
-                            <Link href="/farmer/profile">{t('profile')}</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem asChild>
-                            <Link href="/farmer/settings">Settings</Link>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={logout}>{t('logout')}</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+            <div className='flex items-center'>
+              <LanguageSwitcher />
+              <ThemeToggle />
             </div>
+        </div>
+      )
+  }
+  
+  return (
+    <header className="hidden md:flex w-full sticky top-0 z-50 bg-background/95 backdrop-blur-sm px-6 lg:px-12 py-3 justify-between items-center border-b">
+        <Link href="/farmer/dashboard" className="flex items-center gap-2">
+            <Leaf className="h-6 w-6 text-primary" />
+            <span className="text-xl font-bold">Farmer Portal</span>
+        </Link>
+
+        <nav className="flex items-center gap-6 text-sm font-medium">
+            {farmerNavItems.map((item) => (
+                <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                        'transition-colors hover:text-primary',
+                        pathname.startsWith(item.href) ? 'text-primary' : 'text-muted-foreground'
+                    )}
+                >
+                    {item.label}
+                </Link>
+            ))}
+        </nav>
+
+        <div className="flex items-center gap-2 md:gap-4">
+            <LanguageSwitcher />
+            <ThemeToggle />
+            <NotificationBell />
+
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                        <Avatar className="h-10 w-10">
+                            <AvatarImage src={farmer?.photoUrl ?? ''} alt={farmer?.name} />
+                            <AvatarFallback>{farmer?.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
+                        </Avatar>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuLabel>{farmer?.name ?? "My Account"}</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                        <Link href="/farmer/profile">{t('profile')}</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href="/farmer/settings">Settings</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout}>{t('logout')}</DropdownMenuItem>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </div>
     </header>
   );

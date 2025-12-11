@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ChevronRight, HardDrive, Battery, Rss } from 'lucide-react';
+import { ChevronRight, HardDrive } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -51,8 +51,8 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
   return (
-    <Card className="w-full">
-      <CardHeader className='flex-row items-center justify-between'>
+    <Card className="w-full rounded-xl shadow-sm border p-4 sm:p-6">
+      <CardHeader className='flex-row items-center justify-between p-0 mb-4'>
         <div>
             <div className='flex items-center gap-3'>
                 <HardDrive className='h-6 w-6 text-primary' />
@@ -65,7 +65,7 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
             <p className='text-xs text-muted-foreground'>{t('last_updated')} {timeAgo}</p>
          </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-0">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <WaterTank level={device.waterLevel} />
             <PumpControlCard />
@@ -79,7 +79,7 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
             value={Math.round(device.rssi / -2 + 80)}
           />
         </div>
-         <div className="mt-4 flex justify-end border-t pt-4">
+         <div className="mt-6 flex justify-end border-t pt-4">
             <Button asChild variant="outline">
                 <Link href={`/farmer/devices/${device.id}`}>
                     {t('view_details')} <ChevronRight className='ml-2 h-4 w-4' />
