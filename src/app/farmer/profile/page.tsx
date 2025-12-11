@@ -25,6 +25,30 @@ function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, 
     );
 }
 
+function ProfileLoading() {
+    const { t } = useTranslation();
+     return (
+        <div className="flex flex-col gap-6 pb-20 md:pb-6">
+            <div className="flex items-center justify-between">
+              <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('profile_title')}</h1>
+              <Skeleton className="h-10 w-24" />
+            </div>
+            <Card>
+                <CardHeader className="text-center">
+                    <Skeleton className="mx-auto h-28 w-28 rounded-full" />
+                    <Skeleton className="h-6 w-32 mx-auto mt-4" />
+                    <Skeleton className="h-4 w-24 mx-auto mt-2" />
+                </CardHeader>
+                <CardContent>
+                    <Skeleton className="h-10 w-full" />
+                </CardContent>
+            </Card>
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-48 w-full" />
+        </div>
+    )
+}
+
 export default function FarmerProfilePage() {
   const { farmers, isLoading: isDataLoading, setFarmers } = useData();
   const { t } = useTranslation();
@@ -67,29 +91,9 @@ export default function FarmerProfilePage() {
     }
   };
 
-  if (isDataLoading) {
-    return (
-        <div className="flex flex-col gap-6 pb-20 md:pb-6">
-            <div className="flex items-center justify-between">
-              <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('profile_title')}</h1>
-              <Skeleton className="h-10 w-24" />
-            </div>
-            <Card>
-                <CardHeader className="text-center">
-                    <Skeleton className="mx-auto h-28 w-28 rounded-full" />
-                    <Skeleton className="h-6 w-32 mx-auto mt-4" />
-                    <Skeleton className="h-4 w-24 mx-auto mt-2" />
-                </CardHeader>
-                <CardContent>
-                    <Skeleton className="h-10 w-full" />
-                </CardContent>
-            </Card>
-            <Skeleton className="h-64 w-full" />
-            <Skeleton className="h-48 w-full" />
-        </div>
-    )
+  if (isDataLoading || !farmer) {
+    return <ProfileLoading />
   }
-  if (!farmer) return <div className="p-6 text-center">No profile found. You may need to log in again.</div>;
 
   return (
     <div className="flex flex-col gap-8 pb-20 md:pb-6">
@@ -106,10 +110,10 @@ export default function FarmerProfilePage() {
           <div className="relative">
             <Avatar className="mx-auto h-28 w-28 border-4 border-primary">
                 <AvatarImage
-                    src={farmer.photoUrl ?? ''}
-                    alt={farmer.name}
+                    src={farmer?.photoUrl ?? ''}
+                    alt={farmer?.name}
                 />
-                <AvatarFallback>{farmer.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
+                <AvatarFallback>{farmer?.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
             </Avatar>
             <input 
                 type="file" 
@@ -128,14 +132,14 @@ export default function FarmerProfilePage() {
             </Button>
           </div>
           <div className="text-center mt-4">
-            <CardTitle>{farmer.name}</CardTitle>
-            <p className="text-sm text-muted-foreground">{farmer.phone}</p>
+            <CardTitle>{farmer?.name}</CardTitle>
+            <p className="text-sm text-muted-foreground">{farmer?.phone}</p>
           </div>
         </CardHeader>
         <CardContent>
              <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-                <ProfileItem label={t('aadhaar')} value={farmer.aadhaar} icon={User} />
-                <ProfileItem label={t('address')} value={`${farmer.address}, ${farmer.village}, ${farmer.district}`} icon={MapPin} />
+                <ProfileItem label={t('aadhaar')} value={farmer?.aadhaar} icon={User} />
+                <ProfileItem label={t('address')} value={`${farmer?.address ?? ''}, ${farmer?.village ?? ''}, ${farmer?.district ?? ''}`} icon={MapPin} />
              </div>
         </CardContent>
       </Card>
@@ -148,7 +152,7 @@ export default function FarmerProfilePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {farmer.plots?.length > 0 ? (
+          {farmer?.plots?.length > 0 ? (
             farmer.plots.map((plot: any, index: number) => (
               <div key={index} className="rounded-lg border bg-muted/20 p-4">
                 <p className="font-bold">{t('survey_number')}: {plot.surveyNumber}</p>
@@ -173,7 +177,7 @@ export default function FarmerProfilePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {farmer.devices && farmer.devices.length > 0 ? (
+          {farmer?.devices && farmer.devices.length > 0 ? (
             farmer.devices.map((device: any) => (
               <div key={device.id} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
                 <div>
@@ -182,7 +186,7 @@ export default function FarmerProfilePage() {
                    <p className="text-sm text-muted-foreground">Jalkund Capacity: {device.jalkundMaxQuantity}L</p>
                 </div>
                 <Badge variant={device.status === 'Online' ? 'default' : 'destructive'} className={device.status === 'Online' ? 'bg-green-600' : ''}>
-                  {t(device.status.toLowerCase())}
+                  {t(device.status?.toLowerCase() ?? 'offline')}
                 </Badge>
               </div>
             ))

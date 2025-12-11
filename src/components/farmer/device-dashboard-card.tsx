@@ -18,7 +18,8 @@ import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from "react-i18next";
 
-const getStatusBadgeClass = (status: string) => {
+const getStatusBadgeClass = (status?: string) => {
+    if (!status) return 'bg-gray-500';
     switch (status.toLowerCase()) {
         case 'online':
             return 'bg-green-600 hover:bg-green-700';
@@ -49,7 +50,7 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
             <p className='text-sm text-muted-foreground ml-9'>{t('survey_number')}: {device.surveyNumber}</p>
         </div>
          <div className='flex flex-col items-end gap-2'>
-            <Badge className={cn("text-white", getStatusBadgeClass(device.status))}>{t(device.status.toLowerCase())}</Badge>
+            <Badge className={cn("text-white", getStatusBadgeClass(device.status))}>{t(device.status?.toLowerCase() ?? 'offline')}</Badge>
             <p className='text-xs text-muted-foreground'>{t('last_updated')} {timeAgo}</p>
          </div>
       </CardHeader>

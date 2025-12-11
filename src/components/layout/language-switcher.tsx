@@ -23,7 +23,10 @@ export default function LanguageSwitcher() {
     i18n.changeLanguage(newLocale);
   };
 
-  const selectedLanguage = languages.find(lang => lang.code === i18n.language) || languages[0];
+  const selectedLanguageCode = i18n.language || 'en';
+  // Handle cases like 'en-US' by taking the first part
+  const baseLanguageCode = selectedLanguageCode.split('-')[0];
+  const selectedLanguage = languages.find(lang => lang.code === baseLanguageCode) || languages[0];
 
   return (
     <DropdownMenu>

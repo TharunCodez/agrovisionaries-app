@@ -17,6 +17,7 @@ export default function DeviceCard({ device }: { device: Device }) {
     const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
     const getHealthBadgeClass = () => {
+        if (!device.health) return 'bg-gray-400';
         switch (device.health) {
             case 'Excellent': return 'bg-green-600';
             case 'Good': return 'bg-blue-500';
@@ -27,6 +28,7 @@ export default function DeviceCard({ device }: { device: Device }) {
     };
     
     const getStatusBadgeClass = () => {
+        if (!device.status) return 'bg-gray-500';
         switch (device.status) {
             case 'Online': return 'bg-green-600';
             case 'Warning': return 'bg-yellow-500 text-black';
@@ -72,7 +74,7 @@ export default function DeviceCard({ device }: { device: Device }) {
                 <div className="flex flex-col items-start sm:items-end gap-2 shrink-0">
                      <div className="flex gap-2">
                         <Badge variant={'default'} className={cn('text-white', getStatusBadgeClass())}>
-                            {t(device.status.toLowerCase())}
+                            {t(device.status?.toLowerCase() ?? 'offline')}
                         </Badge>
                          <Badge className={cn(getHealthBadgeClass(), 'text-white')}>{device.health}</Badge>
                      </div>

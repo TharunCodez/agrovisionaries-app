@@ -117,7 +117,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
             <Badge
               className={getStatusBadgeClass()}
             >
-              {t(device.status.toLowerCase())}
+              {t(device.status?.toLowerCase() ?? 'offline')}
             </Badge>
           </div>
           <div className="mt-2 flex items-center justify-between">
