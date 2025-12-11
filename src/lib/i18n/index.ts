@@ -17,8 +17,8 @@ i18n
     debug: false,
     ns: ['common'],
     defaultNS: 'common',
-    keySeparator: '.', // IMPORTANT
-    nsSeparator: ':',   // IMPORTANT
+    keySeparator: '.', // IMPORTANT: Enables nested key access
+    nsSeparator: ':',   // Standard separator, good practice to define
     
     detection: {
       // order and from where user language should be detected
@@ -36,7 +36,7 @@ i18n
     },
     
     react: {
-      useSuspense: false,
+      useSuspense: false, // Fix for hot-reloading issues
     },
     
     // This is crucial to prevent i18next from trying to load region-specific files like `en-US`

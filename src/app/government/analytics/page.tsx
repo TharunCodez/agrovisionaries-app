@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 
 export default function GovernmentAnalyticsPage() {
     const { devices, farmers } = useData();
-    const { t } = useTranslation();
+    const { t } = useTranslation("common");
 
     const stats = useMemo(() => {
         if (!devices || !farmers) {

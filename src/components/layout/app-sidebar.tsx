@@ -33,15 +33,15 @@ export default function AppSidebar() {
   const logout = useLogout();
 
   const governmentMenuItems = [
-    { href: '/government/dashboard', label: t('gov.sidebar.dashboard'), icon: LayoutDashboard },
-    { href: '/government/devices', label: t('gov.sidebar.devices'), icon: HardDrive },
-    { href: '/government/map', label: t('gov.sidebar.map'), icon: Map },
-    { href: '/government/satellite', label: t('gov.sidebar.satellite'), icon: Satellite },
-    { href: '/government/notifications', label: t('gov.sidebar.notifications'), icon: Bell },
-    { href: '/government/farmers', label: t('gov.sidebar.farmers'), icon: Users },
-    { href: '/government/farmers/register', label: t('gov.sidebar.registerFarmer'), icon: UserPlus },
-    { href: '/government/analytics', label: t('gov.sidebar.analytics'), icon: BarChart },
-    { href: '/government/settings', label: t('gov.sidebar.settings'), icon: Settings },
+    { href: '/government/dashboard', label: 'gov.sidebar.dashboard', icon: LayoutDashboard },
+    { href: '/government/devices', label: 'gov.sidebar.devices', icon: HardDrive },
+    { href: '/government/map', label: 'gov.sidebar.map', icon: Map },
+    { href: '/government/satellite', label: 'gov.sidebar.satellite', icon: Satellite },
+    { href: '/government/notifications', label: 'gov.sidebar.notifications', icon: Bell },
+    { href: '/government/farmers', label: 'gov.sidebar.farmers', icon: Users },
+    { href: '/government/farmers/register', label: 'gov.sidebar.registerFarmer', icon: UserPlus },
+    { href: '/government/analytics', label: 'gov.sidebar.analytics', icon: BarChart },
+    { href: '/government/settings', label: 'gov.sidebar.settings', icon: Settings },
   ];
 
   return (
@@ -61,11 +61,11 @@ export default function AppSidebar() {
               <SidebarMenuButton
                 asChild
                 isActive={pathname === item.href || (item.href !== '/government/dashboard' && pathname.startsWith(item.href))}
-                tooltip={{ children: item.label, side: 'right' }}
+                tooltip={{ children: t(item.label), side: 'right' }}
               >
                 <Link href={item.href}>
                   <item.icon />
-                  <span>{item.label}</span>
+                  <span>{t(item.label)}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

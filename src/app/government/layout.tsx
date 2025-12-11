@@ -10,16 +10,14 @@ export default function GovernmentLayout({
   children: React.ReactNode;
 }) {
   return (
-    <I18nProvider>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset>
-          <div className="flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1 bg-background p-4 md:p-6 lg:p-8">{children}</main>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </I18nProvider>
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <div className="flex min-h-screen flex-col">
+          <Header />
+          <main className="flex-1 bg-background p-4 md:p-6 lg:p-8">{children}</main>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
