@@ -14,6 +14,7 @@ import { type AppNotification, markNotificationAsRead } from '@/lib/notification
 import { useRole } from '@/contexts/role-context';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
+import { Timestamp } from 'firebase/firestore';
 
 const iconMap = {
   pump_on: Power,
@@ -35,7 +36,8 @@ export default function NotificationCard({ notification }: { notification: AppNo
   const Icon = iconMap[notification.type] || Siren;
   const colorClasses = urgencyColors[notification.urgency] || urgencyColors.low;
   
-  const timeAgo = formatDistanceToNow(notification.timestamp, { addSuffix: true });
+  const timestamp = notification.timestamp instanceof Timestamp ? notification.timestamp.toDate() : notification.timestamp;
+  const timeAgo = formatDistanceToNow(timestamp, { addSuffix: true });
 
   const handleMarkAsRead = () => {
     if (user && !notification.read) {

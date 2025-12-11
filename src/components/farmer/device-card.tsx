@@ -8,12 +8,23 @@ import { formatDistanceToNow } from 'date-fns';
 import { Button } from "../ui/button";
 import { type Device } from '@/contexts/data-context';
 import { useTranslation } from "react-i18next";
+import { Timestamp } from "firebase/firestore";
+
+function toDate(timestamp: Timestamp | Date | undefined): Date {
+  if (timestamp instanceof Timestamp) {
+    return timestamp.toDate();
+  }
+  if (timestamp instanceof Date) {
+    return timestamp;
+  }
+  return new Date();
+}
 
 export default function DeviceCard({ device }: { device: Device }) {
     const { t } = useTranslation();
     const isOnline = device.status === 'Online';
     
-    const lastUpdated = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
+    const lastUpdated = toDate(device.lastUpdated);
     const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
     const getHealthBadgeClass = () => {
@@ -28,12 +39,13 @@ export default function DeviceCard({ device }: { device: Device }) {
     };
     
     const getStatusBadgeClass = () => {
-        if (!device.status) return 'bg-gray-500';
-        switch (device.status) {
-            case 'Online': return 'bg-green-600';
-            case 'Warning': return 'bg-yellow-500 text-black';
-            case 'Critical': return 'bg-orange-600';
-            case 'Offline': return 'bg-red-600';
+        const status = device.status?.toLowerCase();
+        if (!status) return 'bg-gray-500';
+        switch (status) {
+            case 'online': return 'bg-green-600';
+            case 'warning': return 'bg-yellow-500 text-black';
+            case 'critical': return 'bg-orange-600';
+            case 'offline': return 'bg-red-600';
             default: return 'bg-gray-500';
         }
     };

@@ -27,11 +27,22 @@ import WaterTank from '@/components/farmer/water-tank';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useData } from '@/contexts/data-context';
 import { useTranslation } from 'react-i18next';
+import { Timestamp } from 'firebase/firestore';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full" />,
 });
+
+function toDate(timestamp: Timestamp | Date | undefined): Date {
+  if (timestamp instanceof Timestamp) {
+    return timestamp.toDate();
+  }
+  if (timestamp instanceof Date) {
+    return timestamp;
+  }
+  return new Date();
+}
 
 // This is now the Client Component part of the page
 function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
@@ -72,8 +83,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
     [device]
   );
 
-  const lastUpdated =
-    device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
+  const lastUpdated = toDate(device.lastUpdated);
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
     
   const getStatusBadgeClass = () => {

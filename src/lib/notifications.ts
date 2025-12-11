@@ -6,6 +6,8 @@ import {
   limit,
   updateDoc,
   doc,
+  Timestamp,
+  setDoc
 } from 'firebase/firestore';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { initializeFirebase, useFirestore } from '@/firebase';
@@ -21,7 +23,7 @@ export interface AppNotification {
     | 'device_offline';
   title: string;
   message: string;
-  timestamp: any; // Firestore Timestamp
+  timestamp: Date | Timestamp; 
   read: boolean;
   urgency: 'high' | 'medium' | 'low';
 }
@@ -97,7 +99,9 @@ export function listenForNotifications(
     (querySnapshot) => {
       const notifications: AppNotification[] = [];
       querySnapshot.forEach((doc) => {
-        notifications.push({ id: doc.id, ...doc.data() } as AppNotification);
+        const data = doc.data();
+        const timestamp = data.timestamp instanceof Timestamp ? data.timestamp.toDate() : new Date();
+        notifications.push({ id: doc.id, ...data, timestamp } as AppNotification);
       });
       callback(notifications);
     },

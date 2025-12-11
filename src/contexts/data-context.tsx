@@ -45,7 +45,7 @@ export type Farmer = {
   plots: Plot[];
   devices: string[]; // array of device IDs
   photoUrl: string | null;
-  createdAt: Timestamp;
+  createdAt: Timestamp | Date;
 };
 
 export type Device = {
@@ -58,11 +58,11 @@ export type Device = {
   areaAcres: number;
   landType: 'Irrigated' | 'Unirrigated';
   soilType: string;
-  createdAt: Timestamp;
+  createdAt: Timestamp | Date;
 
   // Mock sensor data
   status: 'Online' | 'Offline' | 'Warning' | 'Critical';
-  lastUpdated: Timestamp;
+  lastUpdated: Timestamp | Date;
   temperature: number;
   humidity: number;
   soilMoisture: number;
@@ -76,13 +76,33 @@ export type Device = {
 export type SensorData = {
     id: string; // {deviceId}-{timestamp}
     deviceId: string;
-    timestamp: Timestamp;
+    timestamp: Timestamp | Date;
     waterLevel: number;
     temperature: number;
     moisture: number;
     rain: number;
     pumpState: 'ON' | 'OFF';
 }
+
+// Utility to convert Firestore Timestamps to JS Dates
+const transformTimestamps = (data: any): any => {
+  if (!data) return data;
+  if (Array.isArray(data)) {
+    return data.map(transformTimestamps);
+  }
+  if (typeof data === 'object' && data !== null) {
+    if (data instanceof Timestamp) {
+      return data.toDate();
+    }
+    const newObj: { [key: string]: any } = {};
+    for (const key in data) {
+      newObj[key] = transformTimestamps(data[key]);
+    }
+    return newObj;
+  }
+  return data;
+};
+
 
 interface DataContextType {
   devices: Device[] | null;
@@ -107,6 +127,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     if (!isFirebaseLoading && !user) {
       setFarmers(null);
       setDevices(null);
+      setIsDataLoading(false);
     }
   }, [user, isFirebaseLoading]);
 
@@ -114,7 +135,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   // Data fetching logic
   useEffect(() => {
     if (!firestore || !user) {
-      setIsDataLoading(false);
+      if (!isFirebaseLoading) {
+        setIsDataLoading(false);
+      }
       return;
     }
 
@@ -130,23 +153,23 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           getDocs(devicesQuery)
         ]);
 
-        const farmersData = farmerSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Farmer));
-        const devicesData = deviceSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Device));
+        const farmersData = farmerSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const devicesData = deviceSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         
-        setFarmers(farmersData);
-        setDevices(devicesData);
+        setFarmers(transformTimestamps(farmersData));
+        setDevices(transformTimestamps(devicesData));
 
-      } else if (role === 'farmer') {
+      } else if (role === 'farmer' && user.phoneNumber) {
         // Fetch specific farmer profile
-        const farmerProfile = await getFarmerProfile(user.phoneNumber!);
+        const farmerProfile = await getFarmerProfile(user.phoneNumber);
         if (farmerProfile) {
-          setFarmers([farmerProfile as Farmer]);
+          const transformedFarmer = transformTimestamps(farmerProfile);
+          setFarmers([transformedFarmer as Farmer]);
+          
           // If farmer has devices, fetch them
           if (farmerProfile.devices && farmerProfile.devices.length > 0) {
-            const devicesQuery = query(collection(firestore, 'devices'), where('id', 'in', farmerProfile.devices));
-            const deviceSnapshot = await getDocs(devicesQuery);
-            const devicesData = deviceSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Device));
-            setDevices(devicesData);
+            const devicesData = transformTimestamps(farmerProfile.devices);
+            setDevices(devicesData as Device[]);
           } else {
             setDevices([]);
           }
@@ -154,6 +177,10 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
            setFarmers([]);
            setDevices([]);
         }
+      } else {
+        // No role or phoneNumber, clear data
+        setFarmers([]);
+        setDevices([]);
       }
       setIsDataLoading(false);
     };
@@ -170,7 +197,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return devices.map(device => ({
         id: `${device.id}-${Date.now()}`,
         deviceId: device.id,
-        timestamp: Timestamp.now(),
+        timestamp: new Date(),
         waterLevel: device.waterLevel,
         temperature: device.temperature,
         moisture: device.soilMoisture,

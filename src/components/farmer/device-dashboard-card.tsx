@@ -17,6 +17,7 @@ import { type Device } from '@/contexts/data-context';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from "react-i18next";
+import { Timestamp } from 'firebase/firestore';
 
 const getStatusBadgeClass = (status?: string) => {
     if (!status) return 'bg-gray-500';
@@ -34,9 +35,19 @@ const getStatusBadgeClass = (status?: string) => {
     }
 }
 
+function toDate(timestamp: Timestamp | Date | undefined): Date {
+  if (timestamp instanceof Timestamp) {
+    return timestamp.toDate();
+  }
+  if (timestamp instanceof Date) {
+    return timestamp;
+  }
+  return new Date();
+}
+
 export default function DeviceDashboardCard({ device }: { device: Device }) {
   const { t } = useTranslation();
-  const lastUpdated = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
+  const lastUpdated = toDate(device.lastUpdated);
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
 
   return (

@@ -18,10 +18,21 @@ import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from 'date-fns';
 import { useData } from "@/contexts/data-context";
 import { Skeleton } from "../ui/skeleton";
+import { Timestamp } from "firebase/firestore";
 
+function toDate(timestamp: Timestamp | Date | undefined): Date {
+  if (timestamp instanceof Timestamp) {
+    return timestamp.toDate();
+  }
+  if (timestamp instanceof Date) {
+    return timestamp;
+  }
+  return new Date();
+}
 
 const getStatusBadge = (status: string) => {
-    switch (status?.toLowerCase()) {
+    const lowerStatus = status?.toLowerCase() ?? 'offline';
+    switch (lowerStatus) {
         case 'online':
             return 'bg-green-600 hover:bg-green-700';
         case 'warning':
@@ -52,7 +63,7 @@ export function GovDeviceTable() {
         if (!devices || !farmers) return [];
         return devices.map(device => {
             const farmer = farmers.find(f => f.id === device.farmerId);
-            const lastUpdatedDate = device.lastUpdated?.toDate ? device.lastUpdated.toDate() : new Date();
+            const lastUpdatedDate = toDate(device.lastUpdated);
             const timeAgo = formatDistanceToNow(lastUpdatedDate, { addSuffix: true });
             return {
                 ...device,
