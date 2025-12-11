@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2, PlusCircle, Trash2, Tractor, Leaf } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import { registerFarmerAction } from '@/lib/actions';
+import { registerFarmerAction } from '@/app/actions/register-farmer';
 import { useRole } from '@/contexts/role-context';
 import Link from 'next/link';
 

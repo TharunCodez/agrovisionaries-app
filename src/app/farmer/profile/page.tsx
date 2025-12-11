@@ -116,8 +116,8 @@ export default function FarmerProfilePage() {
     try {
       const photoUrl = await uploadProfilePhoto(user.uid, file);
       
-      const updatedProfile = { ...farmer, photoUrl };
-      setFarmers([updatedProfile]);
+      // Optimistically update the local state to show the new photo immediately
+      setFarmers(prev => prev ? [{ ...prev[0], photoUrl }] : [{...farmer, photoUrl}]);
 
       toast({
         title: 'Photo Uploaded!',
@@ -221,16 +221,13 @@ export default function FarmerProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {farmer?.devices && farmer.devices.length > 0 ? (
-            farmer.devices.map((device: any, index: number) => (
-              <div key={device.id ?? index} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
-                <div>
-                  <p className="font-bold">{device.nickname}</p>
-                  <p className="text-sm text-muted-foreground">{device.id} - Linked to Plot: {device.surveyNumber}</p>
-                   <p className="text-sm text-muted-foreground">Jalkund Capacity: {device.jalkundMaxQuantity}L</p>
-                </div>
-                <Badge variant={device.status === 'Online' ? 'default' : 'destructive'} className={device.status?.toLowerCase() === 'online' ? 'bg-green-600' : ''}>
-                  {t(device.status?.toLowerCase() ?? 'offline')}
-                </Badge>
+            farmer.devices.map((deviceId: string, index: number) => (
+              // This part assumes device details are not embedded in farmer.devices
+              // It's just an array of IDs as per schema.
+              // A proper implementation would fetch device details separately if needed.
+              // For now, we just list the IDs.
+              <div key={deviceId ?? index} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
+                  <p className="font-bold">{`Device ID: ${deviceId}`}</p>
               </div>
             ))
           ) : (

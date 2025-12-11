@@ -2,16 +2,13 @@
 
 import { getFirestore, collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
-import { firebaseConfig } from '@/firebase/config';
+import { db } from '@/firebase';
 import { normalizeFirestoreData } from '@/lib/normalizeFirestoreData';
 
 
 // Helper to initialize Firebase App on the server for actions
 const getDb = () => {
-    const apps = getApps();
-    // Avoid re-initializing the app
-    const app = apps.length > 0 ? apps[0] : initializeApp(firebaseConfig);
-    return getFirestore(app);
+    return db;
 };
 
 export async function getFarmerProfile(phone: string) {
