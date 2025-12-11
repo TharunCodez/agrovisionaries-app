@@ -87,32 +87,33 @@ interface DataContextType {
   farmers: Farmer[] | null;
   sensorData: SensorData[] | null;
   isLoading: boolean;
-  setFarmers: (farmers: Farmer[]) => void;
+  setFarmers: (farmers: ((prevState: Farmer[] | null) => Farmer[] | null) | Farmer[] | null) => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const { firestore, isUserLoading: isFirebaseLoading, user: firebaseUser } = useFirebase();
+  const { firestore, isUserLoading: isFirebaseLoading } = useFirebase();
   const { user, role } = useRole();
   
   const [farmers, setFarmers] = useState<Farmer[] | null>(null);
   const [devices, setDevices] = useState<Device[] | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
-  // Clear data on logout
+  // Clear data on logout or role change
   useEffect(() => {
-    if (!isFirebaseLoading && !firebaseUser) {
+    if (!isFirebaseLoading && (!user || !role)) {
       setFarmers(null);
       setDevices(null);
       setIsDataLoading(false);
     }
-  }, [firebaseUser, isFirebaseLoading]);
+  }, [user, role, isFirebaseLoading]);
 
 
   // Data fetching logic
   useEffect(() => {
-    if (!firestore || !user) {
+    // Wait for firestore and user role to be available
+    if (!firestore || !role || !user) {
       if (!isFirebaseLoading) {
         setIsDataLoading(false);
       }
@@ -137,7 +138,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         setFarmers(farmersData);
         setDevices(devicesData);
 
-      } else if (role === 'farmer' && user.phoneNumber) {
+      } else if (role === 'farmer' && user?.phoneNumber) {
         // Fetch specific farmer profile
         const farmerProfile = await getFarmerProfile(user.phoneNumber);
         if (farmerProfile) {
@@ -186,7 +187,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   const isLoading = isFirebaseLoading || isDataLoading;
 
-  const handleSetFarmers = useCallback((newFarmers: Farmer[]) => {
+  const handleSetFarmers = useCallback((newFarmers: any) => {
     setFarmers(newFarmers);
   }, []);
 
