@@ -91,8 +91,23 @@ export default function FarmerProfilePage() {
     }
   };
 
-  if (isDataLoading || !farmer) {
+  if (isDataLoading) {
     return <ProfileLoading />
+  }
+
+  if (!isDataLoading && !farmer) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <Card>
+          <CardHeader>
+            <CardTitle>No Profile Found</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>We could not find a profile associated with your account.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   return (
@@ -153,8 +168,8 @@ export default function FarmerProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {farmer?.plots?.length > 0 ? (
-            farmer.plots.map((plot: any, index: number) => (
-              <div key={index} className="rounded-lg border bg-muted/20 p-4">
+            farmer.plots.map((plot: any) => (
+              <div key={plot.surveyNumber} className="rounded-lg border bg-muted/20 p-4">
                 <p className="font-bold">{t('survey_number')}: {plot.surveyNumber}</p>
                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                   <p><span className="font-semibold">{t('area')}:</span> {plot.areaAcres} acres</p>
