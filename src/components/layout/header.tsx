@@ -17,10 +17,12 @@ import LanguageSwitcher from './language-switcher';
 import { useRole } from '@/contexts/role-context';
 import NotificationBell from '../notifications/NotificationBell';
 import ThemeToggle from './theme-toggle';
+import { useTranslation } from 'react-i18next';
 
 function getPageTitle(
   pathname: string,
-  role: 'farmer' | 'government' | null
+  role: 'farmer' | 'government' | null,
+  t: (key: string) => string
 ): string {
   if (role === 'government') {
     if (pathname.includes('/dashboard')) return 'Regional Agriculture Overview';
@@ -33,10 +35,10 @@ function getPageTitle(
     return 'Government Portal';
   }
   if (role === 'farmer') {
-    if (pathname.includes('/dashboard')) return 'Dashboard';
-    if (pathname.includes('/devices')) return 'My Devices';
+    if (pathname.includes('/dashboard')) return t('dashboard');
+    if (pathname.includes('/devices')) return t('devices');
     if (pathname.includes('/map')) return 'Farm Map';
-    if (pathname.includes('/notifications')) return 'Alerts';
+    if (pathname.includes('/notifications')) return t('alerts');
     if (pathname.includes('/settings')) return 'Settings';
     return 'Farmer Portal';
   }
@@ -47,7 +49,8 @@ export default function Header() {
   const { isMobile } = useSidebar();
   const pathname = usePathname();
   const { role } = useRole();
-  const pageTitle = getPageTitle(pathname, role);
+  const { t } = useTranslation();
+  const pageTitle = getPageTitle(pathname, role, t);
 
   const avatarImage = PlaceHolderImages.find(
     (img) => img.id === (role === 'farmer' ? 'farmer-avatar' : 'gov-avatar')
@@ -82,10 +85,10 @@ export default function Header() {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>{t('profile')}</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Logout</DropdownMenuItem>
+            <DropdownMenuItem>{t('logout')}</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

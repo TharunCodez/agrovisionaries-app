@@ -193,6 +193,7 @@ export default function ChatAssistant() {
 }
 
 function DiagnosisCard({ diagnosis }: { diagnosis: DiagnosePlantOutput }) {
+    const {t} = useTranslation();
 
     if (!diagnosis.isPlant) {
         return (

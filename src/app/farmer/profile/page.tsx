@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/role-context';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage, auth } from "@/firebase";
+import { db, storage } from "@/firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { signOut } from 'firebase/auth';
 
@@ -57,6 +57,7 @@ function useLogout() {
   const router = useRouter();
   const { setUser, setRole } = useRole();
   const { setFarmers } = useData();
+  const { toast } = useToast();
 
   return async () => {
     try {
@@ -70,9 +71,20 @@ function useLogout() {
       localStorage.removeItem('userRole');
       localStorage.removeItem('user');
       localStorage.removeItem('agrovisionaries-locale');
+      
+      toast({
+        title: 'Logged Out',
+        description: 'You have been successfully logged out.',
+      });
+
       router.replace("/login");
     } catch (error) {
       console.error("Logout failed:", error);
+       toast({
+        variant: 'destructive',
+        title: 'Logout Failed',
+        description: (error as Error).message || 'An unexpected error occurred.',
+      });
     }
   };
 }
@@ -217,8 +229,8 @@ export default function FarmerProfilePage() {
                   <p className="font-bold">Device ID: {device.id}</p>
                   <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                     <p><span className="font-semibold">Status:</span> {device.status}</p>
-                    <p><span className="font-semibold">Water Level:</span> {device.waterLevel}%</p>
-                    <p><span className="font-semibold">Soil Moisture:</span> {device.soilMoisture}%</p>
+                    <p><span className="font-semibold">{t('reservoir_level')}:</span> {device.waterLevel}%</p>
+                    <p><span className="font-semibold">{t('soil_moisture')}:</span> {device.soilMoisture}%</p>
                   </div>
               </div>
             ))
