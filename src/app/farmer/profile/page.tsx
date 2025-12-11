@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useUser } from '@/firebase';
+import { useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/role-context';
@@ -57,7 +57,7 @@ export default function FarmerProfilePage() {
   const { farmers, isLoading: isDataLoading, setFarmers } = useData();
   const auth = useAuth();
   const router = useRouter();
-  const { setUser, setRole } = useRole();
+  const { user, setUser, setRole } = useRole();
   const { t } = useTranslation();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,16 +93,15 @@ export default function FarmerProfilePage() {
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file || !farmer) return;
+    if (!file || !farmer || !user) return;
 
     setUploading(true);
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('farmerId', farmer.id);
 
     try {
-      const { photoUrl, error } = await uploadProfilePhoto(formData);
+      const { photoUrl, error } = await uploadProfilePhoto(user.uid, formData);
       if (error || !photoUrl) {
         throw new Error(error || 'Upload failed');
       }
@@ -124,26 +123,8 @@ export default function FarmerProfilePage() {
     }
   };
 
-  if (isDataLoading) {
+  if (isDataLoading || !farmer) {
     return <ProfileLoading />
-  }
-
-  if (!isDataLoading && !farmer) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full text-center">
-        <Card>
-          <CardHeader>
-            <CardTitle>No Profile Found</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>We could not find a profile associated with your account.</p>
-             <Button onClick={handleLogout} variant="outline" className="mt-4">
-              Return to Login
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
   }
 
   return (

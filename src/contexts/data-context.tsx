@@ -93,7 +93,7 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const { firestore, isUserLoading: isFirebaseLoading } = useFirebase();
+  const { firestore, isUserLoading: isFirebaseLoading, user: firebaseUser } = useFirebase();
   const { user, role } = useRole();
   
   const [farmers, setFarmers] = useState<Farmer[] | null>(null);
@@ -102,12 +102,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
   // Clear data on logout
   useEffect(() => {
-    if (!isFirebaseLoading && !user) {
+    if (!isFirebaseLoading && !firebaseUser) {
       setFarmers(null);
       setDevices(null);
       setIsDataLoading(false);
     }
-  }, [user, isFirebaseLoading]);
+  }, [firebaseUser, isFirebaseLoading]);
 
 
   // Data fetching logic
@@ -163,7 +163,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
     fetchData();
 
-  }, [firestore, user, role]);
+  }, [firestore, user, role, isFirebaseLoading]);
 
 
   // For now, sensorData is mock.

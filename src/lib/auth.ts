@@ -25,7 +25,7 @@ export type User = {
 export async function checkFarmerExists(phoneNumber: string): Promise<{ exists: boolean; farmerId: string | null }> {
   const { firestore } = initializeFirebase();
   const farmersRef = collection(firestore, 'farmers');
-  const q = query(farmersRef, where('phone', '==', phoneNumber));
+  const q = query(farmersRef, where('phone', '==', phoneNumber.trim()));
   const querySnapshot = await getDocs(q);
 
   if (!querySnapshot.empty) {
