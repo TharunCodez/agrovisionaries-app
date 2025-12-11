@@ -6,9 +6,9 @@ import { setupFCM } from '@/lib/notifications';
 import { useEffect } from 'react';
 import Header from '@/components/layout/header';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { SidebarProvider } from '@/components/ui/sidebar';
 import LanguageSwitcher from '@/components/layout/language-switcher';
 import ThemeToggle from '@/components/layout/theme-toggle';
+import { SidebarProvider } from '@/components/ui/sidebar';
 
 export default function FarmerLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
