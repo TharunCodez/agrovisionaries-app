@@ -33,5 +33,6 @@
   "welcome_message": "Hello! I'm your AI assistant. How can I help you today? You can ask me questions about the app or upload a photo of a plant for a health diagnosis.",
   "ask_question": "Ask a question...",
   "attach_image": "Attach image",
-  "send": "Send"
+  "send": "Send",
+  "liveStatus": "Live Status"
 }

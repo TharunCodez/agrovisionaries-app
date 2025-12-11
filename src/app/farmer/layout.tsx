@@ -4,9 +4,12 @@ import FarmerBottomNav from '@/components/farmer/farmer-bottom-nav';
 import { useUser } from '@/firebase';
 import { setupFCM } from '@/lib/notifications';
 import { useEffect } from 'react';
+import Header from '@/components/layout/header';
+import { useMediaQuery } from '@/hooks/use-media-query';
 
 export default function FarmerLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   useEffect(() => {
     if (user && process.env.NEXT_PUBLIC_FCM_VAPID_KEY) {
@@ -16,11 +19,16 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
 
   return (
     <div className="min-h-screen">
+       {isDesktop && <Header />}
       <main className="w-full max-w-screen-2xl mx-auto p-4 md:p-6 lg:p-8">
           {children}
       </main>
-      <ChatAssistantButton />
-      <FarmerBottomNav />
+      {!isDesktop && (
+        <>
+          <ChatAssistantButton />
+          <FarmerBottomNav />
+        </>
+      )}
     </div>
   );
 }
