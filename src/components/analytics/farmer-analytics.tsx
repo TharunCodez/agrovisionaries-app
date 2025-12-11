@@ -19,12 +19,12 @@ export function FarmerAnalytics() {
     return farmers.slice(0, 5).map(farmer => {
         const deviceCount = devices.filter(d => d.farmerId === farmer.id).length;
         const alertsCount = Math.floor(Math.random() * 15); // Mock data
-        const status = alertsCount > 10 ? t('gov.analytics.risk.high') : alertsCount > 5 ? t('gov.analytics.risk.medium') : t('gov.analytics.risk.low');
+        const status = alertsCount > 10 ? 'high' : alertsCount > 5 ? 'medium' : 'low';
         return {
             ...farmer,
             devices: deviceCount,
             alerts: alertsCount,
-            status: status
+            status: t(`gov.analytics.risk.${status}`)
         }
     }).sort((a,b) => b.alerts - a.alerts);
   }, [farmers, devices, t]);

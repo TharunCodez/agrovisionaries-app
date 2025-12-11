@@ -181,7 +181,7 @@ export function GovDeviceTable() {
                                                             <Thermometer className="h-7 w-7 text-red-500 mb-2"/>
                                                             <p className="text-lg font-bold">{device.temperature}°C</p>
                                                             <p className="text-xs text-muted-foreground">{t('temperature')}</p>
-                                                        </Card>
+                                                         </Card>
                                                          <Card className="flex flex-col items-center justify-center p-3 text-center">
                                                             <Droplets className="h-7 w-7 text-sky-500 mb-2"/>
                                                             <p className="text-lg font-bold">{device.humidity}%</p>

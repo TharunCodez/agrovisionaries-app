@@ -7,27 +7,27 @@ import { useTranslation } from "react-i18next";
 const notifications = [
     {
         id: 1,
-        title: "High Water Usage Alert",
-        description: "Water usage in the Punjab region has increased by 15% in the last 24 hours. Investigate for potential leaks or inefficient irrigation.",
+        title: "gov.notifications.items.1.title",
+        description: "gov.notifications.items.1.description",
         icon: <Siren className="h-5 w-5 text-destructive" />,
         type: 'destructive',
-        time: "1 hour ago"
+        time: "gov.notifications.items.1.time"
     },
     {
         id: 2,
-        title: "Device Offline: LIV-003",
-        description: "Device LIV-003 in Amit Singh's farm (Uttar Pradesh) has been offline for over 6 hours. Please check the device status.",
+        title: "gov.notifications.items.2.title",
+        description: "gov.notifications.items.2.description",
         icon: <HardDrive className="h-5 w-5 text-yellow-500" />,
         type: 'default',
-        time: "3 hours ago"
+        time: "gov.notifications.items.2.time"
     },
      {
         id: 3,
-        title: "System Maintenance Scheduled",
-        description: "A system-wide update is scheduled for tonight at 2:00 AM. A brief downtime of up to 15 minutes is expected.",
+        title: "gov.notifications.items.3.title",
+        description: "gov.notifications.items.3.description",
         icon: <Bell className="h-5 w-5 text-blue-500" />,
         type: 'default',
-        time: "1 day ago"
+        time: "gov.notifications.items.3.time"
     }
 ]
 
@@ -46,11 +46,11 @@ export default function GovernmentNotificationsPage() {
                             <div className="flex-shrink-0">{notification.icon}</div>
                             <div className="flex-grow">
                                 <AlertTitle className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-                                    <span>{t(`gov.notifications.items.${notification.id}.title`)}</span>
-                                    <span className="mt-1 text-xs text-muted-foreground sm:mt-0">{t(`gov.notifications.items.${notification.id}.time`)}</span>
+                                    <span>{t(notification.title)}</span>
+                                    <span className="mt-1 text-xs text-muted-foreground sm:mt-0">{t(notification.time)}</span>
                                 </AlertTitle>
                                 <AlertDescription>
-                                    {t(`gov.notifications.items.${notification.id}.description`)}
+                                    {t(notification.description)}
                                 </AlertDescription>
                             </div>
                         </Alert>

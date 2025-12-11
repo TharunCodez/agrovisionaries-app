@@ -18,7 +18,7 @@ export function DeviceAnalytics() {
     const { devices } = useData();
     const { t } = useTranslation("common");
 
-    const chartConfig = {
+    const chartConfig = useMemo(() => ({
         devices: {
             label: t('devices'),
         },
@@ -38,19 +38,24 @@ export function DeviceAnalytics() {
             label: t('gov.analytics.critical'),
             color: COLORS.Critical,
         }
-    }
+    }), [t]);
 
     const deviceStatusData = useMemo(() => {
         if (!devices) {
             return [];
         }
         const statusCounts = devices.reduce((acc, device) => {
-            acc[device.status] = (acc[device.status] || 0) + 1;
+            const statusLabel = t(device.status?.toLowerCase() ?? 'offline');
+            acc[statusLabel] = (acc[statusLabel] || 0) + 1;
             return acc;
         }, {} as Record<string, number>);
 
-        return Object.entries(statusCounts).map(([name, value]) => ({ name, value, fill: COLORS[name as keyof typeof COLORS] }));
-    }, [devices]);
+        return Object.entries(statusCounts).map(([name, value]) => ({ 
+            name, 
+            value, 
+            fill: COLORS[Object.keys(chartConfig).find(key => chartConfig[key as keyof typeof chartConfig].label === name) as keyof typeof COLORS] 
+        }));
+    }, [devices, t, chartConfig]);
 
     return (
         <Card className="flex flex-col">

@@ -5,16 +5,17 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { regionalAnalyticsData } from "@/lib/data";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useTranslation } from "react-i18next";
+import { useMemo } from "react";
 
 export default function RegionalAnalyticsChart() {
   const { t } = useTranslation("common");
 
-  const chartConfig = {
+  const chartConfig = useMemo(() => ({
     waterUsage: {
-      label: t('gov.analytics.charts.waterUsage'),
+      label: t('gov.dashboard.stats.waterUsage'),
       color: "hsl(var(--chart-1))",
     },
-  };
+  }), [t]);
 
   return (
     <Card>

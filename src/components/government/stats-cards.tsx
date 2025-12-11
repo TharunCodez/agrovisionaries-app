@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, HardDrive, Siren } from "lucide-react";
 import { useData } from "@/contexts/data-context";
 import { useTranslation } from "react-i18next";
+import { useMemo } from "react";
 
 export default function StatsCards() {
     const { farmers, devices } = useData();
@@ -12,11 +13,11 @@ export default function StatsCards() {
     const onlineDevices = devices ? devices.filter(d => d.status === 'Online').length : 0;
     const totalDevices = devices ? devices.length : 0;
 
-    const stats = [
+    const stats = useMemo(() => [
         { title: t('gov.dashboard.stats.totalFarmers'), value: totalFarmers, icon: Users, description: t('gov.dashboard.stats.totalFarmersDesc') },
         { title: t('gov.dashboard.stats.devicesOnline'), value: `${onlineDevices} / ${totalDevices}`, icon: HardDrive, description: `${totalDevices > 0 ? Math.round(onlineDevices/totalDevices * 100) : 0}% ${t('gov.dashboard.stats.uptime')}` },
         { title: t('gov.dashboard.stats.criticalAlerts'), value: "2", icon: Siren, description: t('gov.dashboard.stats.last24h') },
-    ];
+    ], [t, totalFarmers, onlineDevices, totalDevices]);
 
     return (
         <>

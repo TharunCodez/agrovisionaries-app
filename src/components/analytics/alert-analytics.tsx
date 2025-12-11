@@ -20,12 +20,12 @@ const mockAlertsData = [
 export function AlertAnalytics() {
     const { t } = useTranslation("common");
 
-    const chartConfig = {
+    const chartConfig = useMemo(() => ({
         rain: { label: t('gov.analytics.charts.rain'), color: "hsl(var(--chart-1))" },
         water: { label: t('gov.analytics.charts.water'), color: "hsl(var(--chart-2))" },
         soil: { label: t('gov.analytics.charts.soil'), color: "hsl(var(--chart-3))" },
         pump: { label: t('gov.analytics.charts.pump'), color: "hsl(var(--chart-4))" },
-    };
+    }), [t]);
 
     return (
         <Card>
