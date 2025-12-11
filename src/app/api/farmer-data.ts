@@ -3,6 +3,8 @@
 import { getFirestore, collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { initializeApp, getApps } from 'firebase/app';
 import { firebaseConfig } from '@/firebase/config';
+import { normalizeFirestoreData } from '@/lib/normalizeFirestoreData';
+
 
 // Helper to initialize Firebase App on the server for actions
 const getDb = () => {
@@ -27,7 +29,8 @@ export async function getFarmerProfile(phone: string) {
   if (snapshot.empty) return null;
 
   const farmerDoc = snapshot.docs[0];
-  const farmerData = farmerDoc.data();
+  const farmerData = normalizeFirestoreData({id: farmerDoc.id, ...farmerDoc.data()});
+
 
   // Load device details
   const devices = [];
@@ -35,12 +38,13 @@ export async function getFarmerProfile(phone: string) {
     for (const deviceId of farmerData.devices) {
       const dRef = doc(db, 'devices', deviceId);
       const dSnap = await getDoc(dRef);
-      if (dSnap.exists()) devices.push(dSnap.data());
+      if (dSnap.exists()) {
+        devices.push(normalizeFirestoreData(dSnap.data()));
+      }
     }
   }
 
   return {
-    id: farmerDoc.id,
     ...farmerData,
     devices,
   };

@@ -10,12 +10,6 @@ import React, {
   useCallback,
 } from 'react';
 import {
-  useCollection,
-  useFirebase,
-  useMemoFirebase,
-  useUser,
-} from '@/firebase';
-import {
   collection,
   query,
   where,
@@ -26,6 +20,9 @@ import {
 } from 'firebase/firestore';
 import { useRole } from './role-context';
 import { getFarmerProfile } from '@/app/api/farmer-data';
+import { useFirebase } from '@/firebase';
+import { normalizeFirestoreData } from '@/lib/normalizeFirestoreData';
+
 
 export type Plot = {
   surveyNumber: string;
@@ -45,7 +42,7 @@ export type Farmer = {
   plots: Plot[];
   devices: string[]; // array of device IDs
   photoUrl: string | null;
-  createdAt: Timestamp | Date;
+  createdAt: string; // ISO Date String
 };
 
 export type Device = {
@@ -58,11 +55,11 @@ export type Device = {
   areaAcres: number;
   landType: 'Irrigated' | 'Unirrigated';
   soilType: string;
-  createdAt: Timestamp | Date;
+  createdAt: string; // ISO Date String
 
   // Mock sensor data
   status: 'Online' | 'Offline' | 'Warning' | 'Critical';
-  lastUpdated: Timestamp | Date;
+  lastUpdated: string; // ISO Date String
   temperature: number;
   humidity: number;
   soilMoisture: number;
@@ -76,32 +73,13 @@ export type Device = {
 export type SensorData = {
     id: string; // {deviceId}-{timestamp}
     deviceId: string;
-    timestamp: Timestamp | Date;
+    timestamp: string; // ISO Date String
     waterLevel: number;
     temperature: number;
     moisture: number;
     rain: number;
     pumpState: 'ON' | 'OFF';
 }
-
-// Utility to convert Firestore Timestamps to JS Dates
-const transformTimestamps = (data: any): any => {
-  if (!data) return data;
-  if (Array.isArray(data)) {
-    return data.map(transformTimestamps);
-  }
-  if (typeof data === 'object' && data !== null) {
-    if (data instanceof Timestamp) {
-      return data.toDate();
-    }
-    const newObj: { [key: string]: any } = {};
-    for (const key in data) {
-      newObj[key] = transformTimestamps(data[key]);
-    }
-    return newObj;
-  }
-  return data;
-};
 
 
 interface DataContextType {
@@ -153,23 +131,21 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           getDocs(devicesQuery)
         ]);
 
-        const farmersData = farmerSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        const devicesData = deviceSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const farmersData = farmerSnapshot.docs.map(doc => normalizeFirestoreData({ id: doc.id, ...doc.data() }));
+        const devicesData = deviceSnapshot.docs.map(doc => normalizeFirestoreData({ id: doc.id, ...doc.data() }));
         
-        setFarmers(transformTimestamps(farmersData));
-        setDevices(transformTimestamps(devicesData));
+        setFarmers(farmersData);
+        setDevices(devicesData);
 
       } else if (role === 'farmer' && user.phoneNumber) {
         // Fetch specific farmer profile
         const farmerProfile = await getFarmerProfile(user.phoneNumber);
         if (farmerProfile) {
-          const transformedFarmer = transformTimestamps(farmerProfile);
-          setFarmers([transformedFarmer as Farmer]);
+          setFarmers([farmerProfile as Farmer]);
           
           // If farmer has devices, fetch them
           if (farmerProfile.devices && farmerProfile.devices.length > 0) {
-            const devicesData = transformTimestamps(farmerProfile.devices);
-            setDevices(devicesData as Device[]);
+            setDevices(farmerProfile.devices as Device[]);
           } else {
             setDevices([]);
           }
@@ -197,7 +173,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return devices.map(device => ({
         id: `${device.id}-${Date.now()}`,
         deviceId: device.id,
-        timestamp: new Date(),
+        timestamp: new Date().toISOString(),
         waterLevel: device.waterLevel,
         temperature: device.temperature,
         moisture: device.soilMoisture,
