@@ -29,7 +29,7 @@ import { useLogout } from '@/hooks/use-logout';
 
 export default function AppSidebar() {
   const pathname = usePathname();
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const logout = useLogout();
 
   const governmentMenuItems = [

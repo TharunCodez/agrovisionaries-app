@@ -18,7 +18,7 @@ function GovernmentMap() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { devices } = useData();
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
 
   const lat = searchParams.get('lat');
   const lng = searchParams.get('lng');

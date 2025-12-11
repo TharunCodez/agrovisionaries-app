@@ -33,16 +33,16 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased">
-        <I18nProvider>
-          <FirebaseClientProvider>
-            <ThemeProvider>
-              <RoleProvider>
-                <DataProvider>{children}</DataProvider>
-              </RoleProvider>
-            </ThemeProvider>
-            <Toaster />
-          </FirebaseClientProvider>
-        </I18nProvider>
+        <ThemeProvider>
+            <I18nProvider>
+              <FirebaseClientProvider>
+                <RoleProvider>
+                  <DataProvider>{children}</DataProvider>
+                </RoleProvider>
+              </FirebaseClientProvider>
+              <Toaster />
+            </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

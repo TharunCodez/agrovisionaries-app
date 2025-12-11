@@ -4,7 +4,7 @@ import { Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function GovernmentSettingsPage() {
-    const { t } = useTranslation();
+    const { t } = useTranslation("common");
     return (
         <div className="flex flex-col gap-6">
             <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('gov.settings.title')}</h1>

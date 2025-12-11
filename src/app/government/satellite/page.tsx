@@ -21,7 +21,7 @@ const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
 type DataLayer = 'trueColor' | 'ndvi' | 'moisture';
 
 function SatelliteView() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
 
   const dataLayers: Record<DataLayer, { label: string; description: string; icon: React.ElementType }> = {
     trueColor: {
@@ -204,7 +204,7 @@ function SatelliteView() {
 }
 
 export default function SatellitePage() {
-    const { t } = useTranslation();
+    const { t } = useTranslation("common");
     return (
         <div className="flex flex-col gap-6 h-full">
              <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('gov.satellite.title')}</h1>

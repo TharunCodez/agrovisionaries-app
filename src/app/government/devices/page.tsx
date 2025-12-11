@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 
 export default function GovernmentDevicesPage() {
-    const { t } = useTranslation();
+    const { t } = useTranslation("common");
     return (
         <div className="relative flex flex-col h-full gap-6">
             <div className="flex items-center justify-between">

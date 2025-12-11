@@ -32,7 +32,7 @@ const notifications = [
 ]
 
 export default function GovernmentNotificationsPage() {
-    const { t } = useTranslation();
+    const { t } = useTranslation("common");
     return (
         <div className="flex flex-col gap-6">
             <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('gov.notifications.title')}</h1>

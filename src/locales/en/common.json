@@ -50,6 +50,7 @@
   "actions": "Actions",
   "latitude": "Latitude",
   "longitude": "Longitude",
+  "acres": "acres",
   "gov": {
     "portalName": "Government Portal",
     "sidebar": {

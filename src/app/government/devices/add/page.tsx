@@ -44,7 +44,7 @@ export default function AddDevicePage() {
   const [isLoading, setIsLoading] = useState(false);
   const { farmers } = useData();
   const [selectedFarmerId, setSelectedFarmerId] = useState<string | null>(null);
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

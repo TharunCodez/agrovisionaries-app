@@ -54,7 +54,7 @@ export default function RegisterFarmerPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

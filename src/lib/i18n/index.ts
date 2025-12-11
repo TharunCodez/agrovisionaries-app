@@ -33,6 +33,10 @@ i18n
       escapeValue: false, // not needed for react as it escapes by default
     },
     
+    react: {
+      useSuspense: false,
+    },
+    
     // This is crucial to prevent i18next from trying to load region-specific files like `en-US`
     load: 'languageOnly' 
   });

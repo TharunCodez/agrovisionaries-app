@@ -29,7 +29,7 @@ export default function Header() {
   const pathname = usePathname();
   const { role } = useRole();
   const { farmers } = useData();
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const logout = useLogout();
   
   const farmer = farmers?.[0];
