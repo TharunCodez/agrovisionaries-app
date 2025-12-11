@@ -7,11 +7,13 @@ import React, {
   useMemo,
   useState,
   useEffect,
+  useCallback,
 } from 'react';
 import {
   useCollection,
   useFirebase,
   useMemoFirebase,
+  useUser,
 } from '@/firebase';
 import {
   collection,
@@ -19,6 +21,8 @@ import {
   where,
   Timestamp,
   doc,
+  getDocs,
+  getFirestore,
 } from 'firebase/firestore';
 import { useRole } from './role-context';
 import { getFarmerProfile } from '@/app/api/farmer-data';
@@ -28,7 +32,7 @@ export type Plot = {
   areaAcres: number;
   landType: 'Irrigated' | 'Unirrigated';
   soilType: string;
-}
+};
 
 export type Farmer = {
   id: string; // Firestore document ID
@@ -91,82 +95,79 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider = ({ children }: { children: ReactNode }) => {
-  const { firestore } = useFirebase();
-  const { user, isLoading: isAuthLoading, role } = useRole();
+  const { firestore, isUserLoading: isFirebaseLoading } = useFirebase();
+  const { user, role } = useRole();
   
-  const [farmers, setFarmers] = useState<Farmer[] | null>(() => {
-    try {
-      const item = window.localStorage.getItem('farmers');
-      return item ? JSON.parse(item) : null;
-    } catch (error) {
-      return null;
-    }
-  });
+  const [farmers, setFarmers] = useState<Farmer[] | null>(null);
+  const [devices, setDevices] = useState<Device[] | null>(null);
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
-  const [isFetching, setIsFetching] = useState(false);
-
+  // Clear data on logout
   useEffect(() => {
-    try {
-      if (farmers) {
-        window.localStorage.setItem('farmers', JSON.stringify(farmers));
-      } else {
-        window.localStorage.removeItem('farmers');
-      }
-    } catch (error) {
-      console.error("Could not persist farmers to localStorage", error);
+    if (!isFirebaseLoading && !user) {
+      setFarmers(null);
+      setDevices(null);
     }
-  }, [farmers]);
+  }, [user, isFirebaseLoading]);
 
+
+  // Data fetching logic
   useEffect(() => {
-    // If user is a farmer and we don't have their data, fetch it.
-    if (role === 'farmer' && user?.phoneNumber && !farmers && !isFetching) {
-      setIsFetching(true);
-      getFarmerProfile(user.phoneNumber)
-        .then(profile => {
-          if (profile) {
-            setFarmers([profile as Farmer]);
+    if (!firestore || !user) {
+      setIsDataLoading(false);
+      return;
+    }
+
+    const fetchData = async () => {
+      setIsDataLoading(true);
+
+      if (role === 'government') {
+        const farmersQuery = query(collection(firestore, 'farmers'));
+        const devicesQuery = query(collection(firestore, 'devices'));
+        
+        const [farmerSnapshot, deviceSnapshot] = await Promise.all([
+          getDocs(farmersQuery),
+          getDocs(devicesQuery)
+        ]);
+
+        const farmersData = farmerSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Farmer));
+        const devicesData = deviceSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Device));
+        
+        setFarmers(farmersData);
+        setDevices(devicesData);
+
+      } else if (role === 'farmer') {
+        // Fetch specific farmer profile
+        const farmerProfile = await getFarmerProfile(user.phoneNumber!);
+        if (farmerProfile) {
+          setFarmers([farmerProfile as Farmer]);
+          // If farmer has devices, fetch them
+          if (farmerProfile.devices && farmerProfile.devices.length > 0) {
+            const devicesQuery = query(collection(firestore, 'devices'), where('id', 'in', farmerProfile.devices));
+            const deviceSnapshot = await getDocs(devicesQuery);
+            const devicesData = deviceSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Device));
+            setDevices(devicesData);
+          } else {
+            setDevices([]);
           }
-        })
-        .finally(() => setIsFetching(false));
-    }
-  }, [user, role, farmers, isFetching]);
-
-  // Fetch all farmers - for government user
-  const allFarmersQuery = useMemoFirebase(
-    () => (firestore && role === 'government' ? collection(firestore, 'farmers') : null),
-    [firestore, role]
-  );
-  const { data: allFarmersData, isLoading: farmersLoading } = useCollection<Farmer>(allFarmersQuery);
-
-  // Sync government data
-  useEffect(() => {
-      if (role === 'government' && allFarmersData) {
-          setFarmers(allFarmersData);
+        } else {
+           setFarmers([]);
+           setDevices([]);
+        }
       }
-  }, [role, allFarmersData]);
+      setIsDataLoading(false);
+    };
+
+    fetchData();
+
+  }, [firestore, user, role]);
 
 
-  // Fetch all devices
-  const allDevicesQuery = useMemoFirebase(
-    () => (firestore ? collection(firestore, 'devices') : null),
-    [firestore]
-  );
-  const { data: allDevices, isLoading: allDevicesLoading } = useCollection<Device>(allDevicesQuery);
-  
-  // Memoize farmer's devices from the allDevices list
-  const farmerDevices = useMemo(() => {
-     if (role === 'farmer' && user && allDevices) {
-        return allDevices.filter(d => d.farmerId === user.uid);
-     }
-     return null;
-  }, [role, user, allDevices]);
-  
   // For now, sensorData is mock.
   const sensorData: SensorData[] | null = useMemo(() => {
-    const devicesToUse = role === 'government' ? allDevices : farmerDevices;
-    if (!devicesToUse) return null;
+    if (!devices) return null;
 
-    return devicesToUse.map(device => ({
+    return devices.map(device => ({
         id: `${device.id}-${Date.now()}`,
         deviceId: device.id,
         timestamp: Timestamp.now(),
@@ -177,15 +178,18 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         pumpState: Math.random() > 0.5 ? 'ON' : 'OFF',
     }));
 
-  }, [allDevices, farmerDevices, role]);
+  }, [devices]);
 
-  const devices = role === 'government' ? allDevices : farmerDevices;
 
-  const isLoading = isAuthLoading || farmersLoading || allDevicesLoading || isFetching;
+  const isLoading = isFirebaseLoading || isDataLoading;
+
+  const handleSetFarmers = useCallback((newFarmers: Farmer[]) => {
+    setFarmers(newFarmers);
+  }, []);
 
   const value = useMemo(
-    () => ({ devices, farmers, sensorData, isLoading, setFarmers: (f: Farmer[]) => setFarmers(f) }),
-    [devices, farmers, sensorData, isLoading]
+    () => ({ devices, farmers, sensorData, isLoading, setFarmers: handleSetFarmers }),
+    [devices, farmers, sensorData, isLoading, handleSetFarmers]
   );
 
   return (

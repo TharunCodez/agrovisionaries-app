@@ -11,6 +11,10 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
+import { useAuth, useUser } from '@/firebase';
+import { signOut } from 'firebase/auth';
+import { useRouter } from 'next/navigation';
+import { useRole } from '@/contexts/role-context';
 
 function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, icon?: React.ElementType }) {
     const IconComponent = Icon || User;
@@ -30,7 +34,7 @@ function ProfileLoading() {
      return (
         <div className="flex flex-col gap-6 pb-20 md:pb-6">
             <div className="flex items-center justify-between">
-              <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('profile_title')}</h1>
+              <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('your_profile')}</h1>
               <Skeleton className="h-10 w-24" />
             </div>
             <Card>
@@ -51,12 +55,41 @@ function ProfileLoading() {
 
 export default function FarmerProfilePage() {
   const { farmers, isLoading: isDataLoading, setFarmers } = useData();
+  const auth = useAuth();
+  const router = useRouter();
+  const { setUser, setRole } = useRole();
   const { t } = useTranslation();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   
   const farmer = farmers?.[0];
+
+  const handleLogout = async () => {
+    if (!auth) return;
+    try {
+      await signOut(auth);
+      // Clear local state
+      setUser(null);
+      setRole(null);
+      setFarmers([]); // Clear data context
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('user');
+      localStorage.removeItem('agrovisionaries-locale');
+      toast({
+        title: 'Logged Out',
+        description: 'You have been successfully logged out.',
+      });
+      router.replace('/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Logout Failed',
+        description: 'An error occurred while logging out.',
+      });
+    }
+  };
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -104,6 +137,9 @@ export default function FarmerProfilePage() {
           </CardHeader>
           <CardContent>
             <p>We could not find a profile associated with your account.</p>
+             <Button onClick={handleLogout} variant="outline" className="mt-4">
+              Return to Login
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -113,7 +149,7 @@ export default function FarmerProfilePage() {
   return (
     <div className="flex flex-col gap-8 pb-20 md:pb-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('profile_title')}</h1>
+        <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('your_profile')}</h1>
         <Button disabled>
           <Edit className="mr-2 h-4 w-4" />
           {t('edit_profile')}
@@ -126,7 +162,7 @@ export default function FarmerProfilePage() {
             <Avatar className="mx-auto h-28 w-28 border-4 border-primary">
                 <AvatarImage
                     src={farmer?.photoUrl ?? ''}
-                    alt={farmer?.name}
+                    alt={farmer?.name ?? 'Farmer'}
                 />
                 <AvatarFallback>{farmer?.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
             </Avatar>
@@ -147,13 +183,13 @@ export default function FarmerProfilePage() {
             </Button>
           </div>
           <div className="text-center mt-4">
-            <CardTitle>{farmer?.name}</CardTitle>
-            <p className="text-sm text-muted-foreground">{farmer?.phone}</p>
+            <CardTitle>{farmer?.name ?? 'N/A'}</CardTitle>
+            <p className="text-sm text-muted-foreground">{farmer?.phone ?? 'N/A'}</p>
           </div>
         </CardHeader>
         <CardContent>
              <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
-                <ProfileItem label={t('aadhaar')} value={farmer?.aadhaar} icon={User} />
+                <ProfileItem label={t('aadhaar')} value={farmer?.aadhaar ?? 'N/A'} icon={User} />
                 <ProfileItem label={t('address')} value={`${farmer?.address ?? ''}, ${farmer?.village ?? ''}, ${farmer?.district ?? ''}`} icon={MapPin} />
              </div>
         </CardContent>
@@ -163,18 +199,18 @@ export default function FarmerProfilePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Tractor className="h-6 w-6"/>
-            <span>{t('land_plots')}</span>
+            <span>{t('landPlots')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {farmer?.plots?.length > 0 ? (
-            farmer.plots.map((plot: any) => (
-              <div key={plot.surveyNumber} className="rounded-lg border bg-muted/20 p-4">
-                <p className="font-bold">{t('survey_number')}: {plot.surveyNumber}</p>
+            farmer.plots.map((plot: any, index: number) => (
+              <div key={plot.surveyNumber ?? index} className="rounded-lg border bg-muted/20 p-4">
+                <p className="font-bold">{t('surveyNumber')}: {plot.surveyNumber}</p>
                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
                   <p><span className="font-semibold">{t('area')}:</span> {plot.areaAcres} acres</p>
-                  <p><span className="font-semibold">{t('land_type')}:</span> {plot.landType}</p>
-                  <p><span className="font-semibold">{t('soil_type')}:</span> {plot.soilType}</p>
+                  <p><span className="font-semibold">{t('landType')}:</span> {plot.landType}</p>
+                  <p><span className="font-semibold">{t('soilType')}:</span> {plot.soilType}</p>
                 </div>
               </div>
             ))
@@ -188,13 +224,13 @@ export default function FarmerProfilePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <HardDrive className="h-6 w-6"/>
-            <span>{t('my_devices')}</span>
+            <span>{t('myDevices')}</span>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {farmer?.devices && farmer.devices.length > 0 ? (
-            farmer.devices.map((device: any) => (
-              <div key={device.id} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
+            farmer.devices.map((device: any, index: number) => (
+              <div key={device.id ?? index} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
                 <div>
                   <p className="font-bold">{device.nickname}</p>
                   <p className="text-sm text-muted-foreground">{device.id} - Linked to Plot: {device.surveyNumber}</p>
@@ -211,7 +247,7 @@ export default function FarmerProfilePage() {
         </CardContent>
       </Card>
 
-      <Button variant="destructive">
+      <Button variant="destructive" onClick={handleLogout}>
         <LogOut className="mr-2 h-4 w-4" />
         {t('logout')}
       </Button>
