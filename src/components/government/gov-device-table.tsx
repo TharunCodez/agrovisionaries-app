@@ -51,7 +51,7 @@ export function GovDeviceTable() {
     const [expandedRow, setExpandedRow] = useState<string | null>(null);
     const router = useRouter();
     const { devices, farmers, isLoading } = useData();
-    const { t } = useTranslation();
+    const { t } = useTranslation("common");
 
     const toggleRow = (id: string) => {
         setExpandedRow(expandedRow === id ? null : id);

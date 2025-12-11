@@ -7,7 +7,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend
 import { useTranslation } from "react-i18next";
 
 export function RegionalAnalytics() {
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
   const chartConfig = {
     waterUsage: {
       label: t('gov.analytics.charts.waterUsage'),

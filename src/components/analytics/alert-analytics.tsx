@@ -18,7 +18,7 @@ const mockAlertsData = [
 
 
 export function AlertAnalytics() {
-    const { t } = useTranslation();
+    const { t } = useTranslation("common");
 
     const chartConfig = {
         rain: { label: t('gov.analytics.charts.rain'), color: "hsl(var(--chart-1))" },

@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 
 export default function FarmerList() {
   const { farmers, isLoading } = useData();
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
 
   if (isLoading) {
     return (

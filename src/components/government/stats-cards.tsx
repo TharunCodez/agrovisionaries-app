@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 export default function StatsCards() {
     const { farmers, devices } = useData();
-    const { t } = useTranslation();
+    const { t } = useTranslation("common");
 
     const totalFarmers = farmers ? farmers.length : 0;
     const onlineDevices = devices ? devices.filter(d => d.status === 'Online').length : 0;

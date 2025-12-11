@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 
 export function FarmerAnalytics() {
   const { farmers, devices } = useData();
-  const { t } = useTranslation();
+  const { t } = useTranslation("common");
 
   const farmerRiskData = useMemo(() => {
     if (!farmers || !devices) {

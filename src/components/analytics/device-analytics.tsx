@@ -16,7 +16,7 @@ const COLORS = {
 
 export function DeviceAnalytics() {
     const { devices } = useData();
-    const { t } = useTranslation();
+    const { t } = useTranslation("common");
 
     const chartConfig = {
         devices: {
