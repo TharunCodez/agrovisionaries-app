@@ -6,17 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, MapPin, Tractor, HardDrive, Edit, LogOut, Upload, Loader2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/firebase';
-import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/role-context';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { storage, db } from "@/firebase";
+import { db, storage } from "@/firebase";
 import { doc, updateDoc } from "firebase/firestore";
+import { signOut } from 'firebase/auth';
+import { useAuth } from '@/firebase';
 
 function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, icon?: React.ElementType }) {
     const IconComponent = Icon || User;
@@ -83,7 +82,7 @@ function useLogout() {
 
 
 export default function FarmerProfilePage() {
-  const { farmers, isLoading: isDataLoading, setFarmers } = useData();
+  const { farmers, devices, isLoading: isDataLoading, setFarmers } = useData();
   const { user } = useRole();
   const { t } = useTranslation();
   const { toast } = useToast();
@@ -215,10 +214,15 @@ export default function FarmerProfilePage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {farmer?.devices && farmer.devices.length > 0 ? (
-            farmer.devices.map((deviceId: string) => (
-              <div key={deviceId} className="flex items-center justify-between rounded-lg border bg-muted/20 p-4">
-                  <p className="font-bold">{`Device ID: ${deviceId}`}</p>
+          {devices && devices.length > 0 ? (
+            devices.map((device) => (
+              <div key={device.id} className="rounded-lg border bg-muted/20 p-4">
+                  <p className="font-bold">Device ID: {device.id}</p>
+                  <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                    <p><span className="font-semibold">Status:</span> {device.status}</p>
+                    <p><span className="font-semibold">Water Level:</span> {device.waterLevel}%</p>
+                    <p><span className="font-semibold">Soil Moisture:</span> {device.soilMoisture}%</p>
+                  </div>
               </div>
             ))
           ) : (
