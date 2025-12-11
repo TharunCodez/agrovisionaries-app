@@ -4,25 +4,37 @@ import HttpBackend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 i18n
+  // load translation using http -> see /public/locales
   .use(HttpBackend)
+  // detect user language
   .use(LanguageDetector)
+  // pass the i18n instance to react-i18next.
   .use(initReactI18next)
+  // init i18next
   .init({
     fallbackLng: 'en',
+    supportedLngs: ["en", "hi", "sk"],
     debug: process.env.NODE_ENV === 'development',
     ns: ['common'],
     defaultNS: 'common',
-    backend: {
-      loadPath: '/locales/{{lng}}/{{ns}}.json',
-    },
+    
     detection: {
+      // order and from where user language should be detected
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
       lookupLocalStorage: 'agrovisionaries-locale',
     },
-    interpolation: {
-      escapeValue: false, // React already does escaping
+
+    backend: {
+      loadPath: '/locales/{{lng}}/common.json',
     },
+
+    interpolation: {
+      escapeValue: false, // not needed for react as it escapes by default
+    },
+    
+    // This is crucial to prevent i18next from trying to load region-specific files like `en-US`
+    load: 'languageOnly' 
   });
 
 export default i18n;
