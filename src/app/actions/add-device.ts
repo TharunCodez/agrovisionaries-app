@@ -3,7 +3,7 @@
 import type { Device } from '@/contexts/data-context';
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, collection, serverTimestamp, doc, updateDoc, arrayUnion, setDoc } from 'firebase/firestore';
-import { firebaseConfig } from '@/firebase/config';
+import { firebaseConfig } from '@/firebase';
 
 // Helper to initialize Firebase App on the server for actions
 // This creates a temporary app instance and should be used sparingly.
@@ -16,6 +16,9 @@ const getDb = () => {
 
 export async function addDeviceAction(deviceData: Omit<Device, 'id' | 'createdAt' | 'status' | 'lastUpdated' | 'temperature' | 'humidity' | 'soilMoisture' | 'rssi' | 'health' | 'waterLevel'> & { deviceId: string; }) {
     const db = getDb();
+    if (!db) {
+        throw new Error("Firestore not initialized");
+    }
     const { deviceId, farmerId, ...restOfDeviceData } = deviceData;
 
     const deviceRef = doc(db, 'devices', deviceId);

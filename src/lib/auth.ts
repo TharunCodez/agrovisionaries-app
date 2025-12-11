@@ -11,7 +11,7 @@ import {
   where,
   getDocs,
 } from 'firebase/firestore';
-import { initializeFirebase } from '@/firebase';
+import { initializeFirebase, db } from '@/firebase';
 
 export type User = {
   uid: string;
@@ -21,10 +21,12 @@ export type User = {
   isAdmin?: boolean; // Custom claim for government users
 };
 
-// This function is now a server action helper, not using Firebase Auth for OTP
+// This function is now a client-side utility using the imported db instance
 export async function checkFarmerExists(phoneNumber: string): Promise<{ exists: boolean; farmerId: string | null }> {
-  const { firestore } = initializeFirebase();
-  const farmersRef = collection(firestore, 'farmers');
+  if (!db) {
+      throw new Error("Firestore is not initialized.");
+  }
+  const farmersRef = collection(db, 'farmers');
   const q = query(farmersRef, where('phone', '==', phoneNumber.trim()));
   const querySnapshot = await getDocs(q);
 
@@ -48,6 +50,9 @@ export async function signInWithEmailAndPassword(
   password: string
 ): Promise<User> {
   const { auth, firestore } = initializeFirebase();
+  if (!firestore) {
+    throw new Error("Firestore is not initialized.");
+  }
   const userCredential = await firebaseSignInWithEmailAndPassword(
     auth,
     email,

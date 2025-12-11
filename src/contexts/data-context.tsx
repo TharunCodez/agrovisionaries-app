@@ -123,48 +123,55 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const fetchData = async () => {
       setIsDataLoading(true);
 
-      if (role === 'government') {
-        const farmersQuery = query(collection(firestore, 'farmers'));
-        const devicesQuery = query(collection(firestore, 'devices'));
-        
-        const [farmerSnapshot, deviceSnapshot] = await Promise.all([
-          getDocs(farmersQuery),
-          getDocs(devicesQuery)
-        ]);
-
-        const farmersData = farmerSnapshot.docs.map(doc => normalizeFirestoreData({ id: doc.id, ...doc.data() }));
-        const devicesData = deviceSnapshot.docs.map(doc => normalizeFirestoreData({ id: doc.id, ...doc.data() }));
-        
-        setFarmers(farmersData);
-        setDevices(devicesData);
-
-      } else if (role === 'farmer' && user?.phoneNumber) {
-        // Fetch specific farmer profile
-        const farmerProfile = await getFarmerProfile(user.phoneNumber);
-        if (farmerProfile) {
-          setFarmers([farmerProfile as Farmer]);
+      try {
+        if (role === 'government') {
+          const farmersQuery = query(collection(firestore, 'farmers'));
+          const devicesQuery = query(collection(firestore, 'devices'));
           
-          // If farmer has devices, fetch them
-          if (farmerProfile.devices && farmerProfile.devices.length > 0) {
-            setDevices(farmerProfile.devices as Device[]);
+          const [farmerSnapshot, deviceSnapshot] = await Promise.all([
+            getDocs(farmersQuery),
+            getDocs(devicesQuery)
+          ]);
+  
+          const farmersData = farmerSnapshot.docs.map(doc => normalizeFirestoreData({ id: doc.id, ...doc.data() }));
+          const devicesData = deviceSnapshot.docs.map(doc => normalizeFirestoreData({ id: doc.id, ...doc.data() }));
+          
+          setFarmers(farmersData);
+          setDevices(devicesData);
+  
+        } else if (role === 'farmer' && user?.phoneNumber) {
+          // Fetch specific farmer profile
+          const farmerProfile = await getFarmerProfile(user.phoneNumber);
+          if (farmerProfile) {
+            setFarmers([farmerProfile as Farmer]);
+            
+            // If farmer has devices, fetch them
+            if (farmerProfile.devices && farmerProfile.devices.length > 0) {
+              setDevices(farmerProfile.devices as Device[]);
+            } else {
+              setDevices([]);
+            }
           } else {
-            setDevices([]);
+             setFarmers([]);
+             setDevices([]);
           }
         } else {
-           setFarmers([]);
-           setDevices([]);
+          // No role or phoneNumber, clear data
+          setFarmers([]);
+          setDevices([]);
         }
-      } else {
-        // No role or phoneNumber, clear data
+      } catch (error) {
+        console.error("Error fetching data in DataProvider:", error);
         setFarmers([]);
         setDevices([]);
+      } finally {
+        setIsDataLoading(false);
       }
-      setIsDataLoading(false);
     };
 
     fetchData();
 
-  }, [firestore, user, role, isFirebaseLoading]);
+  }, [firestore, user, role]);
 
 
   // For now, sensorData is mock.
