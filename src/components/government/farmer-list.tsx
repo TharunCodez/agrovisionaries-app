@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useData } from "@/contexts/data-context";
 import { Skeleton } from "../ui/skeleton";
 import { useTranslation } from "react-i18next";
+import '@/lib/i18n/client';
 
 export default function FarmerList() {
   const { farmers, isLoading } = useData();

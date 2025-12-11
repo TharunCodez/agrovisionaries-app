@@ -19,6 +19,7 @@ import { addDeviceAction } from '@/app/actions/add-device';
 import { useData } from '@/contexts/data-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTranslation } from 'react-i18next';
+import '@/lib/i18n/client';
 
 
 const AddDeviceMap = dynamic(() => import('@/components/government/add-device-map'), {

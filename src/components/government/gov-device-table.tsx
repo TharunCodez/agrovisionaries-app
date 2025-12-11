@@ -20,6 +20,7 @@ import { useData } from "@/contexts/data-context";
 import { Skeleton } from "../ui/skeleton";
 import { Timestamp } from "firebase/firestore";
 import { useTranslation } from "react-i18next";
+import '@/lib/i18n/client';
 
 function toDate(timestamp: Timestamp | Date | undefined): Date {
   if (timestamp instanceof Timestamp) {

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, PlusCircle } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import '@/lib/i18n/client';
 
 export default function GovernmentDevicesPage() {
     const { t } = useTranslation("common");

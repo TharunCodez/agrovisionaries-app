@@ -5,6 +5,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { useMemo } from "react";
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import { useTranslation } from "react-i18next";
+import '@/lib/i18n/client';
 
 const mockAlertsData = [
   { date: "Mon", rain: 2, water: 5, soil: 8, pump: 1 },

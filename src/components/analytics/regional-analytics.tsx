@@ -6,6 +6,7 @@ import { regionalAnalyticsData } from "@/lib/data";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
+import '@/lib/i18n/client';
 
 export function RegionalAnalytics() {
   const { t } = useTranslation("common");

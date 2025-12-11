@@ -4,6 +4,7 @@ import FarmerList from "@/components/government/farmer-list";
 import RegionalAnalyticsChart from "@/components/government/regional-analytics-chart";
 import StatsCards from "@/components/government/stats-cards";
 import { useTranslation } from "react-i18next";
+import '@/lib/i18n/client';
 
 export default function GovernmentDashboardPage() {
     const { t } = useTranslation("common");

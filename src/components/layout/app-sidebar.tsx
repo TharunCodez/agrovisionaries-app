@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/sidebar';
 import { useTranslation } from 'react-i18next';
 import { useLogout } from '@/hooks/use-logout';
+import '@/lib/i18n/client';
 
 export default function AppSidebar() {
   const pathname = usePathname();

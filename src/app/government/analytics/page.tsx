@@ -11,6 +11,7 @@ import { FarmerAnalytics } from "@/components/analytics/farmer-analytics";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import '@/lib/i18n/client';
 
 
 export default function GovernmentAnalyticsPage() {

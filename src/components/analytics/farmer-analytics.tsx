@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { useData } from "@/contexts/data-context";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import '@/lib/i18n/client';
 
 export function FarmerAnalytics() {
   const { farmers, devices } = useData();

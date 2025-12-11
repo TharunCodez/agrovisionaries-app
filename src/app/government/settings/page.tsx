@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import '@/lib/i18n/client';
 
 export default function GovernmentSettingsPage() {
     const { t } = useTranslation("common");

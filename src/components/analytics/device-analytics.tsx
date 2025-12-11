@@ -6,6 +6,7 @@ import { useData } from "@/contexts/data-context";
 import { useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import { useTranslation } from "react-i18next";
+import '@/lib/i18n/client';
 
 const COLORS = {
     Online: 'hsl(var(--chart-1))',

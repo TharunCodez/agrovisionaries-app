@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { registerFarmerAction } from '@/app/actions/register-farmer';
 import { useTranslation } from 'react-i18next';
+import '@/lib/i18n/client';
 
 
 const soilTypes = [
