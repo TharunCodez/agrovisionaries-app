@@ -6,18 +6,21 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 
-// IMPORTANT: DO NOT MODIFY THIS FUNCTION
-export function initializeFirebase() {
-  const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-  return getSdks(app);
-}
+// This is the correct way to initialize Firebase on the client side.
+const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-export function getSdks(firebaseApp: FirebaseApp) {
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+
+
+// IMPORTANT: DO NOT MODIFY THIS FUNCTION - It is used by the client provider
+export function initializeFirebase() {
   return {
-    firebaseApp,
-    auth: getAuth(firebaseApp),
-    firestore: getFirestore(firebaseApp),
-    storage: getStorage(firebaseApp, firebaseConfig.storageBucket),
+    firebaseApp: app,
+    auth: auth,
+    firestore: db,
+    storage: storage,
   };
 }
 

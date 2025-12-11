@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { uploadProfilePhoto } from '@/app/api/upload-profile-photo';
 import { useData } from '@/contexts/data-context';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, MapPin, Tractor, HardDrive, Edit, LogOut, Upload, Loader2 } from 'lucide-react';
@@ -15,6 +14,9 @@ import { useAuth } from '@/firebase';
 import { signOut } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useRole } from '@/contexts/role-context';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage, db } from "@/firebase";
+import { doc, updateDoc } from "firebase/firestore";
 
 function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, icon?: React.ElementType }) {
     const IconComponent = Icon || User;
@@ -53,19 +55,29 @@ function ProfileLoading() {
     )
 }
 
-export default function FarmerProfilePage() {
-  const { farmers, isLoading: isDataLoading, setFarmers } = useData();
-  const auth = useAuth();
-  const router = useRouter();
-  const { user, setUser, setRole } = useRole();
-  const { t } = useTranslation();
-  const { toast } = useToast();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [uploading, setUploading] = useState(false);
+// Client-only utility function for uploading photo
+async function uploadProfilePhoto(userId: string, file: File) {
+  if (!userId || !file) {
+    throw new Error('Missing user ID or file.');
+  }
   
-  const farmer = farmers?.[0];
+  const imgRef = ref(storage, `profilePhotos/${userId}/${file.name}`);
 
-  const handleLogout = async () => {
+  await uploadBytes(imgRef, file);
+  const url = await getDownloadURL(imgRef);
+
+  await updateDoc(doc(db, "farmers", userId), { photoUrl: url });
+
+  return url;
+}
+
+function useLogout() {
+  const router = useRouter();
+  const auth = useAuth();
+  const { setUser, setRole } = useRole();
+  const { setFarmers } = useData();
+
+  return async () => {
     if (!auth) return;
     try {
       await signOut(auth);
@@ -76,20 +88,24 @@ export default function FarmerProfilePage() {
       localStorage.removeItem('userRole');
       localStorage.removeItem('user');
       localStorage.removeItem('agrovisionaries-locale');
-      toast({
-        title: 'Logged Out',
-        description: 'You have been successfully logged out.',
-      });
-      router.replace('/login');
+      router.replace("/login");
     } catch (error) {
-      console.error('Logout failed:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Logout Failed',
-        description: 'An error occurred while logging out.',
-      });
+      console.error("Logout failed:", error);
     }
   };
+}
+
+
+export default function FarmerProfilePage() {
+  const { farmers, isLoading: isDataLoading, setFarmers } = useData();
+  const { user } = useRole();
+  const { t } = useTranslation();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const handleLogout = useLogout();
+  
+  const farmer = farmers?.[0];
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -97,14 +113,9 @@ export default function FarmerProfilePage() {
 
     setUploading(true);
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const { photoUrl, error } = await uploadProfilePhoto(user.uid, formData);
-      if (error || !photoUrl) {
-        throw new Error(error || 'Upload failed');
-      }
+      const photoUrl = await uploadProfilePhoto(user.uid, file);
+      
       const updatedProfile = { ...farmer, photoUrl };
       setFarmers([updatedProfile]);
 
@@ -185,7 +196,7 @@ export default function FarmerProfilePage() {
         </CardHeader>
         <CardContent className="space-y-4">
           {farmer?.plots?.length > 0 ? (
-            farmer.plots.map((plot: any, index: number) => (
+            farmer.plots.map((plot, index) => (
               <div key={plot.surveyNumber ?? index} className="rounded-lg border bg-muted/20 p-4">
                 <p className="font-bold">{t('surveyNumber')}: {plot.surveyNumber}</p>
                 <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
@@ -217,7 +228,7 @@ export default function FarmerProfilePage() {
                   <p className="text-sm text-muted-foreground">{device.id} - Linked to Plot: {device.surveyNumber}</p>
                    <p className="text-sm text-muted-foreground">Jalkund Capacity: {device.jalkundMaxQuantity}L</p>
                 </div>
-                <Badge variant={device.status === 'Online' ? 'default' : 'destructive'} className={device.status === 'Online' ? 'bg-green-600' : ''}>
+                <Badge variant={device.status === 'Online' ? 'default' : 'destructive'} className={device.status?.toLowerCase() === 'online' ? 'bg-green-600' : ''}>
                   {t(device.status?.toLowerCase() ?? 'offline')}
                 </Badge>
               </div>
