@@ -32,7 +32,7 @@ function ProfileItem({ label, value, icon: Icon }: { label: string; value: any, 
 function ProfileLoading() {
     const { t } = useTranslation();
      return (
-        <div className="space-y-8 pb-20 md:pb-6">
+        <div className="space-y-6 pb-20 md:pb-6">
             <div className="flex items-center justify-between">
               <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('your_profile')}</h1>
               <Skeleton className="h-10 w-24" />
@@ -105,7 +105,7 @@ export default function FarmerProfilePage() {
   }
 
   return (
-    <div className="space-y-8 pb-20 md:pb-6">
+    <div className="space-y-6 pb-20 md:pb-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="font-headline text-2xl md:text-3xl font-bold">{t('your_profile')}</h1>
         <Button disabled>
