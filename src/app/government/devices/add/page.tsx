@@ -11,7 +11,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { MapPin, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import dynamic from 'next/dynamic';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Label } from '@/components/ui/label';
