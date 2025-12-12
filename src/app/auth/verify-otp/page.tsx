@@ -9,8 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { useRole } from '@/contexts/role-context';
 import { useToast } from '@/hooks/use-toast';
+import type { ConfirmationResult } from 'firebase/auth';
 
-const MOCK_OTP = "123456";
+
+declare global {
+  interface Window {
+    confirmationResult?: ConfirmationResult;
+  }
+}
 
 function VerifyOtpComponent() {
   const router = useRouter();
@@ -61,23 +67,46 @@ function VerifyOtpComponent() {
     setError('');
     setLoading(true);
 
-    // Mock OTP verification
-    if (otpCode === MOCK_OTP) {
-        // Successful login
-        const user = { uid: farmerId, phoneNumber: phone, role: 'farmer' as const };
-        setUser(user);
-        setRole('farmer');
-        toast({
-            title: 'Login Successful!',
-            description: 'You are now logged in.',
-        });
-        router.replace('/farmer/dashboard');
-    } else {
-        setError('Invalid OTP. Please try again.');
+    const confirmationResult = window.confirmationResult;
+    if (!confirmationResult) {
+        setError("Verification session expired. Please go back and try again.");
+        setLoading(false);
+        return;
+    }
+
+    try {
+      const result = await confirmationResult.confirm(otpCode);
+      const firebaseUser = result.user;
+
+      // Successful login
+      const user = { uid: farmerId, phoneNumber: phone, role: 'farmer' as const };
+      setUser(user);
+      setRole('farmer');
+
+      toast({
+          title: 'Login Successful!',
+          description: 'You are now logged in.',
+      });
+      
+      // Clean up global object
+      delete window.confirmationResult;
+
+      router.replace('/farmer/dashboard');
+
+    } catch (err) {
+        const e = err as Error & { code?: string };
+        console.error("OTP Verification Error:", e);
+
+        if (e.code === 'auth/invalid-verification-code') {
+            setError('Invalid OTP. Please try again.');
+        } else {
+            setError('Failed to verify OTP. Please try again.');
+        }
         setOtp(new Array(6).fill('')); // Clear OTP fields
         inputRefs.current[0]?.focus(); // Focus first input
+    } finally {
+        setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -90,7 +119,6 @@ function VerifyOtpComponent() {
           <CardTitle>Verify Your Phone</CardTitle>
           <CardDescription>
             Enter the 6-digit code sent to <span className="font-semibold">{phone}</span>.
-            <br/> (Hint: it's 123456)
           </CardDescription>
         </CardHeader>
         <CardContent>

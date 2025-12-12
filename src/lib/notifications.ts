@@ -7,10 +7,11 @@ import {
   updateDoc,
   doc,
   Timestamp,
-  setDoc
+  setDoc,
+  serverTimestamp
 } from 'firebase/firestore';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { initializeFirebase, useFirestore } from '@/firebase';
+import { initializeFirebase } from '@/firebase';
 
 export interface AppNotification {
   id: string;
@@ -36,37 +37,34 @@ export async function setupFCM(userId: string) {
   const { firebaseApp, firestore } = initializeFirebase();
   const messaging = getMessaging(firebaseApp);
 
-  // Request permission
-  const permission = await Notification.requestPermission();
-  if (permission === 'granted') {
-    console.log('Notification permission granted.');
-    // Get token
-    const fcmToken = await getToken(messaging, {
-      vapidKey: process.env.NEXT_PUBLIC_FCM_VAPID_KEY,
-    });
-    if (fcmToken) {
-      console.log('FCM Token:', fcmToken);
-      // Save token to Firestore
-      const tokenRef = doc(firestore, `farmers/${userId}/fcmTokens`, fcmToken);
-      // setDocumentNonBlocking from @/firebase/non-blocking-updates is not available here
-      // so we use setDoc directly with a catch block.
-      await setDoc(tokenRef, { token: fcmToken, createdAt: new Date() }).catch(
-        (err) => console.error('Failed to save FCM token', err)
-      );
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      console.log('Notification permission granted.');
+      const fcmToken = await getToken(messaging, {
+        vapidKey: process.env.NEXT_PUBLIC_FCM_VAPID_KEY,
+      });
+
+      if (fcmToken) {
+        console.log('FCM Token:', fcmToken);
+        const tokenRef = doc(firestore, `farmers/${userId}/fcmTokens`, fcmToken);
+        await setDoc(tokenRef, { token: fcmToken, createdAt: serverTimestamp() });
+      } else {
+        console.log('No registration token available. Request permission to generate one.');
+      }
     } else {
-      console.log('No registration token available. Request permission to generate one.');
+      console.log('Unable to get permission to notify.');
     }
-  } else {
-    console.log('Unable to get permission to notify.');
+  } catch (error) {
+    console.error('An error occurred while setting up FCM.', error);
   }
 
   onMessage(messaging, (payload) => {
     console.log('Message received. ', payload);
-    // Customize notification here
     const notificationTitle = payload.notification?.title || 'New Alert';
     const notificationOptions = {
       body: payload.notification?.body || '',
-      icon: '/firebase-logo.png', // a default icon
+      icon: '/AgroVisionaries_Green.png',
     };
 
     new Notification(notificationTitle, notificationOptions);
