@@ -22,7 +22,7 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
     <SidebarProvider>
       <div className="min-h-screen bg-background">
         <Header />
-        <main className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <main className="w-full mx-auto max-w-[1200px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
             {children}
         </main>
         {!isDesktop && (
