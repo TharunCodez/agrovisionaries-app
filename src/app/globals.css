@@ -104,3 +104,35 @@ body {
     }
   }
 }
+
+/* ============================
+   Farmer portal: force full width on small screens
+   (Scoped: only affects <main data-farmer-layout> on widths < 768px)
+   This is intentionally specific and uses !important so no other
+   parent/container rule can accidentally squeeze mobile layout.
+   ============================ */
+
+   @media (max-width: 767px) {
+    /* Target the farmer portal main */
+    main[data-farmer-layout] {
+      max-width: 100% !important;
+      width: 100% !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+    }
+  
+    /* Ensure immediate child containers expand */
+    main[data-farmer-layout] > * {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  
+    /* Defensive: cards and grid items used on farmer pages */
+    .card, .card > *, .farm-card, .w-full, .col-span-full {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+  }
+  

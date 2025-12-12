@@ -6,7 +6,6 @@ import { setupFCM } from '@/lib/notifications';
 import { useEffect } from 'react';
 import Header from '@/components/layout/header';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { SidebarProvider } from '@/components/ui/sidebar';
 
 export default function FarmerLayout({ children }: { children: React.ReactNode }) {
   const { user } = useUser();
@@ -19,19 +18,20 @@ export default function FarmerLayout({ children }: { children: React.ReactNode }
   }, [user]);
 
   return (
-    <SidebarProvider>
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="w-full mx-auto md:max-w-[1200px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-            {children}
-        </main>
-        {!isDesktop && (
-          <>
-            <ChatAssistantButton />
-            <FarmerBottomNav />
-          </>
-        )}
-      </div>
-    </SidebarProvider>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <main
+        data-farmer-layout
+        className="w-full mx-auto max-w-full md:max-w-[1200px] px-4 sm:px-6 lg:px-8 py-6 sm:py-8"
+      >
+        {children}
+      </main>
+      {!isDesktop && (
+        <>
+          <ChatAssistantButton />
+          <FarmerBottomNav />
+        </>
+      )}
+    </div>
   );
 }
