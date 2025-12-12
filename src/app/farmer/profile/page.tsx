@@ -114,7 +114,7 @@ export default function FarmerProfilePage() {
         </Button>
       </div>
       
-      <Card>
+      <Card className="w-full">
         <CardHeader className="items-center text-center p-6">
           <div className="relative">
             <Avatar className="mx-auto h-28 w-28 border-4 border-primary">
@@ -153,7 +153,7 @@ export default function FarmerProfilePage() {
         </CardContent>
       </Card>
       
-       <Card>
+       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Tractor className="h-6 w-6"/>
@@ -178,7 +178,7 @@ export default function FarmerProfilePage() {
         </CardContent>
       </Card>
       
-       <Card>
+       <Card className="w-full">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <HardDrive className="h-6 w-6"/>

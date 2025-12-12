@@ -38,9 +38,11 @@ export default function DevicesPage() {
                     </Link>
                  </Button>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {devices && devices.map(device => (
-                    <DeviceCard key={device.id} device={device} />
+                    <div key={device.id} className="w-full">
+                        <DeviceCard device={device} />
+                    </div>
                 ))}
                  {(!devices || devices.length === 0) && (
                     <p className="text-muted-foreground col-span-full">{t('no_devices')}</p>
