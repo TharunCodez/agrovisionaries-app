@@ -1,0 +1,51 @@
+
+{
+  "Common": {
+    "online": "Online",
+    "offline": "Offline",
+    "viewDetails": "View Details",
+    "lastUpdated": "Last updated",
+    "editProfile": "Edit Profile",
+    "save": "Save",
+    "cancel": "Cancel",
+    "uploadPhoto": "Upload Photo"
+  },
+  "Nav": {
+    "dashboard": "Dashboard",
+    "devices": "Devices",
+    "assistant": "Assistant",
+    "alerts": "Alerts",
+    "profile": "Profile"
+  },
+  "Dashboard": {
+    "title": "Dashboard",
+    "reservoirLevel": "Reservoir Level",
+    "irrigationPump": "Irrigation Pump",
+    "temperature": "Temperature",
+    "moisture": "Soil Moisture",
+    "signal": "Signal",
+    "battery": "Battery",
+    "noDevicesTitle": "No Devices Found",
+    "noDevicesDesc": "No devices have been registered for your account yet. Please contact your local government office to get started.",
+    "viewDevices": "View Devices Page"
+  },
+  "Assistant": {
+    "title": "AI Assistant",
+    "subtitle": "Your personal farming support bot.",
+    "welcome": "Hello! I'm your AI assistant. How can I help you today? You can ask me questions about the app or upload a photo of a plant for a health diagnosis.",
+    "inputPlaceholder": "Ask a question...",
+    "upload": "Attach image",
+    "send": "Send"
+  },
+  "Profile": {
+    "title": "Your Profile",
+    "aadhaar": "Aadhaar",
+    "address": "Address",
+    "landPlots": "My Land Plots",
+    "surveyNumber": "Survey No",
+    "area": "Area (acres)",
+    "landType": "Land Type",
+    "soilType": "Soil Type",
+    "myDevices": "My Devices"
+  }
+}

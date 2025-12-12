@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 150 25% 95%; /* Light Green */
+    --foreground: 141 33% 21%;
+    --card: 150 25% 98%;
+    --card-foreground: 141 33% 21%;
+    --popover: 150 25% 98%;
+    --popover-foreground: 141 33% 21%;
+    --primary: 141 33% 31%; /* Dark Green */
+    --primary-foreground: 150 25% 95%;
+    --secondary: 150 14% 87%;
+    --secondary-foreground: 141 33% 31%;
+    --muted: 150 14% 91%;
+    --muted-foreground: 141_20%_41%;
+    --accent: 28 36% 48%; /* Earthy Brown */
+    --accent-foreground: 150 25% 95%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 150 14% 87%;
+    --input: 150 14% 89%;
+    --ring: 141 33% 31%;
+    --chart-1: 141 33% 31%;
+    --chart-2: 28 36% 48%;
+    --chart-3: 150 14% 67%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+    --sidebar-background: 150 25% 98%;
+    --sidebar-foreground: 141 33% 21%;
+    --sidebar-primary: 141 33% 31%;
+    --sidebar-primary-foreground: 150 25% 95%;
+    --sidebar-accent: 150 14% 91%;
+    --sidebar-accent-foreground: 141 33% 21%;
+    --sidebar-border: 150 14% 87%;
+    --sidebar-ring: 141 33% 31%;
+  }
+
+  .dark {
+    --background: 141 15% 10%;
+    --foreground: 150 14% 87%;
+    --card: 141 15% 15%;
+    --card-foreground: 150 14% 87%;
+    --popover: 141 15% 15%;
+    --popover-foreground: 150 14% 87%;
+    --primary: 141 33% 31%;
+    --primary-foreground: 150 25% 95%;
+    --secondary: 141 15% 25%;
+    --secondary-foreground: 150 14% 87%;
+    --muted: 141 15% 20%;
+    --muted-foreground: 150 14% 70%;
+    --accent: 28 36% 48%;
+    --accent-foreground: 150 25% 95%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 141 15% 20%;
+    --input: 141 15% 25%;
+    --ring: 141 33% 31%;
+    --chart-1: 141 33% 31%;
+    --chart-2: 28 36% 48%;
+    --chart-3: 150 14% 67%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 141 15% 10%;
+    --sidebar-foreground: 150 14% 87%;
+    --sidebar-primary: 141 33% 31%;
+    --sidebar-primary-foreground: 150 25% 95%;
+    --sidebar-accent: 141 15% 20%;
+    --sidebar-accent-foreground: 150 14% 87%;
+    --sidebar-border: 141 15% 20%;
+    --sidebar-ring: 141 33% 31%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  @keyframes wave {
+    0%,
+    100% {
+      transform: translateY(0) translateX(-50%) rotate(0);
+    }
+    50% {
+      transform: translateY(-10px) translateX(-50%) rotate(5deg);
+    }
+  }
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+/* ============================
+   Farmer portal: force full width on small screens
+   (Scoped: only affects <main data-farmer-layout> on widths < 768px)
+   This is intentionally specific and uses !important so no other
+   parent/container rule can accidentally squeeze mobile layout.
+   ============================ */
+
+   @media (max-width: 767px) {
+    /* Target the farmer portal main */
+    main[data-farmer-layout] {
+      max-width: 100% !important;
+      width: 100% !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      padding-left: 16px !important;
+      padding-right: 16px !important;
+    }
+  
+    /* Ensure immediate child containers expand */
+    main[data-farmer-layout] > * {
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+  
+    /* Defensive: cards and grid items used on farmer pages */
+    .card, .card > *, .farm-card, .w-full, .col-span-full {
+      max-width: 100% !important;
+      width: 100% !important;
+    }
+  }
+  

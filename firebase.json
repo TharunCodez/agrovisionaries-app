@@ -1,0 +1,35 @@
+{
+  "hosting": {
+    "public": "out",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "source": ".",
+    "frameworksBackend": {
+      "region": "us-central1"
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ],
+      "environment": {
+        "TTN_API_KEY": "NNSXS.LIVKNQUZAU4RBT4KFTJVQ3FY7AQDWI5Q55KGSFA.AAH5KWCH4WOZE2NAL35ZRLUANLXFHG6HKHNO2W35BZLL7BF4FPPQ",
+        "TTN_APPLICATION_ID": "dual-valve-control",
+        "FIRESTORE_DEVICES_COLLECTION": "devices"
+      }
+    }
+  ]
+}
