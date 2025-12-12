@@ -21,10 +21,27 @@ import { useTranslation } from 'react-i18next';
 import { useData } from '@/contexts/data-context';
 import { useLogout } from '@/hooks/use-logout';
 import { cn } from '@/lib/utils';
-import { useMediaQuery } from '@/hooks/use-media-query';
+import { useState, useEffect } from 'react';
+
 
 export default function Header() {
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Check on initial mount
+    checkIsMobile();
+
+    // Add resize listener
+    window.addEventListener('resize', checkIsMobile);
+
+    // Cleanup listener on component unmount
+    return () => window.removeEventListener('resize', checkIsMobile);
+  }, []);
+
   const pathname = usePathname();
   const { role } = useRole();
   const { farmers } = useData();
@@ -78,8 +95,8 @@ export default function Header() {
                  <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                        <Avatar className="h-10 w-10">
-                            <AvatarImage src="/gov-avatar.png" alt="Government User"/>
+                        <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+                            <AvatarImage src="/gov-avatar.png" alt="Government User" className="h-full w-full object-cover"/>
                             <AvatarFallback>GV</AvatarFallback>
                         </Avatar>
                         </Button>
@@ -144,8 +161,8 @@ export default function Header() {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                        <Avatar className="h-10 w-10">
-                            <AvatarImage src={farmer?.photoUrl ?? ''} alt={farmer?.name} />
+                        <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+                            <AvatarImage src={farmer?.photoUrl ?? ''} alt={farmer?.name} className="h-full w-full object-cover"/>
                             <AvatarFallback>{farmer?.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
                         </Avatar>
                     </Button>
