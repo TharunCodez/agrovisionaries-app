@@ -103,7 +103,7 @@ export default function Header() {
       return (
         <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-card/80 px-4 backdrop-blur-sm md:px-6">
             <Link href="/farmer/dashboard" className="flex items-center gap-2">
-                <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-6 w-6 object-contain" />
+                <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-8 w-8 rounded-full object-cover" />
                 <span className="text-lg font-bold">{t('farmerPortal')}</span>
             </Link>
             <div className='flex items-center'>
@@ -117,7 +117,7 @@ export default function Header() {
   return (
     <header className="hidden md:flex w-full sticky top-0 z-50 bg-background/95 backdrop-blur-sm px-6 lg:px-12 py-3 justify-between items-center border-b">
         <Link href="/farmer/dashboard" className="flex items-center gap-2">
-            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-6 w-6 object-contain" />
+            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-8 w-8 rounded-full object-cover" />
             <span className="text-xl font-bold">{t('farmerPortal')}</span>
         </Link>
 

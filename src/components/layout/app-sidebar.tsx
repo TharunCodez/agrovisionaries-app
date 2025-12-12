@@ -48,8 +48,8 @@ export default function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-6 w-6 object-contain" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full overflow-hidden">
+            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-8 w-8 object-cover" />
           </div>
           <span className="font-headline text-lg font-bold">{t('gov.sidebar.title')}</span>
         </div>
