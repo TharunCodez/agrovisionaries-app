@@ -31,7 +31,7 @@ export default function Home() {
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-center p-4 text-center">
         <div className="mx-auto max-w-4xl">
           <div className="mb-8 flex items-center justify-center gap-3">
-            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-12 w-12 md:h-16 md:w-16 object-contain" />
+            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-16 w-16 md:h-20 md:w-20 object-contain rounded-full border-2 border-primary shadow-lg" />
             <h1 className="font-headline text-4xl md:text-7xl font-bold tracking-tight text-foreground">
               Agro Visionaries
             </h1>

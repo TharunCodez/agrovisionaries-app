@@ -77,9 +77,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mb-4 flex justify-center">
-            <div className="rounded-full bg-primary p-3">
-              <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-8 w-8 object-contain" />
-            </div>
+            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-20 w-20 rounded-full object-cover border-2 border-primary shadow-md" />
           </div>
           <CardTitle className="text-3xl font-bold">Agro Visionaries</CardTitle>
           <CardDescription>Select your portal to continue</CardDescription>

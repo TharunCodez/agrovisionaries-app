@@ -84,8 +84,8 @@ function VerifyOtpComponent() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary">
-            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-10 w-10 object-contain" />
+          <div className="mx-auto mb-4">
+             <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-20 w-20 rounded-full object-cover border-2 border-primary shadow-md" />
           </div>
           <CardTitle>Verify Your Phone</CardTitle>
           <CardDescription>
