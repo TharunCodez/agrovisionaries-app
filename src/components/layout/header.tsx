@@ -116,7 +116,7 @@ export default function Header() {
   }
 
   // Farmer Header
-  if (isMobile) {
+  if (role === 'farmer' && isMobile) {
       return (
         <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-2 border-b bg-card/80 px-4 backdrop-blur-sm md:px-6">
             <Link href="/farmer/dashboard" className="flex items-center gap-2">
@@ -131,56 +131,61 @@ export default function Header() {
       )
   }
   
-  return (
-    <header className="hidden md:flex w-full sticky top-0 z-50 bg-background/95 backdrop-blur-sm px-6 lg:px-12 py-3 justify-between items-center border-b">
-        <Link href="/farmer/dashboard" className="flex items-center gap-2">
-            <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-8 w-8 rounded-full object-cover" />
-            <span className="text-xl font-bold">{t('farmerPortal')}</span>
-        </Link>
+  if (role === 'farmer') {
+    return (
+        <header className="hidden md:flex w-full sticky top-0 z-50 bg-background/95 backdrop-blur-sm px-6 lg:px-12 py-3 justify-between items-center border-b">
+            <Link href="/farmer/dashboard" className="flex items-center gap-2">
+                <img src="/AgroVisionaries_Green.png" alt="Agro Visionaries Logo" className="h-8 w-8 rounded-full object-cover" />
+                <span className="text-xl font-bold">{t('farmerPortal')}</span>
+            </Link>
 
-        <nav className="flex items-center gap-6 text-sm font-medium">
-            {farmerNavItems.map((item) => (
-                <Link
-                    key={item.href}
-                    href={item.href}
-                    className={cn(
-                        'transition-colors hover:text-primary',
-                        pathname.startsWith(item.href) ? 'text-primary' : 'text-muted-foreground'
-                    )}
-                >
-                    {item.label}
-                </Link>
-            ))}
-        </nav>
+            <nav className="flex items-center gap-6 text-sm font-medium">
+                {farmerNavItems.map((item) => (
+                    <Link
+                        key={item.href}
+                        href={item.href}
+                        className={cn(
+                            'transition-colors hover:text-primary',
+                            pathname.startsWith(item.href) ? 'text-primary' : 'text-muted-foreground'
+                        )}
+                    >
+                        {item.label}
+                    </Link>
+                ))}
+            </nav>
 
-        <div className="flex items-center gap-2 md:gap-4">
-            <LanguageSwitcher />
-            <ThemeToggle />
-            <NotificationBell />
+            <div className="flex items-center gap-2 md:gap-4">
+                <LanguageSwitcher />
+                <ThemeToggle />
+                <NotificationBell />
 
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                        <Avatar className="h-10 w-10 rounded-full overflow-hidden">
-                            <AvatarImage src={farmer?.photoUrl ?? ''} alt={farmer?.name} className="h-full w-full object-cover"/>
-                            <AvatarFallback>{farmer?.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
-                        </Avatar>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>{farmer?.name ?? t('myAccount')}</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                        <Link href="/farmer/profile">{t('profile')}</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                        <Link href="/farmer/settings">{t('settings')}</Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout}>{t('logout')}</DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </div>
-    </header>
-  );
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                            <Avatar className="h-10 w-10 rounded-full overflow-hidden">
+                                <AvatarImage src={farmer?.photoUrl ?? ''} alt={farmer?.name} className="h-full w-full object-cover"/>
+                                <AvatarFallback>{farmer?.name ? farmer.name.charAt(0).toUpperCase() : 'F'}</AvatarFallback>
+                            </Avatar>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56">
+                        <DropdownMenuLabel>{farmer?.name ?? t('myAccount')}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                            <Link href="/farmer/profile">{t('profile')}</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link href="/farmer/settings">{t('settings')}</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={logout}>{t('logout')}</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
+        </header>
+    );
+  }
+
+  // Fallback for when role is not yet determined
+  return <div className="h-16 border-b"></div>
 }
