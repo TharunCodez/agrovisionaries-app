@@ -9,14 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
 import { useRole } from '@/contexts/role-context';
 import { useToast } from '@/hooks/use-toast';
-import type { ConfirmationResult } from 'firebase/auth';
 
-
-declare global {
-  interface Window {
-    confirmationResult?: ConfirmationResult;
-  }
-}
+const DEV_OTP = '123456';
 
 function VerifyOtpComponent() {
   const router = useRouter();
@@ -67,44 +61,23 @@ function VerifyOtpComponent() {
     setError('');
     setLoading(true);
 
-    const confirmationResult = window.confirmationResult;
-    if (!confirmationResult) {
-        setError("Verification session expired. Please go back and try again.");
-        setLoading(false);
-        return;
-    }
+    // TEMPORARY: Development login with hardcoded OTP
+    if (otpCode === DEV_OTP) {
+        // Successful login
+        const user = { uid: farmerId, phoneNumber: phone, role: 'farmer' as const };
+        setUser(user);
+        setRole('farmer');
 
-    try {
-      const result = await confirmationResult.confirm(otpCode);
-      const firebaseUser = result.user;
+        toast({
+            title: 'Login Successful!',
+            description: 'You are now logged in.',
+        });
 
-      // Successful login
-      const user = { uid: farmerId, phoneNumber: phone, role: 'farmer' as const };
-      setUser(user);
-      setRole('farmer');
-
-      toast({
-          title: 'Login Successful!',
-          description: 'You are now logged in.',
-      });
-      
-      // Clean up global object
-      delete window.confirmationResult;
-
-      router.replace('/farmer/dashboard');
-
-    } catch (err) {
-        const e = err as Error & { code?: string };
-        console.error("OTP Verification Error:", e);
-
-        if (e.code === 'auth/invalid-verification-code') {
-            setError('Invalid OTP. Please try again.');
-        } else {
-            setError('Failed to verify OTP. Please try again.');
-        }
+        router.replace('/farmer/dashboard');
+    } else {
+        setError('Invalid OTP. Please try again.');
         setOtp(new Array(6).fill('')); // Clear OTP fields
         inputRefs.current[0]?.focus(); // Focus first input
-    } finally {
         setLoading(false);
     }
   };
@@ -118,13 +91,13 @@ function VerifyOtpComponent() {
           </div>
           <CardTitle>Verify Your Phone</CardTitle>
           <CardDescription>
-            Enter the 6-digit code sent to <span className="font-semibold">{phone}</span>.
+            Enter the development OTP code for <span className="font-semibold">{phone}</span>.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="otp">Verification Code</Label>
+              <Label htmlFor="otp">Verification Code (use 123456)</Label>
               <div className="flex justify-between gap-2">
                 {otp.map((digit, index) => (
                   <Input
