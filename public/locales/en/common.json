@@ -66,7 +66,7 @@
       "settings": "Settings"
     },
     "dashboard": {
-      "title": "South Sikkim Agriculture Overview",
+      "title": "India Agriculture Overview",
       "stats": {
         "totalFarmers": "Total Farmers",
         "totalFarmersDesc": "+2 this month",
@@ -75,8 +75,8 @@
         "criticalAlerts": "Critical Alerts",
         "last24h": "Last 24 hours"
       },
-      "regionalWaterUsageTitle": "Regional Water Usage (South Sikkim)",
-      "regionalWaterUsageDesc": "Comparison of water consumption across regions."
+      "regionalWaterUsageTitle": "Regional Water Usage (India)",
+      "regionalWaterUsageDesc": "Comparison of water consumption across states."
     },
     "devices": {
       "title": "Device Management",
@@ -152,9 +152,9 @@
       }
     },
     "analytics": {
-      "title": "Analytics Dashboard",
+      "title": "India Agriculture Insights",
       "totalFarmers": "Total Farmers",
-      "inSouthSikkim": "in South Sikkim",
+      "inIndia": "across India",
       "totalDevices": "Total Devices",
       "vsLastMonth": "vs last month",
       "onlineDevices": "Online Devices",
@@ -169,8 +169,8 @@
       "devicePerformanceDesc": "Live status of all registered devices.",
       "atRiskFarmersTitle": "Top At-Risk Farmers",
       "atRiskFarmersDesc": "Farmers with the highest number of critical alerts.",
-      "regionalInsightsTitle": "South Sikkim Agriculture Insights",
-      "regionalInsightsDesc": "Water usage and soil moisture across key regions.",
+      "regionalInsightsTitle": "Agriculture Insights by State",
+      "regionalInsightsDesc": "Water usage and soil moisture across all states.",
       "warning": "Warning",
       "critical": "Critical",
       "risk": {
@@ -193,7 +193,7 @@
       "title": "Satellite Analytics",
       "settings": {
         "title": "Location Settings",
-        "description": "Centered on South Sikkim"
+        "description": "Centered on India"
       },
       "dataLayer": "Data Layer",
       "fetchButton": "Fetch Satellite Data",
@@ -202,7 +202,7 @@
       },
       "stats": {
         "ndviIndex": "NDVI Index",
-        "forSelectedArea": "For selected area",
+        "forSelectedArea": "For selected region in India",
         "aggregated": "Aggregated from sensors",
         "vegetationHealthy": "Vegetation is healthy"
       },
