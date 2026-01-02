@@ -66,7 +66,7 @@
       "settings": "Settings"
     },
     "dashboard": {
-      "title": "National Agriculture Overview",
+      "title": "India Agriculture Overview",
       "stats": {
         "totalFarmers": "Total Farmers",
         "totalFarmersDesc": "+2 this month",
@@ -75,7 +75,7 @@
         "criticalAlerts": "Critical Alerts",
         "last24h": "Last 24 hours"
       },
-      "regionalWaterUsageTitle": "Regional Water Usage",
+      "regionalWaterUsageTitle": "Regional Water Usage (India)",
       "regionalWaterUsageDesc": "Comparison of water consumption across states."
     },
     "devices": {
@@ -152,7 +152,7 @@
       }
     },
     "analytics": {
-      "title": "Analytics Dashboard",
+      "title": "India Agriculture Insights",
       "totalFarmers": "Total Farmers",
       "inIndia": "across India",
       "totalDevices": "Total Devices",
@@ -202,7 +202,7 @@
       },
       "stats": {
         "ndviIndex": "NDVI Index",
-        "forSelectedArea": "For selected area",
+        "forSelectedArea": "For selected region in India",
         "aggregated": "Aggregated from sensors",
         "vegetationHealthy": "Vegetation is healthy"
       },

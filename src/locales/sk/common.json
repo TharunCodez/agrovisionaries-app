@@ -66,7 +66,7 @@
       "settings": "सेटिङहरू"
     },
     "dashboard": {
-      "title": "राष्ट्रिय कृषि अवलोकन",
+      "title": "भारत कृषि अवलोकन",
       "stats": {
         "totalFarmers": "कुल किसानहरू",
         "totalFarmersDesc": "+२ यो महिना",
@@ -75,7 +75,7 @@
         "criticalAlerts": "गम्भीर अलर्टहरू",
         "last24h": "पछिल्लो २४ घण्टा"
       },
-      "regionalWaterUsageTitle": "क्षेत्रीय पानी उपयोग",
+      "regionalWaterUsageTitle": "क्षेत्रीय पानी उपयोग (भारत)",
       "regionalWaterUsageDesc": "राज्यहरूमा पानी खपतको तुलना।"
     },
     "devices": {
@@ -152,7 +152,7 @@
       }
     },
     "analytics": {
-      "title": "एनालिटिक्स ड्यासबोर्ड",
+      "title": "भारत कृषि अन्तर्दृष्टि",
       "totalFarmers": "कुल किसानहरू",
       "inIndia": "भारतभरि",
       "totalDevices": "कुल उपकरणहरू",
@@ -202,7 +202,7 @@
       },
       "stats": {
         "ndviIndex": "NDVI सूचकांक",
-        "forSelectedArea": "चयनित क्षेत्रको लागि",
+        "forSelectedArea": "भारतमा चयनित क्षेत्रको लागि",
         "aggregated": "सेन्सरहरूबाट एकत्रित",
         "vegetationHealthy": "वनस्पति स्वस्थ छ"
       },
