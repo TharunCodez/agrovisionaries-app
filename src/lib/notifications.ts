@@ -1,3 +1,5 @@
+'use client';
+
 import {
   collection,
   onSnapshot,
@@ -8,7 +10,7 @@ import {
   doc,
   Timestamp,
   setDoc,
-  serverTimestamp
+  serverTimestamp,
 } from 'firebase/firestore';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import { initializeFirebase } from '@/firebase';
@@ -55,8 +57,13 @@ export async function setupFCM(userId: string) {
     } else {
       console.log('Unable to get permission to notify.');
     }
-  } catch (error) {
-    console.error('An error occurred while setting up FCM.', error);
+  } catch (error: any) {
+    if (error.code === 'messaging/token-subscribe-failed') {
+        console.warn('FCM Token generation failed. This is expected if the app is not running in a secure (HTTPS) context or if the FCM API is not enabled.');
+        console.warn(`To enable the API, visit: https://console.developers.google.com/apis/api/fcmregistrations.googleapis.com/overview?project=${firebaseApp.options.projectId}`);
+    } else {
+        console.error('An error occurred while setting up FCM.', error);
+    }
   }
 
   onMessage(messaging, (payload) => {
