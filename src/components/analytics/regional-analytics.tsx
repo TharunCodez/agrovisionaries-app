@@ -2,10 +2,18 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { regionalAnalyticsData } from "@/lib/data";
+import { indianStates } from "@/lib/data";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
+
+// Generate mock data for all states
+const allStatesAnalyticsData = indianStates.map(state => ({
+    region: state.name,
+    waterUsage: Math.floor(Math.random() * 5000) + 1000,
+    soilMoisture: Math.floor(Math.random() * 50) + 30,
+    farmers: Math.floor(Math.random() * 200) + 10
+}));
 
 export function RegionalAnalytics() {
   const { t } = useTranslation("common");
@@ -29,9 +37,9 @@ export function RegionalAnalytics() {
       <CardContent>
         <ChartContainer config={chartConfig} className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={regionalAnalyticsData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+                <BarChart data={allStatesAnalyticsData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="region" tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
+                    <XAxis dataKey="region" tickLine={false} axisLine={false} tickMargin={8} fontSize={10} interval={1} angle={-45} textAnchor="end" height={80} />
                     <YAxis yAxisId="left" orientation="left" stroke={chartConfig.waterUsage.color} tickFormatter={(value) => `${Number(value) / 1000}k`} tickLine={false} axisLine={false} tickMargin={8} />
                     <YAxis yAxisId="right" orientation="right" stroke={chartConfig.soilMoisture.color} domain={[0, 100]} unit="%" tickLine={false} axisLine={false} tickMargin={8} />
                     <ChartTooltip cursor={true} content={<ChartTooltipContent indicator="dot" />} />

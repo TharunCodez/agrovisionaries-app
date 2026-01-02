@@ -66,7 +66,7 @@
       "settings": "सेटिङहरू"
     },
     "dashboard": {
-      "title": "दक्षिण सिक्किम कृषि अवलोकन",
+      "title": "राष्ट्रिय कृषि अवलोकन",
       "stats": {
         "totalFarmers": "कुल किसानहरू",
         "totalFarmersDesc": "+२ यो महिना",
@@ -75,8 +75,8 @@
         "criticalAlerts": "गम्भीर अलर्टहरू",
         "last24h": "पछिल्लो २४ घण्टा"
       },
-      "regionalWaterUsageTitle": "क्षेत्रीय पानी उपयोग (दक्षिण सिक्किम)",
-      "regionalWaterUsageDesc": "क्षेत्रहरूमा पानी खपतको तुलना।"
+      "regionalWaterUsageTitle": "क्षेत्रीय पानी उपयोग",
+      "regionalWaterUsageDesc": "राज्यहरूमा पानी खपतको तुलना।"
     },
     "devices": {
       "title": "उपकरण व्यवस्थापन",
@@ -154,7 +154,7 @@
     "analytics": {
       "title": "एनालिटिक्स ड्यासबोर्ड",
       "totalFarmers": "कुल किसानहरू",
-      "inSouthSikkim": "दक्षिण सिक्किममा",
+      "inIndia": "भारतभरि",
       "totalDevices": "कुल उपकरणहरू",
       "vsLastMonth": "गत महिनाको तुलनामा",
       "onlineDevices": "अनलाइन उपकरणहरू",
@@ -169,8 +169,8 @@
       "devicePerformanceDesc": "सबै दर्ता गरिएका उपकरणहरूको प्रत्यक्ष स्थिति।",
       "atRiskFarmersTitle": "शीर्ष जोखिममा रहेका किसानहरू",
       "atRiskFarmersDesc": "सबैभन्दा धेरै गम्भीर अलर्ट भएका किसानहरू।",
-      "regionalInsightsTitle": "दक्षिण सिक्किम कृषि अन्तर्दृष्टि",
-      "regionalInsightsDesc": "प्रमुख क्षेत्रहरूमा पानीको उपयोग र माटोको चिस्यान।",
+      "regionalInsightsTitle": "राज्यद्वारा कृषि अन्तर्दृष्टि",
+      "regionalInsightsDesc": "सबै राज्यहरूमा पानीको उपयोग र माटोको चिस्यान।",
       "warning": "चेतावनी",
       "critical": "गम्भीर",
       "risk": {
@@ -193,7 +193,7 @@
       "title": "स्याटेलाइट एनालिटिक्स",
       "settings": {
         "title": "स्थान सेटिङहरू",
-        "description": "दक्षिण सिक्किममा केन्द्रित"
+        "description": "भारतमा केन्द्रित"
       },
       "dataLayer": "डाटा तह",
       "fetchButton": "स्याटेलाइट डाटा प्राप्त गर्नुहोस्",

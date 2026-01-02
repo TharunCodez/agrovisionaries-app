@@ -2,10 +2,17 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { regionalAnalyticsData } from "@/lib/data";
+import { indianStates } from "@/lib/data";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
+
+// Generate mock data for all states
+const allStatesAnalyticsData = indianStates.map(state => ({
+    region: state.name,
+    waterUsage: Math.floor(Math.random() * 5000) + 1000,
+}));
+
 
 export default function RegionalAnalyticsChart() {
   const { t } = useTranslation("common");
@@ -25,9 +32,9 @@ export default function RegionalAnalyticsChart() {
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig} className="h-80 w-full">
-          <BarChart data={regionalAnalyticsData} margin={{ top: 5, right: 10, left: -10, bottom: 5 }}>
+          <BarChart data={allStatesAnalyticsData} margin={{ top: 5, right: 10, left: -10, bottom: 70 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="region" tickLine={false} axisLine={false} tickMargin={8} />
+            <XAxis dataKey="region" tickLine={false} axisLine={false} tickMargin={8} fontSize={10} interval={1} angle={-45} textAnchor="end" />
             <YAxis tickFormatter={(value) => `${Number(value) / 1000}k`} tickLine={false} axisLine={false} tickMargin={8} />
             <ChartTooltip cursor={false} content={<ChartTooltipContent indicator="dot" />} />
             <Bar dataKey="waterUsage" fill="var(--color-waterUsage)" radius={4} />

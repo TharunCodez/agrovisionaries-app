@@ -17,6 +17,7 @@ import { Separator } from '@/components/ui/separator';
 import { registerFarmerAction } from '@/app/actions/register-farmer';
 import { useRole } from '@/contexts/role-context';
 import Link from 'next/link';
+import { indianStates } from '@/lib/data';
 
 const soilTypes = [
   "Alluvial",
@@ -47,6 +48,7 @@ const formSchema = z.object({
   address: z.string().nonempty({ message: "Address is required." }),
   village: z.string().nonempty({ message: "Village is required." }),
   district: z.string().nonempty({ message: "District is required." }),
+  state: z.string().nonempty({ message: "State is required." }),
   plots: z.array(plotSchema).min(1, { message: "At least one plot is required." }),
 });
 
@@ -55,6 +57,7 @@ export default function FarmerSelfRegisterPage() {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const { setRole, setUser } = useRole();
+  const [selectedState, setSelectedState] = useState('');
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,8 +66,9 @@ export default function FarmerSelfRegisterPage() {
       phone: '',
       aadhaar: '',
       address: '',
-      village: 'Jorethang',
-      district: 'South Sikkim',
+      village: '',
+      district: '',
+      state: '',
       plots: [{ surveyNumber: '', areaAcres: 0, landType: 'Irrigated', soilType: 'Alluvial' }],
     },
   });
@@ -101,6 +105,15 @@ export default function FarmerSelfRegisterPage() {
     }
   }
 
+  const handleStateChange = (state: string) => {
+    setSelectedState(state);
+    form.setValue('state', state);
+    form.setValue('district', ''); // Reset district when state changes
+  };
+
+  const districts = selectedState ? indianStates.find(s => s.name === selectedState)?.districts || [] : [];
+
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-2xl">
@@ -133,11 +146,40 @@ export default function FarmerSelfRegisterPage() {
                     <FormItem><FormLabel>Full Address</FormLabel><FormControl><Textarea placeholder="House No, Street, Landmark..." {...field} /></FormControl><FormMessage /></FormItem>
                 )} />
                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                     <FormField
+                        control={form.control}
+                        name="state"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>State</FormLabel>
+                            <Select onValueChange={handleStateChange} defaultValue={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a state" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    {indianStates.map(state => <SelectItem key={state.name} value={state.name}>{state.name}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                         <FormField
+                        control={form.control}
+                        name="district"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>District</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value} disabled={!selectedState}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Select a district" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                    {districts.map(district => <SelectItem key={district} value={district}>{district}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
                     <FormField control={form.control} name="village" render={({ field }) => (
                         <FormItem><FormLabel>Village</FormLabel><FormControl><Input placeholder="e.g., Jorethang" {...field} /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={form.control} name="district" render={({ field }) => (
-                        <FormItem><FormLabel>District</FormLabel><FormControl><Input placeholder="e.g., South Sikkim" {...field} /></FormControl><FormMessage /></FormItem>
                     )} />
                 </div>
               </div>

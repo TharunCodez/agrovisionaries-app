@@ -66,7 +66,7 @@
       "settings": "सेटिंग्स"
     },
     "dashboard": {
-      "title": "दक्षिण सिक्किम कृषि अवलोकन",
+      "title": "राष्ट्रीय कृषि अवलोकन",
       "stats": {
         "totalFarmers": "कुल किसान",
         "totalFarmersDesc": "+2 इस महीने",
@@ -75,8 +75,8 @@
         "criticalAlerts": "गंभीर अलर्ट",
         "last24h": "पिछले 24 घंटे"
       },
-      "regionalWaterUsageTitle": "क्षेत्रीय जल उपयोग (दक्षिण सिक्किम)",
-      "regionalWaterUsageDesc": "क्षेत्रों में पानी की खपत की तुलना।"
+      "regionalWaterUsageTitle": "क्षेत्रीय जल उपयोग",
+      "regionalWaterUsageDesc": "राज्यों में पानी की खपत की तुलना।"
     },
     "devices": {
       "title": "उपकरण प्रबंधन",
@@ -154,7 +154,7 @@
     "analytics": {
       "title": "एनालिटिक्स डैशबोर्ड",
       "totalFarmers": "कुल किसान",
-      "inSouthSikkim": "दक्षिण सिक्किम में",
+      "inIndia": "पूरे भारत में",
       "totalDevices": "कुल उपकरण",
       "vsLastMonth": "पिछले महीने की तुलना में",
       "onlineDevices": "ऑनलाइन उपकरण",
@@ -169,8 +169,8 @@
       "devicePerformanceDesc": "सभी पंजीकृत उपकरणों की लाइव स्थिति।",
       "atRiskFarmersTitle": "शीर्ष जोखिम वाले किसान",
       "atRiskFarmersDesc": "सबसे अधिक गंभीर अलर्ट वाले किसान।",
-      "regionalInsightsTitle": "दक्षिण सिक्किम कृषि अंतर्दृष्टि",
-      "regionalInsightsDesc": "प्रमुख क्षेत्रों में पानी का उपयोग और मिट्टी की नमी।",
+      "regionalInsightsTitle": "राज्य द्वारा कृषि अंतर्दृष्टि",
+      "regionalInsightsDesc": "सभी राज्यों में पानी का उपयोग और मिट्टी की नमी।",
       "warning": "चेतावनी",
       "critical": "गंभीर",
       "risk": {
@@ -193,7 +193,7 @@
       "title": "सैटेलाइट एनालिटिक्स",
       "settings": {
         "title": "स्थान सेटिंग्स",
-        "description": "दक्षिण सिक्किम पर केंद्रित"
+        "description": "भारत पर केंद्रित"
       },
       "dataLayer": "डेटा परत",
       "fetchButton": "सैटेलाइट डेटा प्राप्त करें",

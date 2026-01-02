@@ -50,7 +50,7 @@ export default function GovernmentAnalyticsPage() {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <KpiCard title={t('gov.analytics.totalFarmers')} value={stats.totalFarmers} icon={Users} trend={2} trendDirection="up" description={t('gov.analytics.inSouthSikkim')} />
+                <KpiCard title={t('gov.analytics.totalFarmers')} value={stats.totalFarmers} icon={Users} trend={2} trendDirection="up" description={t('gov.analytics.inIndia')} />
                 <KpiCard title={t('gov.analytics.totalDevices')} value={stats.totalDevices} icon={HardDrive} trend={15} trendDirection="up" description={t('gov.analytics.vsLastMonth')} />
                 <KpiCard title={t('gov.analytics.onlineDevices')} value={`${stats.onlinePercentage}%`} icon={Activity} trend={stats.onlinePercentage - 95} trendDirection={stats.onlinePercentage - 95 > 0 ? "up" : "down"} description={t('gov.analytics.uptime')} />
                 <KpiCard title={t('gov.analytics.criticalAlerts')} value={stats.criticalAlerts} icon={Siren} trend={-1} trendDirection="down" description={t('gov.analytics.inLast24h')} />

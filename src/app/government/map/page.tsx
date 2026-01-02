@@ -24,8 +24,9 @@ function GovernmentMap() {
   const lng = searchParams.get('lng');
   const zoom = searchParams.get('zoom');
 
+  // Default to center of India
   const defaultCenter: [number, number] =
-    lat && lng ? [parseFloat(lat), parseFloat(lng)] : [27.1067, 88.3233]; // Jorethang, South Sikkim
+    lat && lng ? [parseFloat(lat), parseFloat(lng)] : [20.5937, 78.9629]; 
 
   const markers = useMemo(
     () =>
@@ -51,7 +52,7 @@ function GovernmentMap() {
       <div className="flex-1 overflow-hidden rounded-lg border">
         <StableMap
           center={defaultCenter}
-          zoom={zoom ? parseInt(zoom) : 12}
+          zoom={zoom ? parseInt(zoom) : 5}
           markers={markers}
         />
       </div>
