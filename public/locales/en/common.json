@@ -26,8 +26,6 @@
   "irrigation_pump": "Irrigation Pump",
   "temperature": "Temperature",
   "soil_moisture": "Soil Moisture",
-  "signal_strength": "Signal",
-  "battery": "Battery",
   "ai_assistant": "AI Assistant",
   "ai_assistant_subtitle": "Your personal farming support bot.",
   "welcome_message": "Hello! I'm your AI assistant. How can I help you today? You can ask me questions about the app or upload a photo of a plant for a health diagnosis.",
@@ -41,7 +39,6 @@
   "areaAcres": "Area (in acres)",
   "irrigated": "Irrigated",
   "unirrigated": "Unirrigated",
-  "humidity": "Humidity",
   "map": "Map",
   "good": "Good",
   "info": "Info",
@@ -52,9 +49,10 @@
   "longitude": "Longitude",
   "acres": "acres",
   "waterValve": "Water Valve",
-  "rainStatus": "Rain Status",
   "raining": "Raining",
   "noRain": "No Rain",
+  "rainStatus": "Rain Status",
+  "humidity": "Humidity",
   "gov": {
     "portalName": "Government Portal",
     "sidebar": {
@@ -110,7 +108,11 @@
         "farmer": "Farmer",
         "district": "District",
         "liveReadingsTitle": "Live Sensor Readings for {{nickname}}",
-        "viewOnMap": "View on Map"
+        "viewOnMap": "View on Map",
+        "humidity": "Humidity",
+        "rainStatus": "Rain Status",
+        "raining": "Raining",
+        "noRain": "No Rain"
       },
       "toast": {
         "addSuccessTitle": "Device Registered Successfully!",
@@ -253,3 +255,5 @@
     }
   }
 }
+
+    

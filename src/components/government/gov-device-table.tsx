@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
 import { useState, Fragment, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown, ChevronRight, HardDrive, Waves, Thermometer, Rss, Battery, MapPin, Droplets } from "lucide-react";
+import { ChevronDown, ChevronRight, HardDrive, Waves, Thermometer, Droplets, MapPin, CloudRain, Cloud } from "lucide-react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from 'date-fns';
@@ -73,6 +73,8 @@ export function GovDeviceTable() {
                 village: farmer?.village ?? 'N/A',
                 district: farmer?.district ?? 'N/A',
                 lastUpdated: timeAgo,
+                // Mock rain status for consistent display
+                rainStatus: Math.random() > 0.8 ? t('gov.devices.table.raining') : t('gov.devices.table.noRain'),
             };
         }).sort((a, b) => {
           const aNum = parseInt(a.id.split('-')[1] || '0');
@@ -80,7 +82,7 @@ export function GovDeviceTable() {
           if(isNaN(aNum) || isNaN(bNum)) return 0;
           return aNum - bNum;
         });
-    }, [devices, farmers]);
+    }, [devices, farmers, t]);
 
     if(isLoading) {
         return (
@@ -124,6 +126,7 @@ export function GovDeviceTable() {
                     {devicesWithFarmer.map((device) => {
                         const isExpanded = expandedRow === device.id;
                         const statusInfo = getStatusBadge(device.status, t);
+                        const isRaining = device.rainStatus === t('gov.devices.table.raining');
 
                         return (
                             <Fragment key={device.id}>
@@ -185,17 +188,12 @@ export function GovDeviceTable() {
                                                          <Card className="flex flex-col items-center justify-center p-3 text-center">
                                                             <Droplets className="h-7 w-7 text-sky-500 mb-2"/>
                                                             <p className="text-lg font-bold">{device.humidity}%</p>
-                                                            <p className="text-xs text-muted-foreground">{t('humidity')}</p>
+                                                            <p className="text-xs text-muted-foreground">{t('gov.devices.table.humidity')}</p>
                                                          </Card>
-                                                        <Card className="flex flex-col items-center justify-center p-3 text-center">
-                                                            <Rss className="h-7 w-7 text-purple-500 mb-2"/>
-                                                            <p className="text-lg font-bold">{device.rssi} dBm</p>
-                                                            <p className="text-xs text-muted-foreground">{t('signal_strength')}</p>
-                                                        </Card>
                                                          <Card className="flex flex-col items-center justify-center p-3 text-center">
-                                                            <Battery className="h-7 w-7 text-yellow-500 mb-2"/>
-                                                            <p className="text-lg font-bold">{Math.round(device.rssi/-2 + 80)}%</p>
-                                                            <p className="text-xs text-muted-foreground">{t('battery')}</p>
+                                                            {isRaining ? <CloudRain className="h-7 w-7 text-blue-400 mb-2"/> : <Cloud className="h-7 w-7 text-gray-400 mb-2"/>}
+                                                            <p className="text-lg font-bold">{device.rainStatus}</p>
+                                                            <p className="text-xs text-muted-foreground">{t('gov.devices.table.rainStatus')}</p>
                                                          </Card>
                                                     </div>
                                                 </div>
@@ -264,3 +262,5 @@ export function GovDeviceTable() {
     </Card>
   )
 }
+
+    
