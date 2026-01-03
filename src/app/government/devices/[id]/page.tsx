@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, use } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import {
   Card,
