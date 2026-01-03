@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
 import { useTranslation } from "react-i18next";
 import { Timestamp } from 'firebase/firestore';
+import ValveControlCard from './valve-control-card';
 
 const getStatusBadgeClass = (status?: string) => {
     if (!status) return 'bg-gray-500';
@@ -58,7 +59,7 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
                 <HardDrive className='h-6 w-6 text-primary' />
                 <CardTitle>{device.nickname}</CardTitle>
             </div>
-            <p className='text-sm text-muted-foreground ml-9'>{t('survey_number')}: {device.surveyNumber}</p>
+            <p className='text-sm text-muted-foreground ml-9'>{t('surveyNumber')}: {device.surveyNumber}</p>
         </div>
          <div className='flex flex-col items-end gap-2'>
             <Badge className={cn("text-white", getStatusBadgeClass(device.status))}>{t(device.status?.toLowerCase() ?? 'offline')}</Badge>
@@ -66,18 +67,16 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
          </div>
       </CardHeader>
       <CardContent className="p-0">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <WaterTank level={device.waterLevel} />
             <PumpControlCard />
+            <ValveControlCard />
         </div>
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
           <SensorCard type="temperature" value={device.temperature} />
           <SensorCard type="soil" value={device.soilMoisture} />
-          <SensorCard type="lora" value={device.rssi} />
-          <SensorCard
-            type="battery"
-            value={Math.round(device.rssi / -2 + 80)}
-          />
+          <SensorCard type="humidity" value={device.humidity} />
+          <SensorCard type="rain" value={Math.random() > 0.8 ? 'Raining' : 'No Rain'} />
         </div>
          <div className="mt-6 flex justify-end border-t pt-4">
             <Button asChild variant="outline">

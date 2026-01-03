@@ -51,6 +51,10 @@
   "latitude": "Latitude",
   "longitude": "Longitude",
   "acres": "acres",
+  "waterValve": "Water Valve",
+  "rainStatus": "Rain Status",
+  "raining": "Raining",
+  "noRain": "No Rain",
   "gov": {
     "portalName": "Government Portal",
     "sidebar": {

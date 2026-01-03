@@ -51,6 +51,10 @@
   "latitude": "अक्षांश",
   "longitude": "देशान्तर",
   "acres": "एकड",
+  "waterValve": "पानी भल्भ",
+  "rainStatus": "वर्षा स्थिति",
+  "raining": "वर्षा भइरहेको छ",
+  "noRain": "वर्षा छैन",
   "gov": {
     "portalName": "सरकारी पोर्टल",
     "sidebar": {
