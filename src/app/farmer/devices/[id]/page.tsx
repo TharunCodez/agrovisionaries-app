@@ -28,6 +28,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useData } from '@/contexts/data-context';
 import { useTranslation } from 'react-i18next';
 import { Timestamp } from 'firebase/firestore';
+import ValveControlCard from '@/components/farmer/valve-control-card';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -48,9 +49,22 @@ function toDate(timestamp: Timestamp | Date | undefined): Date {
 function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   const { devices } = useData();
   const { t } = useTranslation();
+  const [isMapOpen, setMapOpen] = useState(false);
+
   const device = useMemo(() => devices?.find(d => d.id === deviceId), [devices, deviceId]);
 
-  const [isMapOpen, setMapOpen] = useState(false);
+  const markers = useMemo(() => {
+    if (!device) return [];
+    return [
+      {
+        lat: device.location.lat,
+        lng: device.location.lng,
+        name: device.nickname,
+        id: device.id,
+        isDevice: true,
+      },
+    ];
+  }, [device]);
 
   if (!device) {
        return (
@@ -69,19 +83,6 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
         </div>
        )
   }
-
-  const markers = useMemo(
-    () => [
-      {
-        lat: device.location.lat,
-        lng: device.location.lng,
-        name: device.nickname,
-        id: device.id,
-        isDevice: true,
-      },
-    ],
-    [device]
-  );
 
   const lastUpdated = toDate(device.lastUpdated);
   const timeAgo = formatDistanceToNow(lastUpdated, { addSuffix: true });
@@ -140,6 +141,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <WaterTank level={device.waterLevel} />
         <PumpControlCard />
+        <ValveControlCard />
       </div>
 
       <Card>
@@ -150,11 +152,8 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             <SensorCard type="temperature" value={device.temperature} />
             <SensorCard type="soil" value={device.soilMoisture} />
-            <SensorCard type="lora" value={device.rssi} />
-            <SensorCard
-              type="battery"
-              value={Math.round(device.rssi / -2 + 80)}
-            />
+            <SensorCard type="humidity" value={device.humidity} />
+            <SensorCard type="rain" value={Math.random() > 0.8 ? 'Raining' : 'No Rain'} />
           </div>
         </CardContent>
       </Card>
