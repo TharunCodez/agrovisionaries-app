@@ -1,6 +1,6 @@
 'use client';
 
-import { use } from 'react';
+import { Suspense, use } from 'react';
 import {
   Card,
   CardContent,
@@ -29,6 +29,8 @@ import { useData } from '@/contexts/data-context';
 import { useTranslation } from 'react-i18next';
 import { Timestamp } from 'firebase/firestore';
 import ValveControlCard from '@/components/farmer/valve-control-card';
+import { useSearchParams } from 'next/navigation';
+import { useRole } from '@/contexts/role-context';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -49,6 +51,8 @@ function toDate(timestamp: Timestamp | Date | undefined): Date {
 function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   const { devices } = useData();
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const { role } = useRole();
   const [isMapOpen, setMapOpen] = useState(false);
 
   const device = useMemo(() => devices?.find(d => d.id === deviceId), [devices, deviceId]);
@@ -65,6 +69,13 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
       },
     ];
   }, [device]);
+
+
+  const fromMap = searchParams.get('from') === 'map';
+  const backHref = fromMap
+    ? `/${role}/map`
+    : `/${role}/devices`;
+
 
   if (!device) {
        return (
@@ -101,7 +112,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
     <div className="flex flex-col gap-6 pb-20 md:pb-6">
       <div className="flex items-center justify-between">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/farmer/devices">
+          <Link href={backHref}>
             <ChevronLeft />
           </Link>
         </Button>
@@ -195,14 +206,24 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   );
 }
 
+function DeviceDetailPageWrapper() {
+  const { id } = use(Promise.resolve(useRouter().query as { id: string }));
+  return <DeviceDetailClientView deviceId={id} />;
+}
+
+
 // This is the main page component, which is now a Server Component.
 export default function FarmerDeviceDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }) {
-  const { id } = use(params);
+  const { id } = params;
   
   // We pass the ID to the client component, which will fetch data from context.
-  return <DeviceDetailClientView deviceId={id} />;
+  return (
+    <Suspense fallback={<Skeleton className="h-full w-full" />}>
+        <DeviceDetailClientView deviceId={id} />
+    </Suspense>
+  );
 }

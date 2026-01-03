@@ -3,7 +3,8 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { useRole } from '@/contexts/role-context';
 
 // This is a workaround for a known issue with Leaflet and Next.js/Webpack
 // It ensures that the marker icons are loaded correctly.
@@ -37,6 +38,8 @@ export default function StableMap({ center, zoom, markers, tileLayerUrl, onMove 
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const { role } = useRole();
+  const pathname = usePathname();
 
 
   useEffect(() => {
@@ -92,21 +95,28 @@ export default function StableMap({ center, zoom, markers, tileLayerUrl, onMove 
     markers?.forEach((m) => {
       const marker = L.marker([m.lat, m.lng]).addTo(mapRef.current!);
       
+      const portal = role || 'farmer';
+      let detailUrl = `/${portal}/devices/${m.id}`;
+
+      // This is the key change: append ?from=map if we are on a map page
+      if(pathname.includes('/map')){
+         detailUrl += `?from=map`;
+      }
+      
       let popupContent = `<b>${m.name}</b>`;
       if (m.isDevice && m.id) {
-          const detailUrl = `/farmer/devices/${m.id}`;
-          popupContent += `<br/><a href="${detailUrl}" class="text-primary hover:underline">View Details</a>`;
+          popupContent += `<br/><a href="${detailUrl}" class="text-primary hover:underline leaflet-popup-nav-link">View Details</a>`;
       }
       
       marker.bindPopup(popupContent);
 
       if (m.isDevice && m.id) {
         marker.on('popupopen', () => {
-            const link = document.querySelector(`a[href="/farmer/devices/${m.id}"]`);
+            const link = document.querySelector(`a.leaflet-popup-nav-link[href="${detailUrl}"]`);
             if (link) {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
-                    router.push(`/farmer/devices/${m.id}`);
+                    router.push(detailUrl);
                 });
             }
         });
@@ -125,7 +135,7 @@ export default function StableMap({ center, zoom, markers, tileLayerUrl, onMove 
     //     mapRef.current = null;
     //   }
     // };
-  }, [center, zoom, markers, router, tileLayerUrl, onMove]);
+  }, [center, zoom, markers, router, tileLayerUrl, onMove, role, pathname]);
 
   return (
     <div ref={mapContainerRef} style={{ width: '100%', height: '100%' }} />
