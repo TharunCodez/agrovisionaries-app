@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SidebarTrigger } from '@/components/ui/sidebar';
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,24 @@ import { useData } from '@/contexts/data-context';
 import { useLogout } from '@/hooks/use-logout';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+
+// A helper component to conditionally render the trigger
+function ConditionalSidebarTrigger() {
+  // useSidebar will throw an error if not in a provider.
+  // We can use that to our advantage by catching the error.
+  let sidebar;
+  try {
+    sidebar = useSidebar();
+  } catch (e) {
+    sidebar = null;
+  }
+
+  if (!sidebar) {
+    return null; // Don't render if no sidebar context
+  }
+
+  return <SidebarTrigger className="md:hidden" />;
+}
 
 
 export default function Header() {
@@ -85,7 +103,7 @@ export default function Header() {
     return (
         <header className="sticky top-0 z-20 flex h-16 shrink-0 items-center justify-between gap-4 border-b bg-card/80 px-4 backdrop-blur-sm md:px-6">
             <div className="flex items-center gap-2">
-                <SidebarTrigger className="md:hidden" />
+                <ConditionalSidebarTrigger />
                 <h1 className="font-headline text-lg font-semibold">{pageTitle}</h1>
             </div>
             <div className="flex items-center gap-2 md:gap-4">
