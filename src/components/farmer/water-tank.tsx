@@ -26,12 +26,12 @@ export default function WaterTank({ level }: WaterTankProps) {
   }
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden h-full flex flex-col">
       <CardHeader>
         <CardTitle className="text-lg">{t('reservoir_level')}</CardTitle>
         <CardDescription>Live water level status</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center gap-4 pt-4">
+      <CardContent className="flex flex-1 flex-col items-center justify-center gap-4 pt-4">
         <div className="relative h-48 w-40 rounded-t-lg border-x-4 border-t-4 border-primary bg-muted/20 overflow-hidden">
           {/* Water fill animation */}
           <div

@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ChevronLeft, Share2, Settings, MapPin } from 'lucide-react';
+import { ChevronLeft, Share2, Settings, MapPin, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -32,6 +32,7 @@ import { Timestamp } from 'firebase/firestore';
 import ValveControlCard from '@/components/farmer/valve-control-card';
 import { useSearchParams } from 'next/navigation';
 import { useRole } from '@/contexts/role-context';
+import ChatAssistant from '@/components/farmer/chat-assistant';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
   ssr: false,
@@ -57,7 +58,12 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   const [isMapOpen, setMapOpen] = useState(false);
 
   const device = useMemo(() => devices?.find(d => d.id === deviceId), [devices, deviceId]);
-
+  
+  const fromMap = searchParams.get('from') === 'map';
+  const backHref = fromMap
+    ? `/${role}/map`
+    : `/${role}/devices`;
+    
   const markers = useMemo(() => {
     if (!device) return [];
     return [
@@ -70,12 +76,6 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
       },
     ];
   }, [device]);
-
-
-  const fromMap = searchParams.get('from') === 'map';
-  const backHref = fromMap
-    ? `/${role}/map`
-    : `/${role}/devices`;
 
 
   if (!device) {
@@ -110,106 +110,115 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
 
 
   return (
-    <div className="flex flex-col gap-6 pb-20 md:pb-6">
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href={backHref}>
-            <ChevronLeft />
-          </Link>
-        </Button>
-        <h1 className="flex-1 text-center font-headline text-xl font-bold">
-          {device.nickname}
-        </h1>
-        <div className="flex gap-2">
-          <Button variant="ghost" size="icon">
-            <Share2 />
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 xl:gap-8 pb-20 md:pb-6">
+      
+      {/* Main Content Column */}
+      <div className="lg:col-span-2 flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href={backHref}>
+              <ChevronLeft />
+            </Link>
           </Button>
-          <Button variant="ghost" size="icon">
-            <Settings />
-          </Button>
+          <h1 className="flex-1 text-center font-headline text-xl font-bold">
+            {device.nickname}
+          </h1>
+          <div className="flex gap-2">
+            <Button variant="ghost" size="icon">
+              <Share2 />
+            </Button>
+            <Button variant="ghost" size="icon">
+              <Settings />
+            </Button>
+          </div>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Live Sensor Readings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              <SensorCard type="temperature" value={device.temperature} />
+              <SensorCard type="soil" value={device.soilMoisture} />
+              <SensorCard type="humidity" value={device.humidity} />
+              <SensorCard type="rain" value={Math.random() > 0.8 ? 'Raining' : 'No Rain'} />
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Mobile: Stacked | Desktop: Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-1"><WaterTank level={device.waterLevel} /></div>
+            <div className="md:col-span-1"><PumpControlCard /></div>
+            <div className="md:col-span-1"><ValveControlCard /></div>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Device Status</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">Status</span>
+              <Badge
+                className={getStatusBadgeClass()}
+              >
+                {t(device.status?.toLowerCase() ?? 'offline')}
+              </Badge>
+            </div>
+            <div className="mt-2 flex items-center justify-between">
+              <span className="text-muted-foreground">{t('last_updated')}</span>
+              <span>{timeAgo}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+
+        <Card>
+          <CardHeader className="flex-row items-center justify-between">
+            <CardTitle>Location</CardTitle>
+            <Dialog open={isMapOpen} onOpenChange={setMapOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <MapPin className="h-5 w-5" />
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="h-[70vh] max-w-[90vw] p-2 lg:max-w-[70vw]">
+                <DialogHeader className="p-4">
+                  <DialogTitle>Device Location: {device.nickname}</DialogTitle>
+                </DialogHeader>
+                <div className="h-full w-full overflow-hidden rounded-lg">
+                  {isMapOpen && (
+                    <div key={device.id} className="h-full w-full">
+                      <StableMap
+                        center={[device.location.lat, device.location.lng]}
+                        zoom={14}
+                        markers={markers}
+                      />
+                    </div>
+                  )}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </CardHeader>
+          <CardContent>
+            <div className="text-muted-foreground">
+              {t('surveyNumber')}: {device.surveyNumber}, {device.areaAcres} acres
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Device Status</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between">
-            <span className="text-muted-foreground">Status</span>
-            <Badge
-              className={getStatusBadgeClass()}
-            >
-              {t(device.status?.toLowerCase() ?? 'offline')}
-            </Badge>
-          </div>
-          <div className="mt-2 flex items-center justify-between">
-            <span className="text-muted-foreground">{t('last_updated')}</span>
-            <span>{timeAgo}</span>
-          </div>
-        </CardContent>
-      </Card>
+       {/* AI Assistant Sidebar */}
+      <aside className="hidden lg:block lg:col-span-1">
+        <div className="sticky top-24">
+            <ChatAssistant />
+        </div>
+      </aside>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <WaterTank level={device.waterLevel} />
-        <PumpControlCard />
-        <ValveControlCard />
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Live Sensor Readings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <SensorCard type="temperature" value={device.temperature} />
-            <SensorCard type="soil" value={device.soilMoisture} />
-            <SensorCard type="humidity" value={device.humidity} />
-            <SensorCard type="rain" value={Math.random() > 0.8 ? 'Raining' : 'No Rain'} />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex-row items-center justify-between">
-          <CardTitle>Location</CardTitle>
-          <Dialog open={isMapOpen} onOpenChange={setMapOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="icon">
-                <MapPin className="h-5 w-5" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="h-[70vh] max-w-[90vw] p-2 lg:max-w-[70vw]">
-              <DialogHeader className="p-4">
-                <DialogTitle>Device Location: {device.nickname}</DialogTitle>
-              </DialogHeader>
-              <div className="h-full w-full overflow-hidden rounded-lg">
-                {isMapOpen && (
-                  <div key={device.id} className="h-full w-full">
-                    <StableMap
-                      center={[device.location.lat, device.location.lng]}
-                      zoom={14}
-                      markers={markers}
-                    />
-                  </div>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
-        </CardHeader>
-        <CardContent>
-          <div className="text-muted-foreground">
-             {t('surveyNumber')}: {device.surveyNumber}, {device.areaAcres} acres
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
-}
-
-function DeviceDetailPageWrapper({ params }: { params: { id: string } }) {
-  const { id } = use(params);
-  return <DeviceDetailClientView deviceId={id} />;
 }
 
 

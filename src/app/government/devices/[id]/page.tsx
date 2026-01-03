@@ -127,6 +127,26 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
           </Button>
         </div>
       </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Live Sensor Readings</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <SensorCard type="temperature" value={device.temperature} />
+            <SensorCard type="soil" value={device.soilMoisture} />
+            <SensorCard type="humidity" value={device.humidity} />
+            <SensorCard type="rain" value={Math.random() > 0.8 ? 'Raining' : 'No Rain'} />
+          </div>
+        </CardContent>
+      </Card>
+      
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <WaterTank level={device.waterLevel} />
+        <PumpControlCard />
+        <ValveControlCard />
+      </div>
 
       <Card>
         <CardHeader>
@@ -144,26 +164,6 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
           <div className="mt-2 flex items-center justify-between">
             <span className="text-muted-foreground">{t('last_updated')}</span>
             <span>{timeAgo}</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <WaterTank level={device.waterLevel} />
-        <PumpControlCard />
-        <ValveControlCard />
-      </div>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Live Sensor Readings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <SensorCard type="temperature" value={device.temperature} />
-            <SensorCard type="soil" value={device.soilMoisture} />
-            <SensorCard type="humidity" value={device.humidity} />
-            <SensorCard type="rain" value={Math.random() > 0.8 ? 'Raining' : 'No Rain'} />
           </div>
         </CardContent>
       </Card>

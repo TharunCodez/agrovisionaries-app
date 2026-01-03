@@ -12,12 +12,12 @@ export default function PumpControlCard() {
   const [isPumpOn, setIsPumpOn] = useState(false);
 
   return (
-    <Card className='overflow-hidden'>
+    <Card className='overflow-hidden h-full flex flex-col'>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-medium">{t('irrigation_pump')}</CardTitle>
+        <CardTitle className="text-lg font-medium">{t('pump')}</CardTitle>
         <Power className={cn('h-6 w-6 text-muted-foreground transition-colors', isPumpOn && 'text-green-500')}/>
       </CardHeader>
-      <CardContent className="flex flex-col items-center justify-center gap-4 pt-4">
+      <CardContent className="flex flex-1 flex-col items-center justify-center gap-4 pt-4">
         <div 
             className={cn(
                 "relative flex h-24 w-24 items-center justify-center rounded-full border-4 transition-all duration-500",
