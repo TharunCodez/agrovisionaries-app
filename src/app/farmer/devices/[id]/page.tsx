@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Suspense, use } from 'react';
@@ -198,7 +199,7 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
         </CardHeader>
         <CardContent>
           <div className="text-muted-foreground">
-             {t('survey_number')}: {device.surveyNumber}, {device.areaAcres} acres
+             {t('surveyNumber')}: {device.surveyNumber}, {device.areaAcres} acres
           </div>
         </CardContent>
       </Card>
@@ -206,8 +207,8 @@ function DeviceDetailClientView({ deviceId }: { deviceId: string }) {
   );
 }
 
-function DeviceDetailPageWrapper() {
-  const { id } = use(Promise.resolve(useRouter().query as { id: string }));
+function DeviceDetailPageWrapper({ params }: { params: { id: string } }) {
+  const { id } = use(params);
   return <DeviceDetailClientView deviceId={id} />;
 }
 
@@ -218,7 +219,7 @@ export default function FarmerDeviceDetailPage({
 }: {
   params: { id: string };
 }) {
-  const { id } = params;
+  const { id } = use(params);
   
   // We pass the ID to the client component, which will fetch data from context.
   return (
@@ -227,3 +228,5 @@ export default function FarmerDeviceDetailPage({
     </Suspense>
   );
 }
+
+    

@@ -2,7 +2,6 @@
 'use client';
 
 import { Suspense, use } from 'react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import {
   Card,
   CardContent,
@@ -31,6 +30,7 @@ import { useData } from '@/contexts/data-context';
 import { useTranslation } from 'react-i18next';
 import { Timestamp } from 'firebase/firestore';
 import ValveControlCard from '@/components/farmer/valve-control-card';
+import { useSearchParams } from 'next/navigation';
 import { useRole } from '@/contexts/role-context';
 
 const StableMap = dynamic(() => import('@/components/shared/StableMap'), {
@@ -211,7 +211,7 @@ export default function GovernmentDeviceDetailPage({
 }: {
   params: { id: string };
 }) {
-  const { id } = params;
+  const { id } = use(params);
   
   // We pass the ID to the client component, which will fetch data from context.
   return (
@@ -220,3 +220,5 @@ export default function GovernmentDeviceDetailPage({
     </Suspense>
   );
 }
+
+    
