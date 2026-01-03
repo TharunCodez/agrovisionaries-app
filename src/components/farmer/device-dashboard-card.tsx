@@ -6,9 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { ChevronRight, HardDrive } from 'lucide-react';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { HardDrive } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import SensorCard from '@/components/farmer/sensor-card';
 import PumpControlCard from '@/components/farmer/pump-control-card';
@@ -66,24 +64,20 @@ export default function DeviceDashboardCard({ device }: { device: Device }) {
             <p className='text-xs text-muted-foreground'>{t('last_updated')} {timeAgo}</p>
          </div>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <WaterTank level={device.waterLevel} />
-            <PumpControlCard />
-            <ValveControlCard />
-        </div>
-        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <CardContent className="p-0 space-y-6">
+        {/* Sensor Data Section (First) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <SensorCard type="temperature" value={device.temperature} />
           <SensorCard type="soil" value={device.soilMoisture} />
           <SensorCard type="humidity" value={device.humidity} />
           <SensorCard type="rain" value={Math.random() > 0.8 ? 'Raining' : 'No Rain'} />
         </div>
-         <div className="mt-6 flex justify-end border-t pt-4">
-            <Button asChild variant="outline">
-                <Link href={`/farmer/devices/${device.id}`}>
-                    {t('view_details')} <ChevronRight className='ml-2 h-4 w-4' />
-                </Link>
-            </Button>
+        
+        {/* Control & Storage Section (Second) */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <WaterTank level={device.waterLevel} />
+            <PumpControlCard />
+            <ValveControlCard />
         </div>
       </CardContent>
     </Card>
